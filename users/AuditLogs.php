@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 require_once __DIR__ . '/../lib.inc.php';
 WebLib::AuthSession();
 WebLib::Html5Header("User Activity");
@@ -101,7 +103,7 @@ WebLib::IncludeCSS();
         . ' Where UserID=\'' . $UserID . '\''
         . ' ORDER BY `LogID` desc limit 50;';
 
-    $Data->ShowTable($Query);
+    //$Data->ShowTable($Query);
     //echo "<br />" . $Query;
     ?>
   </div>

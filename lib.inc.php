@@ -140,7 +140,7 @@ class WebLib {
   /**
    * Generates DOCTYPE and Page Title for HTML5
    *
-   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in DatabaseCofig.inc.php
+   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in Database Config.inc.php
    * @param string $PageTitle Title of the page
    */
   public static function Html5Header($PageTitle = 'Paschim Medinipur') {
