@@ -100,6 +100,7 @@ function SQLDefs($ObjectName) {
           . '`UserMapID` int(10) NOT NULL AUTO_INCREMENT,'
           . '`UserID` varchar(50) DEFAULT NULL,'
           . '`MobileNo` varchar(10) DEFAULT NULL,'
+          . '`DisplayName` varchar(50) DEFAULT NULL,'
           . '`UserName` varchar(50) DEFAULT NULL,'
           . '`UserPass` varchar(32) DEFAULT NULL,'
           . '`CtrlMapID` int(10) NOT NULL,'

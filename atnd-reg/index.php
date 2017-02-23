@@ -24,7 +24,7 @@ if (NeedsDB) {
   <div class="content">
     <span class="Message" id="Msg" style="float: right;"></span>
     <?php
-    $Data = new MySQLiDB();
+/*    $Data = new MySQLiDB();
     $Query = 'Select `W`.`SessionID`,`W`.`UserID`,`U`.`UserName`,`W`.`Action`,`W`.`AccessTime` FROM '
             . '(Select `UserID`,Max(`LogID`) as `LogID` FROM `' . MySQL_Pre . 'Logs`'
             . ' Where `UserID`>0 AND (`AccessTime`+0)>(CURRENT_TIMESTAMP -(' . LifeTime . ' * 60)) '
@@ -37,7 +37,7 @@ if (NeedsDB) {
     if (WebLib::GetVal($_SESSION, 'CheckAuth') === 'Valid') {
       $Data->ShowTable($Query);
     }
-    $Data->do_close();
+    $Data->do_close();*/
     WebLib::ShowMsg();
     ?>
     <input type="hidden" id="AjaxToken" value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>" />
