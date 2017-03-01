@@ -93,6 +93,7 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
             Available ACLs can be filtered for Selected menu or selected users<br/> using Show restricted menus or show restricted users.
         </span>
         <div style="clear: both;"></div>
+        <input type="submit" name="CmdMenuAction" value="Refresh"/>
         <input type="submit" name="CmdMenuAction" value="Add Menu ACL"/>
         <!-- input type="submit"  name="CmdMenuAction" value="Delete Menu ACL" / -->
         <input type="submit" name="CmdMenuAction" value="Activate Menu ACL"/>
