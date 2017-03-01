@@ -75,8 +75,8 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
         <div class="column">
             <ul>
               <?php
-              $Status[0]=" Deactivated";
-              $Status[1]=" Activated";
+              $Status[0]=" Allowed";
+              $Status[1]=" Restricted";
 
               echo '<li class="ListItem">Total Menus: ' . count($RowsMenu) . '</li>';
               foreach ($RowsMenu as $Index => $Menu) {
