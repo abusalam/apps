@@ -90,10 +90,6 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
               ?>
             </ul>
         </div>
-        <span class="Message" style="float: right;">
-            ACLs can be activated and deactivated to restrict and allow access to menus respectively.<br/>
-            Available ACLs can be filtered using Show restricted menus<br/> or show restricted users after selecting a menu or user<br/>
-        </span>
         <div style="clear: both;"></div>
         <input type="submit" name="CmdMenuAction" value="Refresh"/>
         <input type="submit" name="CmdMenuAction" value="Restrict Menu"/>
