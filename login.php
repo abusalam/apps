@@ -136,7 +136,7 @@ WebLib::IncludeJS('js/jQuery-MD5/jquery.md5.js');
 <div class="Header">
 </div>
 <?php
-WebLib::ShowMenuBar('WebSite');
+WebLib::ShowMenuBar('APPS');
 ?>
 <div class="content">
   <div class="formWrapper-Autofit">
