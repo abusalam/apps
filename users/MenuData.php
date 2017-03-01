@@ -46,7 +46,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
             $Data->update(MySQL_Pre . 'MenuACL', $DataACL);
           }
         }
-        $_SESSION['Msg'] = 'Activated Successfully!';
+        $_SESSION['Msg'] = 'Menu Restriction Activated Successfully!';
         break;
       case 'Deactivate Menu Restriction':
         foreach ($_POST['UserMapID'] as $UserMapID) {
@@ -58,7 +58,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
             $Data->update(MySQL_Pre . 'MenuACL', $DataACL);
           }
         }
-        $_SESSION['Msg'] = 'Deactivated Successfully!';
+        $_SESSION['Msg'] = 'Menu Restriction Deactivated Successfully!';
         break;
     }
     if ($Query !== '') {

@@ -148,18 +148,12 @@ function SQLDefs($ObjectName) {
           . '(\'\', 1, 0, \'Home\', \'index.php\', 1),'
           . '(\'\', 2, 0, \'Registration\', \'users/Register.php\', 1),'
           . '(\'\', 3, 0, \'Login\', \'login.php\', 1),'
-          . '(\'WebSite\', 1, 0, \'Home\', \'index.php\', 1),'
-          . '(\'WebSite\', 2, 1, \'SRER-2014\', \'srer\', 0),'
-          . '(\'WebSite\', 3, 1, \'Polling Personnel 2014\', \'pp\', 0),'
-          . '(\'WebSite\', 4, 1, \'Counting Personnel 2013\', \'cp\', 0),'
-          . '(\'WebSite\', 5, 1, \'RSBY-2014\', \'rsby\', 0),'
-          . '(\'WebSite\', 6, 1, \'Attendance Register\', \'atnd-reg\', 0),'
-          . '(\'WebSite\', 7, 1, \'Monthly Performance Report\', \'mpr\', 0),'
-          . '(\'WebSite\', 8, 1, \'Website Upload\', \'uploads\', 0),'
-          . '(\'WebSite\', 9, 1, \'SMS Gateway\', \'BulkSMS\', 0),'
-          . '(\'WebSite\',10, 1, \'User Management\', \'users\', 1),'
-          . '(\'WebSite\',11, 1, \'Helpline\', \'Helpline.php\', 1),'
-          . '(\'WebSite\',12, 1, \'Log Out!\', \'login.php?LogOut=1\', 1);';
+          . '(\'APPS\', 1, 0, \'Home\', \'index.php\', 1),'
+          . '(\'APPS\', 6, 1, \'Attendance Register\', \'atnd-reg\', 1),'
+          . '(\'APPS\', 7, 1, \'Monthly Performance Report\', \'mpr\', 1),'
+          . '(\'APPS\',10, 1, \'User Management\', \'users\', 1),'
+          . '(\'APPS\',11, 1, \'Helpline\', \'Helpline.php\', 1),'
+          . '(\'APPS\',12, 1, \'Log Out!\', \'login.php?LogOut=1\', 1);';
       break;
 
     case 'MenuACL':
