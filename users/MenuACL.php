@@ -88,16 +88,15 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
             </ul>
         </div>
         <span class="Message" style="float: right;">
-            Add New ACL => It will add a menu ACL and restrict the menu to the selected user.<br/>
             ACLs can be activated and deactivated to restrict and allow access to menus respectively.<br/>
-            Available ACLs can be filtered for Selected menu or selected users<br/> using Show restricted menus or show restricted users.
+            Available ACLs can be filtered using Show restricted menus<br/> or show restricted users after selecting a menu or user<br/>
         </span>
         <div style="clear: both;"></div>
         <input type="submit" name="CmdMenuAction" value="Refresh"/>
-        <input type="submit" name="CmdMenuAction" value="Add Menu ACL"/>
+        <input type="submit" name="CmdMenuAction" value="Restrict Menu"/>
         <!-- input type="submit"  name="CmdMenuAction" value="Delete Menu ACL" / -->
-        <input type="submit" name="CmdMenuAction" value="Activate Menu ACL"/>
-        <input type="submit" name="CmdMenuAction" value="Deactivate Menu ACL"/>
+        <input type="submit" name="CmdMenuAction" value="Activate Menu Restriction"/>
+        <input type="submit" name="CmdMenuAction" value="Deactivate Menu Restriction"/>
         <input type="submit" name="CmdMenuAction" value="Show Restricted Menus"/>
         <input type="submit" name="CmdMenuAction" value="Show Restricted Users"/>
         <input type="hidden" name="FormToken" value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>"/>
