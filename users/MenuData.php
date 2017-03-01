@@ -14,7 +14,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
   } else {
     // Authenticated Inputs
     switch (WebLib::GetVal($_POST, 'CmdMenuAction')) {
-      case 'Allow':
+      case 'Add Menu ACL':
         foreach ($_POST['UserMapID'] as $UserMapID) {
           foreach ($_POST['MenuID'] as $MenuID) {
             $DataACL['UserMapID'] = $UserMapID;
@@ -25,7 +25,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
         }
         $_SESSION['Msg'] = 'Allowed Successfully!';
         break;
-      case 'Restrict':
+      case 'Delete Menu ACL':
         foreach ($_POST['UserMapID'] as $UserMapID) {
           foreach ($_POST['MenuID'] as $MenuID) {
             $DataACL['AllowOnly'] = 1;
@@ -36,7 +36,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
         }
         $_SESSION['Msg'] = 'Restricted Successfully!';
         break;
-      case 'Activate':
+      case 'Activate Menu ACL':
         foreach ($_POST['UserMapID'] as $UserMapID) {
           foreach ($_POST['MenuID'] as $MenuID) {
             $DataACL['AllowOnly'] = 0;
@@ -48,7 +48,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
         }
         $_SESSION['Msg'] = 'Activated Successfully!';
         break;
-      case 'Deactivate':
+      case 'Deactivate Menu ACL':
         foreach ($_POST['UserMapID'] as $UserMapID) {
           foreach ($_POST['MenuID'] as $MenuID) {
             $DataACL['AllowOnly'] = 1;
