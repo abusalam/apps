@@ -29,26 +29,26 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
     WebLib::ShowMsg();
     $Data = new MySQLiDBHelper();
     if ((WebLib::GetVal($_POST, 'CmdMenuAction') === 'Show Restricted Users') && isset($_POST['MenuID'])) {
-      $Query = 'Select `U`.`UserMapID`,CONCAT(`UserName`,\'-\',`U`.`UserMapID`) as `UserName` '
+      $Query = 'Select `U`.`UserMapID`,CONCAT(`UserName`,\' [\',`U`.`UserMapID`,\']\') as `UserName` '
               . ' FROM `' . MySQL_Pre . 'Users` as `U` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
               . ' ON (`A`.`UserMapID`=`U`.`UserMapID`) Where `A`.`MenuID`=?  Order By `UserName`';
       $RowsUser = $Data->rawQuery($Query, array('MenuID' => $_POST['MenuID'][0]));
       $Query = 'Select `M`.`MenuID`,`AppID`,'
-              . ' CONCAT(`Caption`,\'(\',`UserMapID`,\'-\',`M`.`MenuID`,\'-\',`A`.`Activated`,\')\') as `Caption`'
+              . ' CONCAT(`Caption`,\' [\',`UserMapID`,\'-\',`A`.`Activated`,\']\') as `Caption`'
               . ' FROM `' . MySQL_Pre . 'MenuItems` as `M` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
               . ' ON (`A`.`MenuID`=`M`.`MenuID`) Where `A`.`MenuID`=? Order By `AppID`,`MenuOrder`';
       $RowsMenu = $Data->rawQuery($Query, array('MenuID' => $_POST['MenuID'][0]));
   } else if ((WebLib::GetVal($_POST, 'CmdMenuAction') === 'Show Restricted Menus') && isset($_POST['UserMapID'])) {
 
       $Query = 'Select `M`.`MenuID`,`AppID`,'
-              . ' CONCAT(`Caption`,\'(\',`UserMapID`,\'-\',`M`.`MenuID`,\'-\',`A`.`Activated`,\')\') as `Caption`'
+              . ' CONCAT(`Caption`,\' [\',`UserMapID`,\'-\',`A`.`Activated`,\']\') as `Caption`'
               . ' FROM `' . MySQL_Pre . 'MenuItems` as `M` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
-              . ' ON (`A`.`MenuID`=`M`.`MenuID`) Where `UserMapID`=? Order By `AppID`,`MenuOrder`';
-      $RowsMenu = $Data->rawQuery($Query, array('UserMapID' => $_POST['UserMapID'][0]));
+              . ' ON (`A`.`MenuID`=`M`.`MenuID`) Where `UserMapID` in (?) Order By `AppID`,`MenuOrder`';
+      $RowsMenu = $Data->rawQuery($Query, array('UserMapID' => implode(',',$_POST['UserMapID'])));
 
-      $Query = 'Select `UserMapID`,CONCAT(`UserName`,\'-\',`UserMapID`) as `UserName` '
-              . ' FROM `' . MySQL_Pre . 'Users` as `U` Where `UserMapID`=?  Order By `UserName`';
-      $RowsUser = $Data->rawQuery($Query, array('UserMapID' => $_POST['UserMapID'][0]));
+      $Query = 'Select `UserMapID`,CONCAT(`UserName`,\' [\',`UserMapID`,\']\') as `UserName` '
+              . ' FROM `' . MySQL_Pre . 'Users` as `U` Where `UserMapID` in (?)  Order By `UserName`';
+      $RowsUser = $Data->rawQuery($Query, array('UserMapID' => implode(',',$_POST['UserMapID'])));
     } else {
       $RowsUser = $Data->rawQuery('Select `UserMapID`,`UserName` '
               . ' FROM `' . MySQL_Pre . 'Users`  Order By `UserName`');
@@ -75,13 +75,16 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
         <div class="column">
             <ul>
               <?php
+              $Status[0]=" Deactivated";
+              $Status[1]=" Activated";
+
               echo '<li class="ListItem">Total Menus: ' . count($RowsMenu) . '</li>';
               foreach ($RowsMenu as $Index => $Menu) {
                 echo '<li class="ListItem">'
                   . '<label for="Menu' . $Menu['MenuID'] . '" >'
                   . '<input id="Menu' . $Menu['MenuID'] . '" type="checkbox" name="MenuID[]" '
                   . 'value="' . $Menu['MenuID'] . '" />'
-                  . '<strong>' . $Menu['AppID'] . '=>' . $Menu['Caption'] . '</strong>'
+                  . '<strong>' . $Menu['AppID'] . '=>' . $Menu['Caption'] . $Status[substr($Menu['Caption'],-2,1)] . '</strong>'
                   . '</label></li>';
               }
               ?>
