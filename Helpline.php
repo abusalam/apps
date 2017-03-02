@@ -50,7 +50,7 @@ WebLib::JQueryInclude();
   </div>
   <div class="Header"></div>
   <?php
-  WebLib::ShowMenuBar('WebSite');
+  WebLib::ShowMenuBar('APPS');
   ?>
   <div class="content">
     <?php
