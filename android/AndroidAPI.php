@@ -28,6 +28,7 @@
  */
 
 require_once(__DIR__ . '/AuthOTP.php');
+require_once (__DIR__ . '/../smsgw/smsgw.inc.php');
 
 class AndroidAPI {
   protected $Req;
