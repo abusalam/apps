@@ -46,7 +46,11 @@ class AndroidAPI {
   }
 
   function __invoke() {
-    $this->setCallAPI($this->Req->API);
+    if(property_exists($this->Req,"API")) {
+      $this->setCallAPI($this->Req->API);
+    } else {
+      $this->Resp['MSG'] = "Invalid API PayLoad!";
+    }
   }
 
   private function setCallAPI($CallAPI) {
