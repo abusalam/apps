@@ -132,8 +132,14 @@ class AndroidAPI {
    *
    */
   protected function RU() {
-    $DB                    = new MySQLiDBHelper();
+
     $this->Resp['SendSMS'] = false;
+    if(!property_exists($this->Req,"MDN")){
+      $this->Resp['API']     = true;
+      $this->Resp['MSG'] = "Invalid PayLoad";
+      return;
+    }
+    $DB                    = new MySQLiDBHelper();
     $Data['MobileNo']      = $this->Req->MDN;
     $DB->where('MobileNo', $Data['MobileNo']);
     $Profile = $DB->query('Select UserName, Designation, eMailID, LastAccessTime '
