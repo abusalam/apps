@@ -141,7 +141,7 @@ class AndroidAPI {
     if(!property_exists($this->Req,"MDN")){
       $this->Resp['MSG'] = "Invalid PayLoad";
       return;
-    } else if(!preg_match('/\^[789]\d{9}$/', $this->Req->MDN)){
+    } else if(!preg_match('/^[789]\d{9}$/', $this->Req->MDN)){
       $this->Resp['MSG'] = "Invalid Mobile Number";
       return;
     }
