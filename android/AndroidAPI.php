@@ -139,8 +139,10 @@ class AndroidAPI {
 
     $this->Resp['SendSMS'] = false;
     if(!property_exists($this->Req,"MDN")){
-      $this->Resp['API']     = true;
       $this->Resp['MSG'] = "Invalid PayLoad";
+      return;
+    } else if(!preg_match('\^[789]\d{9}$', $this->Req->MDN)){
+      $this->Resp['MSG'] = "Invalid Mobile Number";
       return;
     }
     $DB                    = new MySQLiDBHelper();
