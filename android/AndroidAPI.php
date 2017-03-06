@@ -37,19 +37,18 @@ class AndroidAPI {
   private $NoAuthMode;
   private $IntervalRU;
 
-  function __construct($jsonData, $mNoAuthMode = FALSE) {
+  function __construct($jsonData, $mNoAuthMode = false) {
     $this->IntervalRU = 3600;
     $this->Resp['ET'] = microtime();
-    $this->Expiry = NULL;
-    $this->Req = $jsonData;
+    $this->Expiry     = null;
+    $this->Req        = $jsonData;
     $this->setNoAuthMode($mNoAuthMode);
   }
 
   function __invoke() {
     if (property_exists($this->Req, "API")) {
       $this->setCallAPI($this->Req->API);
-    }
-    else {
+    } else {
       $this->Resp['MSG'] = "Invalid API Syntax!";
     }
   }
@@ -57,12 +56,11 @@ class AndroidAPI {
   private function setCallAPI($CallAPI) {
     if (method_exists($this, $CallAPI)) {
       $this->$CallAPI();
-    }
-    else {
+    } else {
       /**
        * Unknown API Call
        */
-      $this->Resp['API'] = FALSE;
+      $this->Resp['API'] = false;
       $this->Resp['MSG'] = 'Invalid API' . $CallAPI;
     }
   }
@@ -92,12 +90,11 @@ class AndroidAPI {
         case 'MDN':
           if (!property_exists($this->Req, $Param)) {
             $this->Resp['MSG'] = "Invalid PayLoad";
-            return FALSE;
-          }
-          else {
+            return false;
+          } else {
             if (!preg_match('/^[789]\d{9}$/', $this->Req->$Param)) {
               $this->Resp['MSG'] = "Invalid Mobile Number";
-              return FALSE;
+              return false;
             }
           }
           break;
@@ -105,36 +102,33 @@ class AndroidAPI {
         case 'OTP':
           if (!property_exists($this->Req, 'OTP')) {
             $this->Resp['MSG'] = "Invalid PayLoad";
-            return FALSE;
-          }
-          else {
+            return false;
+          } else {
             if (!preg_match('/^\d{6}$/', $this->Req->OTP)) {
               $this->Resp['MSG'] = "OTP should be 6 digits only";
-              return FALSE;
+              return false;
             }
           }
           break;
         case 'OTP1':
           if (!property_exists($this->Req, 'OTP')) {
             $this->Resp['MSG'] = "Invalid PayLoad";
-            return FALSE;
-          }
-          else {
+            return false;
+          } else {
             if (!preg_match('/^\d{6}$/', $this->Req->OTP)) {
               $this->Resp['MSG'] = "OTP should be 6 digits only";
-              return FALSE;
+              return false;
             }
           }
           break;
         case 'OTP2':
           if (!property_exists($this->Req, 'OTP')) {
             $this->Resp['MSG'] = "Invalid PayLoad";
-            return FALSE;
-          }
-          else {
+            return false;
+          } else {
             if (!preg_match('/^\d{6}$/', $this->Req->OTP)) {
               $this->Resp['MSG'] = "OTP should be 6 digits only";
-              return FALSE;
+              return false;
             }
           }
           break;
@@ -142,16 +136,17 @@ class AndroidAPI {
         default:
           if (!property_exists($this->Req, $Param)) {
             $this->Resp['MSG'] = "Invalid PayLoad";
-            return FALSE;
+            return false;
           }
       }
     }
+    return true;
   }
 
   protected function sendResponse() {
-    $this->Resp['json'] = $this->Req; //TODO: Remove for Production
+    //$this->Resp['json'] = $this->Req; //TODO: Remove for Production
     $this->Resp['ET'] = microtime() - $this->Resp['ET'];
-    $DateFormat = 'D d M g:i:s A';
+    $DateFormat       = 'D d M g:i:s A';
     $this->Resp['ST'] = date($DateFormat, time());
 
     $JsonResp = json_encode($this->Resp);
@@ -166,15 +161,14 @@ class AndroidAPI {
     /**
      * Important: Tells volley not to cache the response
      */
-    if (($this->Expiry == NULL) OR
-      ($this->getNoAuthMode() == FALSE)
+    if (($this->Expiry == null) OR
+      ($this->getNoAuthMode() == false)
     ) {
       /**
        * Never Cache Authenticated Response
        */
       $Expires = time() - 3600;
-    }
-    else {
+    } else {
       $Expires = time() + $this->Expiry;
     }
 
@@ -190,7 +184,7 @@ class AndroidAPI {
     return $this->NoAuthMode;
   }
 
-  protected function setNoAuthMode($NoAuthMode = TRUE) {
+  protected function setNoAuthMode($NoAuthMode = true) {
     $this->NoAuthMode = $NoAuthMode;
   }
 
@@ -199,9 +193,11 @@ class AndroidAPI {
   }
 
   /**
-   * Register User: Register User with Mobile No. to get the Secret Key for HOTP
+   * Register User: Register User with Mobile No. to get the Secret Key for
+   * HOTP
    *
-   * TODO Important: Store New Credentials in an Alternate field for validation against OTP
+   * TODO Important: Store New Credentials in an Alternate field for validation
+   * against OTP
    *
    * Request:
    *   JSONObject={"API":"RU",
@@ -219,36 +215,33 @@ class AndroidAPI {
     if (!$this->checkPayLoad(array('MDN'))) {
       return;
     };
-    $this->Resp['SendSMS'] = FALSE;
-    $DB = new MySQLiDBHelper();
-    $Data['MobileNo'] = $this->Req->MDN;
+    $this->Resp['SendSMS'] = false;
+    $DB                    = new MySQLiDBHelper();
+    $Data['MobileNo']      = $this->Req->MDN;
     $DB->where('MobileNo', $Data['MobileNo']);
     $Profile = $DB->query('Select UserName, Designation, eMailID, LastAccessTime '
       . 'FROM ' . MySQL_Pre . 'APP_Users');
     if (count($Profile) == 0) {
       $DB->insert(MySQL_Pre . 'APP_Users', $Data);
-      $this->Resp['SendSMS'] = TRUE;
-    }
-    elseif ((time() - strtotime($Profile[0]['LastAccessTime'])) > $this->IntervalRU) {
-      $this->Resp['SendSMS'] = TRUE;
+      $this->Resp['SendSMS'] = true;
+    } elseif ((time() - strtotime($Profile[0]['LastAccessTime'])) > $this->IntervalRU) {
+      $this->Resp['SendSMS']     = true;
       $this->Resp['TimeElapsed'] = time() - strtotime($Profile[0]['LastAccessTime']);
-    }
-    else {
+    } else {
       $this->Resp['TimeElapsed'] = $Profile[0]['LastAccessTime'];
     }
-    if ($this->Resp['SendSMS'] === TRUE) {
+    if ($this->Resp['SendSMS'] === true) {
       $AuthUser = new AuthOTP(AuthOTP::TOKEN_DATA_TEMP);
       $AuthUser->deleteUser($this->Req->MDN);
       $SecretKey = $AuthUser->setUser($this->Req->MDN, "TOTP");
       SMSGW::SendSMS('Activation Key: ' . $SecretKey
         . "\nValid Till: " . date("D d M g:i:s A", time() + $this->IntervalRU), $this->Req->MDN);
       $this->Resp['MSG'] = "Please enter the Activation Key Sent to Mobile No. " . $this->Req->MDN;
-    }
-    else {
+    } else {
       $this->Resp['MSG'] = "Please enter the Activation Key received on Mobile No. "
         . $this->Req->MDN . " \nAfter: " . $this->Resp['TimeElapsed'];
     }
-    $this->Resp['API'] = TRUE;
+    $this->Resp['API']     = true;
     $fieldData['MobileNo'] = $this->Req->MDN;
     $DB->insert(MySQL_Pre . 'APP_Register', $fieldData);
   }
@@ -265,7 +258,8 @@ class AndroidAPI {
    * Response:
    *    JSONObject={"API":true,
    *               "DB": {'KeyUpdated':1,
-   *                      "USER":{"UserName":"John Smith", TODO Send User Profile Data available at server.
+   *                      "USER":{"UserName":"John Smith", TODO Send User
+   *                      Profile Data available at server.
    *                              "Designation":"Operator",
    *                              "eMailID":"jsmith@gmail.com"}
    *                      }
@@ -288,15 +282,14 @@ class AndroidAPI {
       $this->Resp['DB']['USER'] = $DB->query('Select `UserMapID`, `UserID` as `eMailID`,'
         . ' `UserName` as `Designation`, `DisplayName` FROM ' . MySQL_Pre . 'Users');
 
-      $this->Resp['API'] = TRUE;
+      $this->Resp['API'] = true;
       $this->Resp['MSG'] = 'Mobile No. ' . $this->Req->MDN . ' is Registered Successfully!'
         . ' Now you can start using the Project AIO App.';
-    }
-    else {
+    } else {
       //$this->Resp['URL'] = $AuthUser->createURL($this->Req->MDN);
       $this->Resp['DB'] = "Authentication Failed!";
       //. $AuthUser->oath_hotp($AuthUser->getKey($this->Req->MDN), $this->Req->TC);
-      $this->Resp['API'] = FALSE;
+      $this->Resp['API'] = false;
       $this->Resp['MSG'] = 'Invalid OTP';
     }
   }
@@ -333,12 +326,11 @@ class AndroidAPI {
     ) {
       $DB = new MySQLiDBHelper();
       $DB->where('MobileNo', $this->Req->MDN);
-      $this->Resp['DB'] = $DB->get(MySQL_Pre . 'Users');
-      $this->Resp['API'] = TRUE;
+      $this->Resp['DB']  = $DB->get(MySQL_Pre . 'Users');
+      $this->Resp['API'] = true;
       $this->Resp['MSG'] = 'Synchronized Successfully.';
-    }
-    else {
-      $this->Resp['API'] = FALSE;
+    } else {
+      $this->Resp['API'] = false;
       $this->Resp['MSG'] = 'Invalid OTP';
     }
   }
@@ -362,15 +354,15 @@ class AndroidAPI {
     if (!$this->checkPayLoad(array('MDN', 'IP', 'IMEI'))) {
       return;
     };
-    $DB = new MySQLiDBHelper();
-    $Data['LocalIP'] = $this->Req->IP;
+    $DB               = new MySQLiDBHelper();
+    $Data['LocalIP']  = $this->Req->IP;
     $Data['MobileNo'] = $this->Req->MDN;
-    $Data['IMEI'] = $this->Req->IMEI;
-    $Data['IP'] = $_SERVER['REMOTE_ADDR'];
+    $Data['IMEI']     = $this->Req->IMEI;
+    $Data['IP']       = $_SERVER['REMOTE_ADDR'];
 
     $DB->insert(MySQL_Pre . 'APP_Logs', $Data);
 
-    $this->Resp['API'] = TRUE;
+    $this->Resp['API'] = true;
     $this->Resp['MSG'] = 'Access Logged Successfully!';
   }
 }
