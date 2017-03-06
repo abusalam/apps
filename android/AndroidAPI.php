@@ -39,7 +39,7 @@ class AndroidAPI {
 
   function __construct($jsonData, $mNoAuthMode = FALSE) {
     $this->IntervalRU = 3600;
-    $this->Resp['ET'] = time();
+    $this->Resp['ET'] = microtime();
     $this->Expiry = NULL;
     $this->Req = $jsonData;
     $this->setNoAuthMode($mNoAuthMode);
@@ -50,7 +50,7 @@ class AndroidAPI {
       $this->setCallAPI($this->Req->API);
     }
     else {
-      $this->Resp['MSG'] = "Invalid API PayLoad!";
+      $this->Resp['MSG'] = "Invalid API Syntax!";
     }
   }
 
@@ -90,12 +90,12 @@ class AndroidAPI {
 
       switch ($Param) {
         case 'MDN':
-          if (!property_exists($this->Req, 'MDN')) {
+          if (!property_exists($this->Req, $Param)) {
             $this->Resp['MSG'] = "Invalid PayLoad";
             return FALSE;
           }
           else {
-            if (!preg_match('/^[789]\d{9}$/', $this->Req->MDN)) {
+            if (!preg_match('/^[789]\d{9}$/', $this->Req->$Param)) {
               $this->Resp['MSG'] = "Invalid Mobile Number";
               return FALSE;
             }
@@ -149,8 +149,8 @@ class AndroidAPI {
   }
 
   protected function sendResponse() {
-    //$this->Resp['json'] = $this->Req; //TODO: Remove for Production
-    $this->Resp['ET'] = time() - $this->Resp['ET'];
+    $this->Resp['json'] = $this->Req; //TODO: Remove for Production
+    $this->Resp['ET'] = microtime() - $this->Resp['ET'];
     $DateFormat = 'D d M g:i:s A';
     $this->Resp['ST'] = date($DateFormat, time());
 
