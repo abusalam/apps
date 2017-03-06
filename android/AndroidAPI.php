@@ -350,8 +350,7 @@ class AndroidAPI {
    *   JSONObject={"API":"AL",
    *               "MDN":"9876543210",
    *               "IP":"164.100.105.34",
-   *               "IMEI":"3214352671528765",
-   *               "OTP":"123456"}
+   *               "IMEI":"3214352671528765"}
    *
    * Response:
    *    JSONObject={"API":true,
