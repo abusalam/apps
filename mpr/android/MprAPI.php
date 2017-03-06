@@ -31,6 +31,43 @@ require_once(__DIR__ . '/../../android/AndroidAPI.php');
 class MprAPI extends AndroidAPI {
 
   /**
+   * Input validation for API PayLoads in this class
+   *
+   * Following keys are checked in the parent class:
+   *      ['MDN','OTP','OTP1','OTP2','IMEI','IP']
+   *
+   * @param $Params
+   * @return bool
+   *
+   * @example Sample function call
+   *
+   *        $this->checkPayLoad(array('MDN','OTP'))
+   *
+   */
+  protected function checkPayLoad($Params) {
+
+    foreach ($Params as $Param) {
+
+      switch ($Param) {
+        case 'UID':
+          if(!property_exists($this->Req,$Param)){
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else if(!preg_match('/^\d$/', $this->Req->$Param)){
+            $this->Resp['MSG'] = "Invalid User ID";
+            return false;
+          }
+          break;
+
+        default:
+          $checkParam[]=$Param;
+          parent::checkPayLoad($checkParam);
+      }
+    }
+    return true;
+  }
+
+  /**
    * User Schemes: Retrieve all the Schemes for the User
    *
    * Request:
@@ -45,6 +82,9 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function US() {
+    if (!$this->checkPayLoad(array('UID'))) {
+      return false;
+    };
     $DB = new MySQLiDBHelper();
     $DB->where('UserMapID', $this->Req->UID);
     $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
@@ -171,11 +211,12 @@ class MprAPI extends AndroidAPI {
    *
    * Request:
    *   JSONObject={"API":"UP",
+   *               "MDN":"9876543210",
+   *               "OTP":"987654",
    *               "UID":"35",
    *               "WID":"5",
-   *               "EA":"35",
-   *               "P":"10",
-   *               "B":"10029792",
+   *               "EA":"35000",
+   *               "P":"90",
    *               "R":"Some Remarks"}
    *
    * Response:

@@ -100,34 +100,38 @@ class AndroidAPI {
           break;
 
         case 'OTP':
-          if (!property_exists($this->Req, 'OTP')) {
-            $this->Resp['MSG'] = "Invalid PayLoad";
-            return false;
-          } else {
-            if (!preg_match('/^\d{6}$/', $this->Req->OTP)) {
-              $this->Resp['MSG'] = "OTP should be 6 digits only";
-              return false;
-            }
-          }
-          break;
         case 'OTP1':
-          if (!property_exists($this->Req, 'OTP')) {
+        case 'OTP2':
+          if (!property_exists($this->Req, $Param)) {
             $this->Resp['MSG'] = "Invalid PayLoad";
             return false;
           } else {
-            if (!preg_match('/^\d{6}$/', $this->Req->OTP)) {
+            if (!preg_match('/^\d{6}$/', $this->Req->$Param)) {
               $this->Resp['MSG'] = "OTP should be 6 digits only";
               return false;
             }
           }
           break;
-        case 'OTP2':
-          if (!property_exists($this->Req, 'OTP')) {
+
+        case 'IMEI':
+          if (!property_exists($this->Req, $Param)) {
             $this->Resp['MSG'] = "Invalid PayLoad";
             return false;
           } else {
-            if (!preg_match('/^\d{6}$/', $this->Req->OTP)) {
-              $this->Resp['MSG'] = "OTP should be 6 digits only";
+            if (!preg_match('/^\d{15}$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "IMEI should be 15 digits only";
+              return false;
+            }
+          }
+          break;
+
+        case 'IP':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "IP should be digits in valid range and in xxx.xxx.xxx.xxx format!";
               return false;
             }
           }
