@@ -118,6 +118,9 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SF() {
+    if (!$this->checkPayLoad(array('UID'))) {
+      return false;
+    }
     $DB = new MySQLiDBHelper();
     $DB->where('UserMapID', $this->Req->UID);
     $Schemes = $DB->query('Select `SchemeName` as `SN`, '
@@ -153,6 +156,9 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SU() {
+    if (!$this->checkPayLoad(array('UID','SID'))) {
+      return false;
+    }
     $DB = new MySQLiDBHelper();
     $DB->where('UserMapID', $this->Req->UID);
     $DB->where('SchemeID', $this->Req->SID);
@@ -189,6 +195,9 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function UW() {
+    if (!$this->checkPayLoad(array('UID','SID'))) {
+      return false;
+    }
     $DB = new MySQLiDBHelper();
     $DB->where('UserMapID', $this->Req->UID);
     $DB->where('SchemeID', $this->Req->SID);
@@ -227,6 +236,9 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function UP() {
+    if (!$this->checkPayLoad(array('MDN','OTP','UID','WID','EA','P','R'))) {
+      return false;
+    }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
       OR $this->getNoAuthMode()
