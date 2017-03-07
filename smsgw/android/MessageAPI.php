@@ -231,13 +231,19 @@ class MessageAPI extends AndroidAPI {
     }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
-      $Group                = new Group();
-      $GroupID              = $Group->CreateGroup($this->Req->GRP);
-      $GroupDB['GroupID']   = $GroupID;
-      $GroupDB['GroupName'] = $this->Req->GRP;
-      $this->Resp['DB']     = $GroupDB;
-      $this->Resp['API']    = true;
-      $this->Resp['MSG']    = 'Group Created with ID:' . $GroupID;
+      $Group   = new Group();
+      $GroupID = $Group->CreateGroup($this->Req->GRP);
+      if ($GroupID > 0) {
+        $GroupDB['GroupID']   = $GroupID;
+        $GroupDB['GroupName'] = $this->Req->GRP;
+        $this->Resp['DB']     = $GroupDB;
+        $this->Resp['API']    = true;
+        $this->Resp['MSG']    = 'Group Created with ID:' . $GroupID;
+      } else {
+        $this->Resp['API'] = false;
+        $this->Resp['MSG'] = 'Unable to Create Group!';
+      }
+
     } else {
       $this->Resp['API'] = false;
       $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
