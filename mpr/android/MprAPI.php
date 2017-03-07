@@ -46,25 +46,30 @@ class MprAPI extends AndroidAPI {
    */
   protected function checkPayLoad($Params) {
 
+    $checkParams = array();
+
     foreach ($Params as $Param) {
 
       switch ($Param) {
         case 'UID':
-          if(!property_exists($this->Req,$Param)){
+          if (!property_exists($this->Req, $Param)) {
             $this->Resp['MSG'] = "Invalid PayLoad";
             return false;
-          } else if(!preg_match('/^\d$/', $this->Req->$Param)){
-            $this->Resp['MSG'] = "Invalid User ID";
-            return false;
+          } else {
+            if (!preg_match('/^\d$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Invalid User ID";
+              return false;
+            }
           }
           break;
 
         default:
-          $checkParam[]=$Param;
-          parent::checkPayLoad($checkParam);
+          array_push($checkParams, $Param);
+          break;
+
       }
     }
-    return true;
+    return parent::checkPayLoad($checkParams);
   }
 
   /**
@@ -156,7 +161,7 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SU() {
-    if (!$this->checkPayLoad(array('UID','SID'))) {
+    if (!$this->checkPayLoad(array('UID', 'SID'))) {
       return false;
     }
     $DB = new MySQLiDBHelper();
@@ -165,7 +170,7 @@ class MprAPI extends AndroidAPI {
     $Users = $DB->query('Select `UserName` as `UN`, `UserMapID` as `ID`,`MobileNo` as `M`, '
       . ' `Funds` as `F`, `Balance` as `B`, \'Schemes\' as `S` FROM '
       . MySQL_Pre . 'MPR_ViewUserFunds');
-    if(count($Users)==0){
+    if (count($Users) == 0) {
       $DB->where('SchemeID', $this->Req->SID);
       $Users = $DB->query('Select `UserName` as `UN`, `UserMapID` as `ID`,`MobileNo` as `M`, '
         . ' `Funds` as `F`, `Balance`  as `B`, \'Schemes\' as `S` FROM '
@@ -195,7 +200,7 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function UW() {
-    if (!$this->checkPayLoad(array('UID','SID'))) {
+    if (!$this->checkPayLoad(array('UID', 'SID'))) {
       return false;
     }
     $DB = new MySQLiDBHelper();
@@ -216,7 +221,8 @@ class MprAPI extends AndroidAPI {
   }
 
   /**
-   * Update Progress: Update Progress of Works for the User for a particular Work
+   * Update Progress: Update Progress of Works for the User for a particular
+   * Work
    *
    * Request:
    *   JSONObject={"API":"UP",
@@ -256,16 +262,16 @@ class MprAPI extends AndroidAPI {
           $tableData['Progress']          = $this->Req->P;
           $tableData['ReportDate']        = date("Y-m-d", time());
           $tableData['Remarks']           = $this->Req->R;
-          $tableData['MobileNo']           = $this->Req->MDN;
+          $tableData['MobileNo']          = $this->Req->MDN;
 
           $ProgressID = $DB->insert(MySQL_Pre . 'MPR_Progress', $tableData);
 
-          if($ProgressID){
+          if ($ProgressID) {
             $DB->where('WorkID', $this->Req->WID);
-            $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
-            $this->Resp['DB'] = $UserWorks;
-            $this->Resp['API']        = true;
-            $this->Resp['MSG']        = 'Updated Successfully!';
+            $UserWorks         = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
+            $this->Resp['DB']  = $UserWorks;
+            $this->Resp['API'] = true;
+            $this->Resp['MSG'] = 'Updated Successfully!';
           } else {
             $this->Resp['API'] = false;
             $this->Resp['MSG'] = 'Unable To Update Progress.';

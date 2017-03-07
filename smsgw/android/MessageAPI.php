@@ -50,6 +50,8 @@ class MessageAPI extends AndroidAPI {
    */
   protected function checkPayLoad($Params) {
 
+    $checkParams = array();
+
     foreach ($Params as $Param) {
 
       switch ($Param) {
@@ -59,18 +61,18 @@ class MessageAPI extends AndroidAPI {
             return false;
           } else {
             if (!preg_match('/^\d$/', $this->Req->$Param)) {
-              $this->Resp['MSG'] = "Invalid ContactID";
+              $this->Resp['MSG'] = "Invalid Contact ID";
               return false;
             }
           }
           break;
 
         default:
-          $checkParam[] = $Param;
-          parent::checkPayLoad($checkParam);
+          array_push($checkParams, $Param);
+          break;
       }
     }
-    return true;
+    return parent::checkPayLoad($checkParams);
   }
 
   /**
