@@ -84,7 +84,7 @@ class MprAPI extends AndroidAPI {
   protected function US() {
     if (!$this->checkPayLoad(array('UID'))) {
       return false;
-    };
+    }
     $DB = new MySQLiDBHelper();
     $DB->where('UserMapID', $this->Req->UID);
     $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
