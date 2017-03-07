@@ -10,7 +10,7 @@ class User {
   function __construct($MobileNo) {
     $DB = new MySQLiDBHelper();
     $DB->where('MobileNo', $MobileNo);
-    $Users             = $DB->get(MySQL_Pre . 'SMS_Users');
+    $Users             = $DB->get(MySQL_Pre . 'APP_Users');
     $this->eMailID     = $Users[0]['eMailID'];
     $this->UserName    = $Users[0]['UserName'];
     $this->Designation = $Users[0]['Designation'];
@@ -57,7 +57,7 @@ class User {
     $insertData['UserName'] = $UserName;
     $insertData['Password'] = $Pass;
     $insertData['Status']   = 'off';
-    $UserID                 = $DB->insert(MySQL_Pre . 'SMS_Users', $insertData);
+    $UserID                 = $DB->insert(MySQL_Pre . 'APP_Users', $insertData);
 
     return true;
   }

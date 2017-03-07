@@ -343,12 +343,18 @@ class MessageAPI extends AndroidAPI {
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
       $Contact   = new Contact();
       $ContactID = $Contact->createContact($this->Req->MN, $this->Req->NM, $this->Req->DG);
-      $Group     = new Group();
-      $Group->setGroup($this->Req->GRP);
-      $Gid               = $Group->addMember($ContactID);
-      $this->Resp['DB']  = $Gid;
-      $this->Resp['API'] = true;
-      $this->Resp['MSG'] = 'Added to ' . $this->Req->GRP . ' Group';
+      if ($ContactID > 0) {
+        $Group = new Group();
+        $Group->setGroup($this->Req->GRP);
+        $Gid               = $Group->addMember($ContactID);
+        $this->Resp['DB']  = $Gid;
+        $this->Resp['API'] = true;
+        $this->Resp['MSG'] = 'Added to ' . $this->Req->GRP . ' Group';
+      } else {
+        $this->Resp['API'] = false;
+        $this->Resp['MSG'] = 'Unable to add Contact!';
+      }
+
     } else {
       $this->Resp['API'] = false;
       $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;

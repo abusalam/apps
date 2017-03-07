@@ -8,6 +8,7 @@ class Group {
     $DB = new MySQLiDBHelper();
     $DB->where('GroupName', $GroupName);
     $Group         = $DB->get(MySQL_Pre . 'SMS_Groups');
+    //TODO Check if Group Exists
     $this->GroupID = $Group[0]['GroupID'];
   }
 
