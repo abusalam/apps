@@ -202,6 +202,47 @@ class MessageAPI extends AndroidAPI {
   }
 
   /**
+   * Create a New Group
+   *
+   * Request:
+   *   JSONObject={"API":"NG",
+   *               "MDN":"9876543210",
+   *               "GRP":"Test Group",
+   *               "OTP":"987654"}
+   *
+   * Response:
+   *   JSONObject={
+   *                "ET": 0.527576,
+   *                "DB":
+   *                    {
+   *                      "GroupID": 1,
+   *                      "GroupName": "Test Group"
+   *                    },
+   *                "API": true,
+   *                "MSG": "Group Created with ID:1",
+   *                "ST": "Tue 07 Mar 3:39:37 PM"
+   *              }
+   */
+  protected function NG() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'GRP'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $Group                = new Group();
+      $GroupID              = $Group->CreateGroup($this->Req->GRP);
+      $GroupDB['GroupID']   = $GroupID;
+      $GroupDB['GroupName'] = $this->Req->GRP;
+      $this->Resp['DB']     = $GroupDB;
+      $this->Resp['API']    = true;
+      $this->Resp['MSG']    = 'Group Created with ID:' . $GroupID;
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+  }
+
+  /**
    * Get All Members in a Group
    *
    * Request:
@@ -250,6 +291,7 @@ class MessageAPI extends AndroidAPI {
    * Request:
    *   JSONObject={"API":"CG",
    *               "MDN":"9876543210",
+   *               "CID":"10",
    *               "OTP":"987654"}
    *
    * Response:
@@ -260,9 +302,9 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function CG() {
-    $this->Resp['DB']  = Group::getContactGroups();
+    $this->Resp['DB']  = Group::getContactGroups($this->Req->CID);
     $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'All Groups Loaded';
+    $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
     //$this->setExpiry(3600); // 60 Minutes
   }
 
