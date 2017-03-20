@@ -128,7 +128,7 @@ class WebLib {
     if ($EnableLoging === true) {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-      curl_setopt($ch, CURLOPT_URL, 'https://www.paschimmedinipur.gov.in');
+      curl_setopt($ch, CURLOPT_URL, 'https://apps.paschimmedinipur.gov.in');
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($_SESSION));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       $CURL_OUTPUT = curl_exec($ch);

@@ -174,12 +174,12 @@ WebLib::ShowMenuBar('APPS');
         <label for="UserID">
           <strong>User ID</strong> (Registered E-Mail)
           <input type="text" id="UserID" class="form-TxtInput"
-                 name="UserID" value="admin" autocomplete="off"/>
+                 name="UserID" value="" autocomplete="off"/>
         </label>
         <label for="UserPass">
           <strong>Password</strong>
           <input type="password" id="UserPass" class="form-TxtInput"
-                 name="UserPass" value="test@123" autocomplete="off"/>
+                 name="UserPass" value="" autocomplete="off"/>
         </label>
         <?php
         if (WebLib::GetVal($_SESSION, 'TryCount') >= $FailedTry) {

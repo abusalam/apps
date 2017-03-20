@@ -29,14 +29,37 @@ WebLib::IncludeCSS();
   </div>
   <?php
   WebLib::ShowMenuBar('APPS');
-  ?>
-  <div class="content">
-  </div>
-  <div class="pageinfo">
-    <?php WebLib::PageInfo(); ?>
-  </div>
-  <div class="footer">
-    <?php WebLib::FooterInfo(); ?>
-  </div>
+?>
+<div class="content">
+    <span class="Message" id="Msg" style="float: right;">
+      <b>Loading please wait...</b>
+    </span>
+    <div class="formWrapper">
+        <h3 class="formWrapper-h3">PHP <?php echo phpversion(); ?></h3>
+      <?php
+        $link = mysqli_connect(HOST_Name, MySQL_User, MySQL_Pass);
+        if (!$link) {
+          printf('Could not connect: %s<br/>' . mysqli_error($link));
+        } else {
+          printf("MySQL Server: %s<br/>", mysqli_get_server_info($link));
+        }
+        printf("MySQL Client: %s<br/>", mysqli_get_client_info());
+        if (function_exists('mcrypt_encrypt')) {
+          echo "The mcrypt extension is available.<br/>";
+        } else {
+          echo "The mcrypt extension is missing!<br/>";
+        }
+      ?>
+        <span class="Message">
+            <strong>Default User ID: admin Password: test@123</strong>
+        </span>
+    </div>
+</div>
+<div class="pageinfo">
+  <?php WebLib::PageInfo(); ?>
+</div>
+<div class="footer">
+  <?php WebLib::FooterInfo(); ?>
+</div>
 </body>
 </html>
