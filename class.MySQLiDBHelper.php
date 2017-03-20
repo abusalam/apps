@@ -462,8 +462,9 @@ class MySQLiDBHelper {
    */
   protected function _prepareQuery() {
     if (!$stmt = $this->_mysqli->prepare($this->_query)) {
-      trigger_error("Problem preparing query ($this->_query) " . $this->_mysqli->error,
-                    E_USER_ERROR);
+      //trigger_error("Problem preparing query ($this->_query) "
+      //                . $this->_mysqli->error, E_USER_ERROR);
+      trigger_error("Problem preparing query.", E_USER_ERROR);
     }
     return $stmt;
   }

@@ -1,7 +1,4 @@
 <?php
-//ini_set('display_errors', '1');
-//error_reporting(E_ALL);
-
 require_once __DIR__ . '/../lib.inc.php';
 
 WebLib::AuthSession();
@@ -32,11 +29,6 @@ WebLib::IncludeJS('js/chosen.jquery.min.js');
       echo WebLib::GetVal($_SERVER, 'PHP_SELF');
       ?>">
         <h3>Project</h3>
-        <?php
-//        include __DIR__ . '/DataMPR.php';
-//        $Data  = new MySQLiDB();
-//        $Data1 = new MySQLiDBHelper();
-        ?>
         <label for="ProjectName"><strong>Name of Project</strong>
         </label>
         <input type="text" name="ProjectName" id="ProjectName"

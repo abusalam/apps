@@ -212,7 +212,7 @@ class WebLib {
    * @param bool $ForSQL If set to true then SQLSafe else htmlentities will be applied
    * @param bool $HTMLSafe If FALSE then OutPut without htmlentities
    * @return null|$Array[$Index]
-   * @example WebLib::GetVal($Array, $Index) = htmlspecialchars | NULL
+   * @example WebLib::GetVal($Array, $Index) = htmlentities | NULL
    * @example WebLib::GetVal($Array, $Index, TRUE) = SqlSafe | ''
    * @example WebLib::GetVal($Array, $Index, FALSE, FALSE) = raw output | NULL
    */
@@ -448,9 +448,7 @@ class WebLib {
         } elseif (self::GetVal($_SESSION, 'ID') !== session_id()) {
           $_SESSION['Debug'] = '(' . self::GetVal($_SESSION, 'ID')
             . ' = ' . session_id() . ')';
-
-          return 'INVALID SESSION ID (' . self::GetVal($_SESSION, 'ID')
-          . ' = ' . session_id() . ')';
+          return 'INVALID SESSION ID';
         } elseif (self::IsAllowed($ScriptURL) === false) {
           return 'Restricted!';
         } elseif (self::GetVal($_SESSION, 'AppKey') !== AppKey) {
@@ -547,12 +545,6 @@ class WebLib {
           $_SESSION['BaseDIR']);
         $_SESSION['SESSION_TOKEN'] = $sess_id;
         $_SESSION['LifeTime']      = time();
-      }
-    }
-    if (self::GetVal($_REQUEST, 'show_src') !== null) {
-      if ($_REQUEST['show_src'] == 'me') {
-        $ScriptName = $_SERVER['PHP_SELF'];
-        show_source(substr($ScriptName, 1, strlen($ScriptName)));
       }
     }
   }

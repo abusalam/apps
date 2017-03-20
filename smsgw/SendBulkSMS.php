@@ -1,5 +1,4 @@
 <?php
-ini_set('display_errors', 'On');
 require_once('../library.php');
 initHTML5page();
 if ((GetVal($_POST, "ChkUseForm") === "No") && (GetVal($_POST, "CmdShow") === "Send")) {
@@ -37,10 +36,6 @@ $_SESSION['AppID'] = GetVal($_SESSION, "SessionAppID");
       echo "No Contact Nos. in DB";
     }
   }
-  echo "<pre>";
-  print_r($_SESSION);
-  print_r($_POST);
-  echo "</pre>";
   ?>
   <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
     <label for="AppMobile">Send SMS to this Mobile No:</label>

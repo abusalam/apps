@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', '1');
-error_reporting(E_ALL);
 if (version_compare(phpversion(), '5.3.0', 'ge')) {
   $MySQLi = extension_loaded('mysqli');
   $MySQL = extension_loaded('mysql');

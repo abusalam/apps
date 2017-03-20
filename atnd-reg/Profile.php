@@ -120,7 +120,6 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
       </div>
       <input type="hidden" id="AjaxToken" name="FormToken"
              value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>" />
-      <input type="hidden" name="Query" value="<?php echo $Query; ?>"/>
       <input type="button" id="ChgPwd" value="Change Password" />
     </form>
   </div>

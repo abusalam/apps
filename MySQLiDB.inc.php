@@ -156,7 +156,7 @@ class MySQLiDB {
     $this->do_connect();
     $this->RecSet = mysql_query($querystr, $this->conn);
     if (!$this->RecSet) {
-      $message = 'Error(database): ' . mysql_error();
+      $message = 'Error in Inserting into database.'; // . mysql_error();
       //$message .= 'Whole query: '. $querystr."<br>";
       if ($this->Debug)
         $_SESSION['Msg'] = $message;
@@ -181,8 +181,9 @@ class MySQLiDB {
     $this->do_connect();
     $this->RecSet = mysql_query($querystr, $this->conn);
     if (mysql_errno($this->conn)) {
-      if ($this->Debug)
+      if ($this->Debug) { //Show error only in debug mode
         $_SESSION['Msg'] = mysql_error($this->conn);
+      }
       $this->NoResult = 1;
       $this->RowCount = 0;
       return 0;

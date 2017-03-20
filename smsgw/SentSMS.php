@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', '1');
-error_reporting(E_ALL);
-
 require_once(__DIR__ . '/../lib.inc.php');
 WebLib::SetPATH(17);
 WebLib::InitHTML5page('SMS Gateway Report');
