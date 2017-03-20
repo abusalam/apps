@@ -209,8 +209,8 @@ class WebLib {
    *
    * @param array $Array eg. $_SESSION
    * @param string $Index eg. 'index'
-   * @param bool $ForSQL If set to true then SQLSafe else htmlspecialchars will be applied
-   * @param bool $HTMLSafe If FALSE then OutPut without htmlspecialchars
+   * @param bool $ForSQL If set to true then SQLSafe else htmlentities will be applied
+   * @param bool $HTMLSafe If FALSE then OutPut without htmlentities
    * @return null|$Array[$Index]
    * @example WebLib::GetVal($Array, $Index) = htmlspecialchars | NULL
    * @example WebLib::GetVal($Array, $Index, TRUE) = SqlSafe | ''
@@ -231,7 +231,7 @@ class WebLib {
         return $Value;
       } else {
         if ($HTMLSafe) {
-          return htmlspecialchars($Array[$Index]);
+          return htmlentities($Array[$Index]);
         } else {
           return $Array[$Index];
         }
