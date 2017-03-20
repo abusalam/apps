@@ -111,7 +111,7 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
     $_SESSION['Token'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . $_SESSION['ET']);
     WebLib::ShowMsg();
     ?>
-    <form id="ChgPwd-frm" action="<?php echo WebLib::GetVal($_SERVER, 'PHP_SELF'); ?>" method="post">
+    <form id="ChgPwd-frm" action="<?php echo WebLib::GetVal($_SERVER, 'PHP_SELF'); ?>" method="post" autocomplete="off">
       <h2>Change Password</h2>
       <div id="chgpwd-dlg" title="Change Password">
         <input type="password" placeholder="Old Password" name="OldPassWD" id="OldPassWD" /><br/>
