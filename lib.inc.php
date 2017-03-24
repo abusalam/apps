@@ -480,8 +480,8 @@ class WebLib {
     $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
       . 'InInitPage(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
       . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN', true) . ')';
-    setcookie('SESSION_TOKEN', $sess_id, (time() + (LifeTime * 60)),
-      $_SESSION['BaseDIR'], 'apps.paschimmedinipur.gov.in', true, true);
+    setcookie('SESSION_TOKEN', $sess_id, (time() - (LifeTime * 60)),
+      $_SESSION['BaseDIR'], $_SERVER['HTTP_HOST'], true, true);
     $_SESSION['SESSION_TOKEN'] = $sess_id;
     $_SESSION['LifeTime']      = time();
   }
@@ -538,8 +538,8 @@ class WebLib {
         $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
           . 'SESSION_TOKEN-Valid';
         $sess_id           = md5(microtime());
-        setcookie('SESSION_TOKEN', $sess_id, (time() + (LifeTime * 60)),
-          $_SESSION['BaseDIR'], 'apps.paschimmedinipur.gov.in', true, true);
+        setcookie('SESSION_TOKEN', $sess_id, (time() - (LifeTime * 60)),
+          $_SESSION['BaseDIR'], $_SERVER['HTTP_HOST'], true, true);
         $_SESSION['SESSION_TOKEN'] = $sess_id;
         $_SESSION['LifeTime']      = time();
       }
