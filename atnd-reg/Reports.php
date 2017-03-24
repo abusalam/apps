@@ -58,9 +58,7 @@ $Data  = new MySQLiDB();
   <div class="content">
     <h2>Attendance Report</h2>
     <hr/>
-    <form name="frmAtndRpt" method="post" action="<?php
-    echo WebLib::GetVal($_SERVER, 'PHP_SELF');
-    ?>">
+    <form name="frmAtndRpt" method="post" action="Reports.php">
       <div class="FieldGroup">
         <label for="OfficeSL">
           <label for="textfield"><strong>Month:</strong></label>

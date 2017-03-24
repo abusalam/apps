@@ -32,7 +32,7 @@ function PrintArr($Arr) {
   ?>
   <div class="content">
     <h2>Attendance Register</h2>
-    <form name="frmEditUser" id="frmAssignParts" method="post" action="<?php echo WebLib::GetVal($_SERVER, 'PHP_SELF'); ?>">
+    <form name="frmEditUser" id="frmAssignParts" method="post" action="Attendance.php">
       <?php
       $Data = new MySQLiDBHelper();
 

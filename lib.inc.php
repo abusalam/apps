@@ -821,8 +821,8 @@ class WebLib {
       } else {
         $sel = "";
       }
-      echo '<option value="' . htmlspecialchars($Row[$val])
-        . '"' . $sel . '>' . htmlspecialchars($Row[$txt]) . '</option>';
+      echo '<option value="' . htmlentities($Row[$val])
+        . '"' . $sel . '>' . htmlentities($Row[$txt]) . '</option>';
     }
     unset($DB);
     unset($Rows);

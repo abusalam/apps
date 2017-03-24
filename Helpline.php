@@ -70,7 +70,7 @@ WebLib::JQueryInclude();
         if ((strlen($fd) > 1024) || ($fd === '')) {
           ?>
           <form name="feed_frm" method="post"
-                action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" style="text-align: left;">
+                action="Helpline.php" style="text-align: left;">
             <b>Describe your problem: </b><span id="info">(Max: 1024 chars)</span><br />
             <textarea rows="12" cols="100" style="height: 200px; margin: 0px;"
                       name="feed_txt" onkeyup="limitChars(this, 1024, 'info')"><?php echo $fd; ?></textarea><br/>
@@ -128,16 +128,16 @@ WebLib::JQueryInclude();
           <h3>
             <b>
               <?php
-              echo '[' . $row['HelpID'] . '] ' . htmlspecialchars($row['UserName'])
+              echo '[' . WebLib::GetVal($row,'HelpID') . '] ' . htmlentities($row['UserName'])
               . " [Replied On: " . date("l d F Y g:i:s A ", strtotime($row['ReplyTime'])) . ']';
               ?>
             </b>
           </h3>
           <div>
-            <?php echo str_replace("\r\n", "<br />", htmlspecialchars($row['TxtQry'])); ?><br/>
+            <?php echo str_replace("\r\n", "<br />", htmlentities($row['TxtQry'])); ?><br/>
             <small><i>
                 <?php
-                echo "From IP: {$row['IP']} On: " . date("l d F Y g:i:s A ", strtotime($row['QryTime']));
+                echo 'From IP: ' . WebLib::GetVal($row,'IP') . ' On: ' . date("l d F Y g:i:s A ", strtotime($row['QryTime']));
                 ?>
               </i>
             </small>
@@ -146,7 +146,7 @@ WebLib::JQueryInclude();
             <p>
               <i>&ldquo;
                 <?php
-                echo str_replace("\r\n", "<br />", htmlspecialchars($row['ReplyTxt']));
+                echo str_replace("\r\n", "<br />", htmlentities($row['ReplyTxt']));
                 ?>
                 &rdquo;</i>
             </p>

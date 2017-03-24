@@ -37,7 +37,7 @@ $_SESSION['AppID'] = GetVal($_SESSION, "SessionAppID");
     }
   }
   ?>
-  <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+  <form method="post" action="SendBulkSMS.php">
     <label for="AppMobile">Send SMS to this Mobile No:</label>
     <input id="AppMobile" type="text" name="AppMobile" value="<?php echo GetVal($_POST, "AppMobile"); ?>"/>
     <input id="ChkUseDBYes" type="radio" value="Yes" name="ChkUseForm" checked="checked" />

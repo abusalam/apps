@@ -56,7 +56,7 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
               . ' FROM `' . MySQL_Pre . 'MenuItems` Order By `AppID`,`MenuOrder`');
     }
     ?>
-    <form method="post" action="<?php echo WebLib::GetVal($_SERVER, 'PHP_SELF'); ?>">
+    <form method="post" action="MenuACL.php">
         <div class="column">
             <ul>
               <?php

@@ -20,7 +20,7 @@ if ($_REQUEST['Reply'] == '1') {
   }
   ?>
     <form name="frmLogin" method="post"
-          action="<?php $_SERVER['PHP_SELF'] ?>">
+          action="Reply.php">
         <label for="ReplyTo">Reply To:</label> <select name="ReplyTo">
         <?php
         $Query = 'SELECT HelpID,CONCAT(\'[\',Replied,\'-\',HelpID,\'] \',UserName) as `AppName` '

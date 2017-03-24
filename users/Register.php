@@ -86,9 +86,7 @@ WebLib::ShowMenuBar('WebSite');
     }
     elseif (count($UnregisteredUsers) > 0) {
       ?>
-      <form name="feed_frm" method="post" action="<?php
-      echo WebLib::GetVal($_SERVER, 'PHP_SELF', FALSE);
-      ?>">
+      <form name="feed_frm" method="post" action="Register.php">
         <div class="FieldGroup">
           <label for="UserMapID"><strong>User ID:</strong><br/></label>
           <select id="UserMapID" name="UserMapID">

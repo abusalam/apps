@@ -52,9 +52,7 @@ $Data = new MySQLiDB();
     ?>
     <div class="FieldGroup" id="CreateUser-dialog-form" style="display:none">
       <form name="frmCreateUser" id="frmCreateUser" method="post"
-            action="<?php
-            echo WebLib::GetVal($_SERVER, 'PHP_SELF');
-            ?>">
+            action="Users.php">
         <label for="UserName">User Name: </label>
         <input type="text" name="UserName" id="UserName" required/>
         <br/>
@@ -69,9 +67,7 @@ $Data = new MySQLiDB();
     </div>
 
     <form name="frmEditUser" id="frmCreateUser" method="post"
-          action="<?php
-          echo WebLib::GetVal($_SERVER, 'PHP_SELF');
-          ?>">
+          action="Users.php">
       <div class="FieldGroup">
         <label for="UserName">Select User: </label><br/>
         <select name="UserMapID" data-placeholder="Select an User">

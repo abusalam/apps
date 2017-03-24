@@ -24,9 +24,7 @@ WebLib::IncludeJS('js/chosen.jquery.min.js');
   ?>
   <div class="content">
     <div class="formWrapper">
-      <form method="post" action="<?php
-      echo WebLib::GetVal($_SERVER, 'PHP_SELF');
-      ?>"><?php
+      <form method="post" action="Department.php"><?php
               include __DIR__ . '/DataMPR.php';
               WebLib::ShowMsg();
               ?>

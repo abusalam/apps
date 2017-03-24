@@ -170,7 +170,7 @@ WebLib::ShowMenuBar('APPS');
       WebLib::ShowMsg();
       ?>
       <form name="frmLogin" method="post"
-            action="<?php $_SERVER['PHP_SELF'] ?>">
+            action="login.php">
         <label for="UserID">
           <strong>User ID</strong> (Registered E-Mail)
           <input type="text" id="UserID" class="form-TxtInput"

@@ -141,7 +141,7 @@ class MySQLiDB {
     if ($row[0] == null)
       return 0;
     else
-      return htmlspecialchars($row[0]);
+      return htmlentities($row[0]);
   }
 
   /**
@@ -270,8 +270,8 @@ class MySQLiDB {
         $sel = "selected";
       else
         $sel = "";
-      echo '<option value="' . htmlspecialchars($Row[$val])
-      . '"' . $sel . '>' . htmlspecialchars($Row[$txt]) . '</option>';
+      echo '<option value="' . htmlentities($Row[$val])
+      . '"' . $sel . '>' . htmlentities($Row[$txt]) . '</option>';
     }
   }
 
@@ -316,7 +316,7 @@ class MySQLiDB {
       $i = 0;
       foreach ($line as $col_value) {
         echo "\t<tr>\n";
-        echo '<th  style="background-color:#FFDA91;font-weight:bold;text-align:left;border: 1px solid black;">' . htmlspecialchars(mysql_field_name($this->RecSet, $i)) . '</th>';
+        echo '<th  style="background-color:#FFDA91;font-weight:bold;text-align:left;border: 1px solid black;">' . htmlentities(mysql_field_name($this->RecSet, $i)) . '</th>';
         echo "\t\t" . '<td style="border: 1px solid black;">' . $col_value . "</td>\n";
         //$strdt=date("F j, Y, g:i:s a",$ntime);
         //echo "\t\t<td>$strdt</td>\n";

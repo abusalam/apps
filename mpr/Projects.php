@@ -25,9 +25,7 @@ WebLib::IncludeJS('js/chosen.jquery.min.js');
   ?>
   <div class="content">
     <div class="formWrapper">
-      <form method="post" action="<?php
-      echo WebLib::GetVal($_SERVER, 'PHP_SELF');
-      ?>">
+      <form method="post" action="Projects.php">
         <h3>Project</h3>
         <label for="ProjectName"><strong>Name of Project</strong>
         </label>
