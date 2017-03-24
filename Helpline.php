@@ -80,11 +80,12 @@ WebLib::JQueryInclude();
           <?php
         } else {
           echo '<h3>Thankyou for your valuable time and appreciation.</h3>'; //.$message;
-          $Data = new MySQLiDB();
-          $HelpQry = 'Insert into ' . MySQL_Pre . 'Helpline(IP,SessionID,UserMapID,TxtQry) '
-                  . 'Values(\'' . $_SERVER['REMOTE_ADDR'] . '\',\'' . session_id()
-                  . '\',\'' . $_SESSION['UserMapID'] . '\',\'' . $fd . '\')';
-          $Submitted = $Data->do_ins_query($HelpQry);
+          $Data = new MySQLiDBHelper();
+          $HelpData['IP']= $_SERVER['REMOTE_ADDR'];
+          $HelpData['SessionID']= session_id();
+          $HelpData['UserMapID']= $_SESSION['UserMapID'];
+          $HelpData['TxtQry']= $fd;
+          $Submitted = $Data->insert(MySQL_Pre . 'Helpline',$HelpData);
           if ($Submitted > 0)
             $_SESSION['SendQry'] = "0";
           else

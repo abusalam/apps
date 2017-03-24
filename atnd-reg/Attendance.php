@@ -34,23 +34,24 @@ function PrintArr($Arr) {
     <h2>Attendance Register</h2>
     <form name="frmEditUser" id="frmAssignParts" method="post" action="<?php echo WebLib::GetVal($_SERVER, 'PHP_SELF'); ?>">
       <?php
-      $Data = new MySQLiDB();
+      $Data = new MySQLiDBHelper();
 
       if ((WebLib::GetVal($_POST, 'CmdAtnd') !== null) && (WebLib::GetVal($_SESSION, 'AtndDone') !== '1')) {
-        if ($_SESSION['InOut'] === 'In') {
-          $AtndQuery = 'INSERT INTO `' . MySQL_Pre . 'ATND_Register` (`UserMapID`, `InDateTime`) '
-                  . 'VALUES (' . $_SESSION['UserMapID'] . ',FROM_UNIXTIME(' . $_SESSION['ATND_TIME'] . '));';
-        } else {
-          $AtndQuery = 'Update `' . MySQL_Pre . 'ATND_Register` '
-                  . 'Set `OutDateTime`=FROM_UNIXTIME(' . $_SESSION['ATND_TIME'] . ')'
-                  . ' Where `AtndID`=' . $_SESSION['AtndID'] . ';';
-        }
-        $_SESSION['Query'] = $AtndQuery;
         $MobileNo=$Data->do_max_query('Select MobileNo FROM `' . MySQL_Pre . 'Users`'
                             .' WHERE `UserMapID`=' . $_SESSION['UserMapID']);
 
         if (strstr($_SERVER['REMOTE_ADDR'], '10.173.168.') !== false) {
-          if ($Data->do_ins_query($AtndQuery) > 0) {
+          if ($_SESSION['InOut'] === 'In') {
+            $AtndData['UserMapID']=WebLib::GetVal($_SESSION,'UserMapID',true);
+            $AtndData['InDateTime']=$_SESSION['ATND_TIME'];
+            $AtndDone=$Data->insert(MySQL_Pre . 'ATND_Register',$AtndData);
+          } else {
+            $Data->where('AtndID',WebLib::GetVal($_SESSION,'AtndID',true));
+            $AtndData['OutDateTime']=$_SESSION['ATND_TIME'];
+            $AtndDone=$Data->update(MySQL_Pre . 'ATND_Register',$AtndData);
+          }
+          unset($Data);
+          if ($AtndDone > 0) {
             $_SESSION['Msg'] = 'Attendance Registered!';
             $_SESSION['AtndDone'] = '1';
             if (UseSMSGW === true) {
@@ -75,6 +76,7 @@ function PrintArr($Arr) {
       }
       WebLib::ShowMsg();
 
+      $Data = new MySQLiDB();
       $Query = 'SELECT Max(`AtndID`) as `AtndID` FROM `' . MySQL_Pre . 'ATND_Register`'
               . ' WHERE `UserMapID`=' . $_SESSION['UserMapID'] . ' AND `InDateTime`>CURDATE();';
       $_SESSION['AtndID'] = $Data->do_max_query($Query);

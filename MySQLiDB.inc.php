@@ -152,9 +152,10 @@ class MySQLiDB {
    * @param string $querystr
    * @return int
    */
-  public function do_ins_query($querystr) {
-    $this->do_connect();
-    $this->RecSet = mysql_query($querystr, $this->conn);
+  public function do_ins_query($TableName, $FieldData=array()) {
+    $Data = new MySQLiDBHelper();
+    $this->RecSet = $Data->insert($TableName, $FieldData);
+    unset($Data);
     if (!$this->RecSet) {
       $message = 'Error in Inserting into database.'; // . mysql_error();
       //$message .= 'Whole query: '. $querystr."<br>";
@@ -165,8 +166,7 @@ class MySQLiDB {
       return 0;
     }
     $this->NoResult = 1;
-    $this->RowCount = mysql_affected_rows($this->conn);
-    return $this->RowCount;
+    return $this->RecSet;
   }
 
   /**
@@ -175,23 +175,12 @@ class MySQLiDB {
    * Returns the number of rows fetched
    *
    * @param string $querystr
-   * @return int
+   * @return array
    */
   public function do_sel_query($querystr) {
-    $this->do_connect();
-    $this->RecSet = mysql_query($querystr, $this->conn);
-    if (mysql_errno($this->conn)) {
-      if ($this->Debug) { //Show error only in debug mode
-        $_SESSION['Msg'] = mysql_error($this->conn);
-      }
-      $this->NoResult = 1;
-      $this->RowCount = 0;
-      return 0;
-    }
-    $this->NoResult = 0;
-    $this->RowCount = mysql_num_rows($this->RecSet);
-    $this->ColCount = mysql_num_fields($this->RecSet);
-    return $this->RowCount;
+    // TODO :: Find All Usage and Review
+    $Data = new MySQLiDBHelper();
+    return $Data->rawQuery($querystr);
   }
 
   /**
