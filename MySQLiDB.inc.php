@@ -305,31 +305,6 @@ class MySQLiDB {
     return (count($Rows));
   }
 
-  public function ShowTableKiosk($QueryString) {
-    // Connecting, selecting database
-    $this->do_sel_query($QueryString);
-    // Printing results in HTML
-    echo '<table rules="all" frame="box" width="100%" cellpadding="5" cellspacing="1" border="1">';
-    echo '<tr><td colspan="2" style="background-color:#F4A460;height:3px;border: 1px solid black;"></td></tr>';
-    $i = 0;
-    while ($line = mysql_fetch_array($this->RecSet, MYSQL_ASSOC)) {
-      $i = 0;
-      foreach ($line as $col_value) {
-        echo "\t<tr>\n";
-        echo '<th  style="background-color:#FFDA91;font-weight:bold;text-align:left;border: 1px solid black;">' . htmlentities(mysql_field_name($this->RecSet, $i)) . '</th>';
-        echo "\t\t" . '<td style="border: 1px solid black;">' . $col_value . "</td>\n";
-        //$strdt=date("F j, Y, g:i:s a",$ntime);
-        //echo "\t\t<td>$strdt</td>\n";
-        echo "\t</tr>\n";
-        $i++;
-      }
-      echo '<tr><td colspan="2" style="background-color:#F4A460;height:3px;border: 1px solid black;"></td></tr>';
-    }
-    echo "</table>\n";
-    $this->do_close();
-    return ($i);
-  }
-
   /**
    * Closes the current database connection
    */

@@ -4,7 +4,8 @@
  * @todo Unique Random ID Generator function to be included
  * @todo HelpLine has to be added
  * @todo Menus made to be Database driven
- * @todo *** VVI *** Make Modernizr to display message if browser is not capable.
+ * @todo *** VVI *** Make Modernizr to display message if browser is not
+ *       capable.
  *
  *
  * block attempts to directly run this script from script directory
@@ -122,8 +123,8 @@ class WebLib {
    * Deployment info of the server
    */
   public static function DeployInfo($EnableLoging = false) {
-    $_SESSION['Version'] = `git describe --tags`;
-    $_SESSION['Version'] .= date('Ymd');
+    $_SESSION['Version']  = `git describe --tags`;
+    $_SESSION['Version']  .= date('Ymd');
     $_SESSION['AppTitle'] = AppTitle;
     if ($EnableLoging === true) {
       $ch = curl_init();
@@ -140,7 +141,8 @@ class WebLib {
   /**
    * Generates DOCTYPE and Page Title for HTML5
    *
-   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in Database Config.inc.php
+   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in Database
+   * Config.inc.php
    * @param string $PageTitle Title of the page
    */
   public static function Html5Header($PageTitle = 'Paschim Medinipur') {
@@ -203,18 +205,21 @@ class WebLib {
   }
 
   /**
-   * <b>WebLib::GetVal($Array, $Index, [$ForSQL = FALSE, [$HTMLSafe = TRUE]])</b>
+   * <b>WebLib::GetVal($Array, $Index, [$ForSQL = FALSE, [$HTMLSafe =
+   * TRUE]])</b>
    *
    * Returns value of an array element without cousing warning/error
    *
-   * @param array $Array eg. $_SESSION
-   * @param string $Index eg. 'index'
-   * @param bool $ForSQL If set to true then SQLSafe else htmlentities will be applied
-   * @param bool $HTMLSafe If FALSE then OutPut without htmlentities
+   * @param array  $Array    eg. $_SESSION
+   * @param string $Index    eg. 'index'
+   * @param bool   $ForSQL   If set to true then SQLSafe else htmlentities will
+   *                         be applied
+   * @param bool   $HTMLSafe If FALSE then OutPut without htmlentities
    * @return null|$Array[$Index]
-   * @example WebLib::GetVal($Array, $Index) = htmlentities | NULL
-   * @example WebLib::GetVal($Array, $Index, TRUE) = SqlSafe | ''
-   * @example WebLib::GetVal($Array, $Index, FALSE, FALSE) = raw output | NULL
+   * @example     WebLib::GetVal($Array, $Index) = htmlentities | NULL
+   * @example     WebLib::GetVal($Array, $Index, TRUE) = SqlSafe | ''
+   * @example     WebLib::GetVal($Array, $Index, FALSE, FALSE) = raw output |
+   *              NULL
    */
   public static function GetVal($Array,
                                 $Index,
@@ -280,8 +285,8 @@ class WebLib {
     $size  = strlen($chars);
     $str   = '';
     for ($i = 0; $i < $length; $i++) {
-      $Chr = $chars[rand(0, $size - 1)];
-      $str .= $Chr;
+      $Chr   = $chars[rand(0, $size - 1)];
+      $str   .= $Chr;
       $chars = str_replace($Chr, '', $chars);
       $size  = strlen($chars);
     }
@@ -321,14 +326,14 @@ class WebLib {
 
   public static function ShowMsg() {
     if (self::GetVal($_SESSION, 'Msg') != '') {
-      echo '<span class="Message">' . self::GetVal($_SESSION, 'Msg', false,
-          false) . '</span><br/>';
+      echo '<span class="Message">' . self::GetVal($_SESSION, 'Msg') . '</span><br/>';
       $_SESSION['Msg'] = '';
     }
   }
 
   /**
-   * Displays Page Informations and Records Visit Count in MySQL_Pre.Visits table
+   * Displays Page Informations and Records Visit Count in MySQL_Pre.Visits
+   * table
    * @todo Active User Count to be incorporated with LifeTime Limit
    */
   public static function PageInfo() {
@@ -361,7 +366,7 @@ class WebLib {
     $_SESSION['LifeTime'] = time();
     echo '<strong > Last Updated On:</strong> &nbsp;&nbsp;'
       . date('l d F Y g:i:s A ', filemtime($strfile))
-      . ' IST &nbsp;&nbsp;&nbsp;<b>Your IP: </b>' . $_SERVER['REMOTE_ADDR']
+      . ' IST &nbsp;&nbsp;&nbsp;<b>Your IP: </b>' . self::GetVal($_SERVER, 'REMOTE_ADDR')
       . '&nbsp;&nbsp;&nbsp;<b>Visits:</b>&nbsp;&nbsp;' . $VisitorNum
       . '&nbsp;&nbsp;&nbsp;<span id="ED"><b>Loaded In:</b> '
       . round(microtime(true) - self::GetVal($_SESSION, 'ET'), 3) . ' Sec</span>';
@@ -369,7 +374,8 @@ class WebLib {
   }
 
   /**
-   * Shows Static Footer Information and Records Execution Duration with Visitor Logs
+   * Shows Static Footer Information and Records Execution Duration with
+   * Visitor Logs
    */
   public static function FooterInfo() {
     echo 'Designed and Developed By '
@@ -433,8 +439,8 @@ class WebLib {
     } else {
       if (self::GetVal($_SESSION, 'LifeTime') < (time() - (LifeTime * 60))) {
         return 'TimeOut(' . time() . '-'
-        . self::GetVal($_SESSION, 'LifeTime') . '='
-        . (time() - self::GetVal($_SESSION, 'LifeTime')) . ' Sec)';
+          . self::GetVal($_SESSION, 'LifeTime') . '='
+          . (time() - self::GetVal($_SESSION, 'LifeTime')) . ' Sec)';
       } else {
         if (self::GetVal($_SESSION, 'SESSION_TOKEN') !=
           self::GetVal($_COOKIE, 'SESSION_TOKEN')
@@ -443,17 +449,16 @@ class WebLib {
             . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN') . ')';
 
           return 'INVALID SESSION TOKEN ('
-          . self::GetVal($_SESSION, 'SESSION_TOKEN')
-          . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN') . ')';
+            . self::GetVal($_SESSION, 'SESSION_TOKEN')
+            . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN') . ')';
         } elseif (self::GetVal($_SESSION, 'ID') !== session_id()) {
-          $_SESSION['Debug'] = '(' . self::GetVal($_SESSION, 'ID')
-            . ' = ' . session_id() . ')';
+          $_SESSION['Debug'] = '(Invalid Session ID)';
           return 'INVALID SESSION ID';
         } elseif (self::IsAllowed($ScriptURL) === false) {
           return 'Restricted!';
         } elseif (self::GetVal($_SESSION, 'AppKey') !== AppKey) {
           return 'Invalid AppKey(' . self::GetVal($_SESSION, 'AppKey')
-          . '-' . AppKey . ')!';
+            . '-' . AppKey . ')!';
         } elseif (self::GetVal($_SESSION, 'UserMapID') !== null) {
           return 'Valid';
         }
@@ -604,9 +609,9 @@ class WebLib {
     $Class        = ($IsSameScript) ? 'SelMenuitems' : 'Menuitems';
 
     return '<li class = "' . $Class . '">'
-    . '<a href = "' . $_SESSION['BaseURL'] . $URL . '">'
-    . $Caption . '</a>'
-    . '</li>';
+      . '<a href = "' . $_SESSION['BaseURL'] . $URL . '">'
+      . $Caption . '</a>'
+      . '</li>';
   }
 
   /**
@@ -721,8 +726,8 @@ class WebLib {
   /**
    * Returns the leafnodes of a subtree from a given node
    *
-   * @todo Searches the whole tree every time,
-   * @todo tree should be reduced to subtrees filtering by parents
+   * @todo  Searches the whole tree every time,
+   * @todo  tree should be reduced to subtrees filtering by parents
    *
    * @param (ref) array $Tree[](P,C);
    * @param int $Node (P)
@@ -775,8 +780,8 @@ class WebLib {
     }
     if (self::GetVal($_SESSION, 'BaseDIR') === null) {
       $_SESSION['AppROOT'] = __DIR__ . '/';
-      $_SESSION['BaseDIR'] = substr($_SERVER['SCRIPT_NAME'], 0,
-        strlen($_SERVER['SCRIPT_NAME']) - $PageLength);
+      $_SESSION['BaseDIR'] = substr(self::GetVal($_SERVER, 'SCRIPT_NAME'), 0,
+        strlen(self::GetVal($_SERVER, 'SCRIPT_NAME')) - $PageLength);
       $Proto               = (self::GetVal($_SERVER, 'HTTPS') === 'on') ? 'https://' : 'http://';
       $_SESSION['BaseURL'] = $Proto . $_SERVER['HTTP_HOST'] . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
@@ -786,7 +791,8 @@ class WebLib {
   }
 
   /**
-   * Restricts Access to the script from Specified IP Addresses in IntraNIC Table
+   * Restricts Access to the script from Specified IP Addresses in IntraNIC
+   * Table
    */
   public static function IntraNIC() {
     $Data = new MySQLiDBHelper(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
@@ -804,12 +810,12 @@ class WebLib {
   /**
    * Displays a HTML Combo filled with options specified by $txt & $val
    *
-   * @param string $val Name of the Field which will be used as value
-   * @param string $txt Name of the Field which will be shown in options
-   * @param string $query Should select the $val & $txt fields
+   * @param string $val     Name of the Field which will be used as value
+   * @param string $txt     Name of the Field which will be shown in options
+   * @param string $query   Should select the $val & $txt fields
    * @param string $sel_val Value of the Option to be selected
    * @example Output: <option value="$row[$val]"> $row[$txt] < /option>;
-   * htmlspecialchars() applied to all the values
+   *                        htmlspecialchars() applied to all the values
    */
   public static function showSelect($val, $txt, $query, $sel_val = "") {
     $DB   = new MySQLiDBHelper();

@@ -71,7 +71,7 @@ function PrintArr($Arr) {
                   . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
                   . ' On: ' . date('d/m/Y l H:i:s A', $_SESSION['ATND_TIME']);
           SMSGW::SendSMS($TxtSMS, AdminMobile);
-          $_SESSION['Msg'] = 'UnAuthorised Access From IP:' . $_SERVER['REMOTE_ADDR'];
+          $_SESSION['Msg'] = 'UnAuthorised Access From IP:' . WebLib::GetVal($_SERVER,'REMOTE_ADDR');
         }
       }
       WebLib::ShowMsg();
