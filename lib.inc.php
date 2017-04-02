@@ -178,7 +178,7 @@ class WebLib {
    * @param string $PathToJS src including path
    */
   public static function IncludeJS($PathToJS) {
-    echo '<script type="text/javascript" src="' . $_SESSION['BaseURL'] . $PathToJS . '"></script>';
+    echo '<script type="text/javascript" src="' . self::GetVal($_SESSION,'BaseURL') . $PathToJS . '"></script>';
   }
 
   /**
@@ -189,7 +189,7 @@ class WebLib {
    * @param string $PathToCSS href including path
    */
   public static function IncludeCSS($PathToCSS = 'css/Style.css') {
-    echo '<link type="text/css" href="' . $_SESSION['BaseURL'] . $PathToCSS . '" rel="Stylesheet" />';
+    echo '<link type="text/css" href="' . self::GetVal($_SESSION,'BaseURL') . $PathToCSS . '" rel="Stylesheet" />';
   }
 
   /**
@@ -597,7 +597,7 @@ class WebLib {
       array(new FilterSame('AppID', $AppID), 'IsSame'));
     foreach ($MenuItems as $MenuItem) {
       if (self::IsAllowed($MenuItem['URL'])) {
-        echo self::ShowMenuitem($MenuItem['Caption'], $MenuItem['URL']);
+        echo self::ShowMenuitem(self::GetVal($MenuItem,'Caption'), self::GetVal($MenuItem,'URL'));
       }
     }
     echo '</ul></div>';
@@ -783,7 +783,7 @@ class WebLib {
       $_SESSION['BaseDIR'] = substr(self::GetVal($_SERVER, 'SCRIPT_NAME'), 0,
         strlen(self::GetVal($_SERVER, 'SCRIPT_NAME')) - $PageLength);
       $Proto               = (self::GetVal($_SERVER, 'HTTPS') === 'on') ? 'https://' : 'http://';
-      $_SESSION['BaseURL'] = $Proto . $_SERVER['HTTP_HOST'] . $_SESSION['BaseDIR'];
+      $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER,'HTTP_HOST') . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
       //self::DeployInfo();
       $_SESSION['Version'] = 'v1.1-314-g6debe48 20150207';
