@@ -17,6 +17,7 @@ if (version_compare(phpversion(), '5.3.0', 'ge')) {
 WebLib::SetPATH();
 WebLib::InitHTML5page('Home');
 WebLib::IncludeCSS();
+WebLib::IncludeCSS('css/forms.css');
 ?>
 </head>
 <body>

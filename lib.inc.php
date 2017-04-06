@@ -378,10 +378,7 @@ class WebLib {
   public static function FooterInfo() {
     echo 'Designed and Developed By '
       . '<strong>National Informatics Centre</strong>, '
-      . 'Paschim Medinipur District Centre<br/>'
-      . 'L. A. Building (2nd floor), Collectorate Compound, Midnapore<br/>'
-      . 'West Bengal - 721101 , India Phone : +91-3222-263506, '
-      . 'Email: wbmdp(a)gov.in<br/>';
+      . 'Paschim Medinipur District Centre<br/>';
     echo $_SESSION['Version'];
     $_SESSION['ED']            = round(microtime(true) - self::GetVal($_SESSION,
         'ET'), 3);
