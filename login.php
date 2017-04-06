@@ -51,7 +51,7 @@ if ($action == "LogOut") {
   WebLib::InitSess();
 }
 
-if (WebLib::GetVal($_SESSION, 'TryCount') >= $FailedTry) {
+if ((WebLib::GetVal($_SESSION, 'TryCount') >= $FailedTry) && UseCaptcha) {
   $ValidCaptcha = WebLib::StaticCaptcha();
 } else {
   $ValidCaptcha = true;
@@ -182,8 +182,8 @@ WebLib::ShowMenuBar('APPS');
                  name="UserPass" value="" autocomplete="off"/>
         </label>
         <?php
-        if (WebLib::GetVal($_SESSION, 'TryCount') >= $FailedTry) {
-          WebLib::StaticCaptcha(true);
+        if ((WebLib::GetVal($_SESSION, 'TryCount') >= $FailedTry) && UseCaptcha) {
+            WebLib::StaticCaptcha(true);
         }
         ?>
         <hr/>
