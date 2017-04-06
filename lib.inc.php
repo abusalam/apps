@@ -163,9 +163,9 @@ class WebLib {
    * Generates call to jQuery Scripts in Head Section
    */
   public static function JQueryInclude() {
-    echo '<link href="css/smoothness/jquery-ui.min.css" type="text/css" rel="Stylesheet" />'
-      . '<script type="text/javascript" src="js/jquery-ui.min.js"></script>'
-      . '<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>';
+    self::IncludeJS('js/jquery-1.10.2.min.js');
+    self::IncludeJS('js/jquery-ui.min.js');
+    self::IncludeCSS('css/smoothness/jquery-ui.min.css');
   }
 
   /**
