@@ -780,8 +780,8 @@ class WebLib {
       $Proto               = (self::GetVal($_SERVER, 'HTTPS') === 'on') ? 'https://' : 'http://';
       $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER,'HTTP_HOST') . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
-      //self::DeployInfo();
-      $_SESSION['Version'] = 'NIC/CSD/IA/11911 Level:01 20170405';
+      //self::DeployInfo(); // TODO :: Update Version for Production
+      $_SESSION['Version'] = 'NIC/CSD/IA/11911 Level:01 20170405 {SCA_11911-4-gcae9423 20170406}';
     }
   }
 
