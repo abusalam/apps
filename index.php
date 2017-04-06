@@ -31,9 +31,6 @@ WebLib::IncludeCSS();
   WebLib::ShowMenuBar('APPS');
 ?>
 <div class="content">
-    <span class="Message" id="Msg" style="float: right;">
-      <b>Loading please wait...</b>
-    </span>
     <div class="formWrapper">
         <h3 class="formWrapper-h3">PHP <?php echo phpversion(); ?></h3>
       <?php
