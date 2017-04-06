@@ -1,5 +1,6 @@
 <?php
-
+//ini_set('display_errors', 'On');
+//error_reporting(E_ALL);
 /**
  * @todo Unique Random ID Generator function to be included
  * @todo HelpLine has to be added
@@ -786,7 +787,7 @@ class WebLib {
       $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER,'HTTP_HOST') . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
       //self::DeployInfo();
-      $_SESSION['Version'] = 'v1.1-314-g6debe48 20150207';
+      $_SESSION['Version'] = 'NIC/CSD/IA/11911 Level:01 20170405';
     }
   }
 
