@@ -57,8 +57,11 @@ class SMSGW {
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-    $curl_output = curl_exec($ch);
-
+    if (UseSMSGW === true) {
+      $curl_output = curl_exec($ch);
+    } else {
+      $curl_output = 'SMS Gateway disabled in configuration.';
+    }
     curl_close($ch);
 
     return $curl_output;

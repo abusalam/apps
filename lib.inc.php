@@ -324,7 +324,7 @@ class WebLib {
 
   public static function ShowMsg() {
     if (self::GetVal($_SESSION, 'Msg') != '') {
-      echo '<span class="Message">' . self::GetVal($_SESSION, 'Msg') . '</span><br/>';
+      echo '<span class="Message">' . self::GetVal($_SESSION, 'Msg', false, false) . '</span><br/>';
       $_SESSION['Msg'] = '';
     }
   }
