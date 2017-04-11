@@ -176,7 +176,7 @@ class WebLib {
    * @param string $PathToJS src including path
    */
   public static function IncludeJS($PathToJS) {
-    echo '<script type="text/javascript" src="' . self::GetVal($_SESSION,'BaseURL') . $PathToJS . '"></script>';
+    echo '<script type="text/javascript" src="' . self::GetVal($_SESSION, 'BaseURL') . $PathToJS . '"></script>';
   }
 
   /**
@@ -187,7 +187,7 @@ class WebLib {
    * @param string $PathToCSS href including path
    */
   public static function IncludeCSS($PathToCSS = 'css/Style.css') {
-    echo '<link type="text/css" href="' . self::GetVal($_SESSION,'BaseURL') . $PathToCSS . '" rel="Stylesheet" />';
+    echo '<link type="text/css" href="' . self::GetVal($_SESSION, 'BaseURL') . $PathToCSS . '" rel="Stylesheet" />';
   }
 
   /**
@@ -217,7 +217,7 @@ class WebLib {
    * @example     WebLib::GetVal($Array, $Index) = htmlentities | NULL
    * @example     WebLib::GetVal($Array, $Index, TRUE) = SqlSafe | ''
    * @example     WebLib::GetVal($Array, $Index, FALSE, FALSE) = raw output |
-   *              NULL
+   *                         NULL
    */
   public static function GetVal($Array,
                                 $Index,
@@ -592,7 +592,7 @@ class WebLib {
       array(new FilterSame('AppID', $AppID), 'IsSame'));
     foreach ($MenuItems as $MenuItem) {
       if (self::IsAllowed($MenuItem['URL'])) {
-        echo self::ShowMenuitem(self::GetVal($MenuItem,'Caption'), self::GetVal($MenuItem,'URL'));
+        echo self::ShowMenuitem(self::GetVal($MenuItem, 'Caption'), self::GetVal($MenuItem, 'URL'));
       }
     }
     echo '</ul></div>';
@@ -778,7 +778,7 @@ class WebLib {
       $_SESSION['BaseDIR'] = substr(self::GetVal($_SERVER, 'SCRIPT_NAME'), 0,
         strlen(self::GetVal($_SERVER, 'SCRIPT_NAME')) - $PageLength);
       $Proto               = (self::GetVal($_SERVER, 'HTTPS') === 'on') ? 'https://' : 'http://';
-      $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER,'HTTP_HOST') . $_SESSION['BaseDIR'];
+      $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER, 'HTTP_HOST') . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
       //self::DeployInfo(); // TODO :: Update Version for Production
       $_SESSION['Version'] = 'NIC/CSD/IA/11911 Level:01 20170405 {SCA_11911-4-gcae9423 20170406}';
