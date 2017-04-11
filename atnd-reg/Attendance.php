@@ -42,7 +42,7 @@ function PrintArr($Arr) {
       $Data = new MySQLiDBHelper();
 
       if ((WebLib::GetVal($_POST, 'CmdAtnd') !== null) && (WebLib::GetVal($_SESSION, 'AtndDone') !== '1')) {
-        $MobileNo=explode('', $Data->query('Select MobileNo FROM `' . MySQL_Pre . 'Users`'
+        $MobileNo=@explode('', $Data->query('Select MobileNo FROM `' . MySQL_Pre . 'Users`'
                             .' WHERE `UserMapID`=' . $_SESSION['UserMapID']));
 
         if (strstr($_SERVER['REMOTE_ADDR'], AtndAllowedIP) !== false) {

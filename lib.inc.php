@@ -1,6 +1,6 @@
 <?php
-//ini_set('display_errors', 'On');
-//error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
 /**
  * @todo Unique Random ID Generator function to be included
  * @todo HelpLine has to be added
