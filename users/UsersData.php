@@ -119,6 +119,8 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
           } else {
             $_SESSION['Msg'] = 'Password has been Reset: ' . $TxtBody . '<br/>';
           }
+        } else {
+          $_SESSION['Msg'] = 'Unable to reset Password. May be due to locked account.<br/>';
         }
 
         $Subject  = 'User Account Password Reset - Paschim Medinipur District Portal';

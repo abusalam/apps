@@ -73,6 +73,9 @@ WebLib::ShowMenuBar('WebSite');
             $_SESSION['Msg'] = "<h3>Registration successful.</h3>"
               . "<p>$TxtBody</p>"
               . "<b>Please Note: </b>Password is sent to: {$email}" . $SentSMS;
+          } else {
+            $_SESSION['Msg'] = "<h3>Registration successful but Unable to Send Email.</h3>"
+              . "<p>$TxtBody</p>";
           }
           WebLib::ShowMsg();
         }
