@@ -27,7 +27,9 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
     <hr/>
     <?php
     WebLib::ShowMsg();
-    $Data = new MySQLiDBHelper();
+    $Data         = new MySQLiDBHelper();
+    $NoMenuStatus = true;
+
     if ((WebLib::GetVal($_POST, 'CmdMenuAction') === 'Show Restricted Users') && isset($_POST['MenuID'])) {
       $Query = 'Select `U`.`UserMapID`,CONCAT(`UserName`,\' [\',`U`.`UserMapID`,\']\') as `UserName` '
               . ' FROM `' . MySQL_Pre . 'Users` as `U` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
@@ -54,6 +56,7 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
               . ' FROM `' . MySQL_Pre . 'Users`  Order By `UserName`');
       $RowsMenu = $Data->rawQuery('Select `MenuID`,`AppID`,`Caption` '
               . ' FROM `' . MySQL_Pre . 'MenuItems` Order By `AppID`,`MenuOrder`');
+      $NoMenuStatus = true;
     }
     ?>
     <form method="post" action="MenuACL.php">
@@ -80,11 +83,16 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
 
               echo '<li class="ListItem">Total Menus: ' . count($RowsMenu) . '</li>';
               foreach ($RowsMenu as $Index => $Menu) {
+                if ($NoMenuStatus) {
+                  $MenuStatus = '';
+                } else {
+                  $MenuStatus = $Status[substr($Menu['Caption'], -2, 1)];
+                }
                 echo '<li class="ListItem">'
                   . '<label for="Menu' . $Menu['MenuID'] . '" >'
                   . '<input id="Menu' . $Menu['MenuID'] . '" type="checkbox" name="MenuID[]" '
                   . 'value="' . $Menu['MenuID'] . '" />'
-                  . '<strong>' . $Menu['AppID'] . '=>' . $Menu['Caption'] . $Status[substr($Menu['Caption'],-2,1)] . '</strong>'
+                  . '<strong>' . $Menu['AppID'] . '=>' . $Menu['Caption'] . $MenuStatus . '</strong>'
                   . '</label></li>';
               }
               ?>
