@@ -19,8 +19,7 @@ if ($_REQUEST['Reply'] == '1') {
     unset($DB);
   }
   ?>
-    <form name="frmLogin" method="post"
-          action="Reply.php">
+    <form name="frmLogin" method="post" action="Helpline.php?Reply=1">
         <label for="ReplyTo">Reply To:</label> <select name="ReplyTo">
         <?php
         $Query = 'SELECT HelpID,CONCAT(\'[\',Replied,\'-\',HelpID,\'] \',UserName) as `AppName` '
