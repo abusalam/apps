@@ -48,11 +48,11 @@ function PrintArr($Arr) {
         if (strstr($_SERVER['REMOTE_ADDR'], AtndAllowedIP) !== false) {
           if ($_SESSION['InOut'] === 'In') {
             $AtndData['UserMapID']=WebLib::GetVal($_SESSION,'UserMapID',true);
-            $AtndData['InDateTime']=$_SESSION['ATND_TIME'];
+            $AtndData['InDateTime']=date('Y-m-d H:i:s', $_SESSION['ATND_TIME']);;
             $AtndDone=$Data->insert(MySQL_Pre . 'ATND_Register',$AtndData);
           } else {
             $Data->where('AtndID',WebLib::GetVal($_SESSION,'AtndID',true));
-            $AtndData['OutDateTime']=$_SESSION['ATND_TIME'];
+            $AtndData['OutDateTime']=date('Y-m-d H:i:s', $_SESSION['ATND_TIME']);;
             $AtndDone=$Data->update(MySQL_Pre . 'ATND_Register',$AtndData);
           }
           unset($Data);
@@ -78,7 +78,7 @@ function PrintArr($Arr) {
               . ' On: ' . date('d/m/Y l H:i:s A', $_SESSION['ATND_TIME']);
             SMSGW::SendSMS($TxtSMS, AdminMobile);
           }
-          $_SESSION['Msg'] = 'Attendance Not Permitted From IP:' . WebLib::GetVal($_SERVER,'REMOTE_ADDR');
+          $_SESSION['Msg'] = 'Attendance Not Permitted From IP:' . WebLib::GetVal($_SERVER, 'REMOTE_ADDR');
         }
       }
       WebLib::ShowMsg();
