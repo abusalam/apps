@@ -1,7 +1,4 @@
 <?php
-/**
- * @todo User Password Change incomplete [Working currently]
- */
 require_once(__DIR__ . '/../lib.inc.php');
 WebLib::AuthSession();
 WebLib::Html5Header("Profile");
@@ -97,13 +94,13 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
     //TODO :: Review Update Password
     $Data->where('UserMapID', $_SESSION['UserMapID']);
     $Users=$Data->get(MySQL_Pre . 'Users',1);
-    $Password=WebLib::GetVal($Users,'UserPass');
+    $Password=WebLib::GetVal($Users[0],'UserPass');
     if(md5($Password.$_SESSION['Token'])===WebLib::GetVal($_POST, 'OldPassWD')){
       $Data->where('Registered', 1);
       $Data->where('Activated', 1);
       $Data->where('UserMapID', $_SESSION['UserMapID']);
 
-      $PassData['Pass'] = WebLib::GetVal($_POST, 'CnfPassWD', true);
+      $PassData['UserPass'] = WebLib::GetVal($_POST, 'CnfPassWD', true);
       $Updated = $Data->update(MySQL_Pre . 'Users', $PassData);
       if ($Updated > 0) {
         $_SESSION['Msg'] = 'Password Changed Successfully!';

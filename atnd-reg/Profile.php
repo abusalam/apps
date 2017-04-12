@@ -1,7 +1,4 @@
 <?php
-/**
- * @todo User Password Change incomplete [Working currently]
- */
 require_once(__DIR__ . '/../lib.inc.php');
 WebLib::AuthSession();
 WebLib::Html5Header("Profile");
@@ -90,37 +87,46 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
     <span class="Message" id="Msg">
       <b>Loading please wait...</b>
     </span>
-    <?php
-    $Query = '';
-    if ((WebLib::GetVal($_POST, 'CnfPassWD') !== null) && ($_SESSION['Token'] === WebLib::GetVal($_POST, 'FormToken'))) {
-      $Data = new MySQLiDB();
-      $Pass = WebLib::GetVal($_POST, 'CnfPassWD', TRUE);
-      $UserMapID = WebLib::GetVal($_SESSION, 'UserMapID', TRUE);
-      $Query = 'Update `' . MySQL_Pre . 'Users` '
-              . ' SET `UserPass`=\'' . $Pass . '\' '
-              . ' Where Registered=1 AND Activated=1 AND UserMapID=\'' . $UserMapID . '\''
-              . ' AND MD5(concat(`UserPass`,\'' . WebLib::GetVal($_SESSION, 'Token', TRUE) . '\'))'
-              . ' =\'' . WebLib::GetVal($_POST, 'OldPassWD', TRUE) . '\';';
-      if ($Data->do_ins_query($Query) > 0) {
+  <?php
+
+  if ((WebLib::GetVal($_POST, 'CnfPassWD') !== null) && ($_SESSION['Token'] === WebLib::GetVal($_POST, 'FormToken'))) {
+    $Data = new MySQLiDBHelper();
+    $Data->where('UserMapID', $_SESSION['UserMapID']);
+    $Users=$Data->get(MySQL_Pre . 'Users',1);
+    $Password=WebLib::GetVal($Users[0],'UserPass');
+    if(md5($Password.$_SESSION['Token'])===WebLib::GetVal($_POST, 'OldPassWD')){
+      $Data->where('Registered', 1);
+      $Data->where('Activated', 1);
+      $Data->where('UserMapID', $_SESSION['UserMapID']);
+
+      $PassData['UserPass'] = WebLib::GetVal($_POST, 'CnfPassWD', true);
+      $Updated = $Data->update(MySQL_Pre . 'Users', $PassData);
+      if ($Updated > 0) {
         $_SESSION['Msg'] = 'Password Changed Successfully!';
       } else {
         $_SESSION['Msg'] = 'Unable to change password!';
       }
-      $Data->do_close();
+    } else {
+      $_SESSION['Msg'] = 'Wrong password!';
     }
-    $_SESSION['Token'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . $_SESSION['ET']);
-    WebLib::ShowMsg();
-    ?>
+    unset($Data);
+  }
+  $_SESSION['Token'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . $_SESSION['ET']);
+  WebLib::ShowMsg();
+  ?>
     <form id="ChgPwd-frm" action="Profile.php" method="post" autocomplete="off">
-      <h2>Change Password</h2>
-      <div id="chgpwd-dlg" title="Change Password">
-        <input type="password" placeholder="Old Password" name="OldPassWD" id="OldPassWD" /><br/>
-        <input type="password" placeholder="New Password" name="NewPassWD" id="NewPassWD" /><span id="PwdScore"></span><br/>
-        <input type="password" placeholder="Confirm Password" name="CnfPassWD" id="CnfPassWD" /><span id="PwdMatch"></span>
-      </div>
-      <input type="hidden" id="AjaxToken" name="FormToken"
-             value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>" />
-      <input type="button" id="ChgPwd" value="Change Password" />
+        <h2>Change Password</h2>
+        <div id="chgpwd-dlg" title="Change Password">
+            <input type="password" placeholder="Old Password" name="OldPassWD"
+                   id="OldPassWD"/><br/>
+            <input type="password" placeholder="New Password" name="NewPassWD"
+                   id="NewPassWD"/><span id="PwdScore"></span><br/>
+            <input type="password" placeholder="Confirm Password"
+                   name="CnfPassWD" id="CnfPassWD"/><span id="PwdMatch"></span>
+        </div>
+        <input type="hidden" id="AjaxToken" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
+        <input type="button" id="ChgPwd" value="Change Password"/>
     </form>
   </div>
   <div class="pageinfo">
