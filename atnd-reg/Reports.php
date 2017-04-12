@@ -23,7 +23,7 @@ if (WebLib::GetVal($_POST, 'FormName') === 'Download') {
   $Name      = WebLib::GetVal($_SESSION, 'UserName');
   //WebLib::GetVal($_POST, 'MonYr');
   $pdf->cols = $ColWidths;
-  $pdf->SetTitle($AttendanceReport);
+  $_SESSION['PDFName'] = 'Generated From: ' . $_SERVER['REMOTE_ADDR'];
   $pdf->Setauthor($Name);
   $pdf->SetTitle($AtndMonth);
   $pdf->AddPage();

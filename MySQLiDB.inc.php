@@ -175,12 +175,22 @@ class MySQLiDB {
    * Returns the number of rows fetched
    *
    * @param string $querystr
-   * @return array
+   * @return integer
    */
   public function do_sel_query($querystr) {
-    // TODO :: Find All Usage and Review
-    $Data = new MySQLiDBHelper();
-    return $Data->rawQuery($querystr);
+    $this->do_connect();
+    $this->RecSet = mysql_query($querystr, $this->conn);
+    if (mysql_errno($this->conn)) {
+      if ($this->Debug)
+        $_SESSION['Msg'] = mysql_error($this->conn);
+      $this->NoResult = 1;
+      $this->RowCount = 0;
+      return 0;
+    }
+    $this->NoResult = 0;
+    $this->RowCount = mysql_num_rows($this->RecSet);
+    $this->ColCount = mysql_num_fields($this->RecSet);
+    return $this->RowCount;
   }
 
   /**

@@ -94,7 +94,7 @@ class PDF extends FPDF_Protection {
     $this->Cell(0, 0, 'Page: ' . $this->PageNo() . ' of {nb}', 0, 1, 'R');
   }
 
-  function SplitLn($s, $SlNo = 1) {
+  function SplitLn($s, $SlNo = 0) {
     $c = 0;
     $this->maxln = 0;
     $ns = array();
