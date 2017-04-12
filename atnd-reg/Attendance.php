@@ -83,10 +83,13 @@ function PrintArr($Arr) {
       }
       WebLib::ShowMsg();
 
-      $Data = new MySQLiDB();
+      $Data = new MySQLiDBHelper();
       $Query = 'SELECT Max(`AtndID`) as `AtndID` FROM `' . MySQL_Pre . 'ATND_Register`'
               . ' WHERE `UserMapID`=' . $_SESSION['UserMapID'] . ' AND `InDateTime`>CURDATE();';
-      $_SESSION['AtndID'] = $Data->do_max_query($Query);
+      $AtndIDs=$Data->query($Query);
+      unset($Data);
+
+      $_SESSION['AtndID'] = (is_null($AtndIDs[0]['AtndID'])?0:$AtndIDs[0]['AtndID']);
 
       $Query = 'SELECT DATE_FORMAT(`InDateTime`,"%d-%m-%Y") as `Attendance Date`, '
               . ' DATE_FORMAT(`InDateTime`,"%r") as `In Time`, '
@@ -107,6 +110,7 @@ function PrintArr($Arr) {
     </form>
     <?php
     //PrintArr($_SESSION);
+    $Data = new MySQLiDB();
     $Data->ShowTable($Query);
     $Data->do_close();
     ?>
