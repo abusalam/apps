@@ -11,7 +11,7 @@ $Query = '';
 if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
   if (WebLib::GetVal($_POST, 'FormToken') !== WebLib::GetVal($_SESSION, 'FormToken')) {
     $_SESSION['action'] = 1;
-  } else {
+  } else if (isset($_POST['MenuID']) && isset($_POST['UserMapID'])) {
     // Authenticated Inputs
     switch (WebLib::GetVal($_POST, 'CmdMenuAction')) {
       case 'Restrict Menu':
