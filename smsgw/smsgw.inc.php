@@ -10,12 +10,11 @@ class SMSGW {
 
   public static function SendSMS($SMSData, $MobileNo, $MsgType = 'PM', $ScheTime = null, $DlrType = 5) {
 
-    $PostData['username'] = SMSGW_USER;
-
-    $PostData['pin'] = SMSGW_PASS;
+    $PostData['username']  = SMSGW_USER;
+    $PostData['pin']       = SMSGW_PASS;
     $PostData['signature'] = SMSGW_SENDER;
-    $PostData['mnumber'] = $MobileNo;
-    $PostData['message'] = $SMSData;
+    $PostData['mnumber']   = $MobileNo;
+    $PostData['message']   = $SMSData;
 
     /**
      * Scheduled time to deliver this message in the format of yyyy/MM/dd/HH/mm;
@@ -47,7 +46,7 @@ class SMSGW {
 
     $ch = curl_init();
 
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     curl_setopt($ch, CURLOPT_USERPWD, SMSGW_USER . ':' . SMSGW_PASS);
 
@@ -62,11 +61,29 @@ class SMSGW {
     } else {
       $curl_output = 'SMS Gateway disabled in configuration.';
     }
+
+    if ($curl_output === false) {
+      $Status = curl_errno($ch);
+    } else {
+      $Status = $curl_output;
+    }
+
     curl_close($ch);
 
-    return $curl_output;
+    return self::UsageLog($MobileNo, $SMSData, $Status, 'APPS');
   }
 
-}
+  private static function UsageLog($MobileNo, $MsgText, $Status, $AppID) {
 
-?>
+    $UsageData['MobileNo'] = $MobileNo;
+    $UsageData['MsgText']  = $MsgText;
+    $UsageData['AppID']    = $AppID;
+    $UsageData['Status']   = $Status;
+    $UsageData['Script']   = __FILE__ . '[' . __LINE__ . ']';
+
+    $MySQLiDB = new MySQLiDBHelper();
+    $MySQLiDB->insert(MySQL_Pre . 'SMS_Usage', $UsageData);
+
+    return $Status;
+  }
+}
