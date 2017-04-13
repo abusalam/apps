@@ -54,7 +54,7 @@ class AttendanceAPI extends AndroidAPI {
 	$Data		   = array();
 	//array_push($Data, $DB->get(MySQL_Pre . 'AR_View'));
 	//array_push($Data, $DB->get(MySQL_Pre . 'SMS_NoDefsUsage'));
-	$Data['AR']	   = $DB->get(MySQL_Pre . 'AR_View');
+	$Data['AR']	   = $DB->get(MySQL_Pre . 'ATND_View');
 	$this->Resp['DB']  = array();
         array_push($this->Resp['DB'], $Data);
 

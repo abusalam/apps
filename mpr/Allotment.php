@@ -12,7 +12,7 @@ if (isset($_POST['BtnAll']) == 1) {
   $DB = new MySQLiDBHelper();
   $insertdata['SchemeID'] = $_POST['Scheme'];
   $insertdata['BlockID'] = $_POST['Block'];
-  $insertdata['AllotmentDate'] = $_POST['txtDate'];
+  $insertdata['AllotmentDate'] = WebLib::ToDBDate(WebLib::GetVal($_POST,'txtDate'));
   $insertdata['Amount'] = $_POST['txtAmount'];
   //$insertdata['UserMapID']="2";
   $SchemeID = $DB->insert(MySQL_Pre . 'MPR_Allotment', $insertdata);

@@ -1,5 +1,5 @@
 <?php
-ini_set('display_errors', 'On');
+ini_set('display_errors', 'On'); // TODO:: Turn Off for Security Audit
 error_reporting(E_ALL);
 
 /**
@@ -602,7 +602,7 @@ class WebLib {
         echo self::ShowMenuitem(self::GetVal($MenuItem, 'Caption'), self::GetVal($MenuItem, 'URL'));
       }
     }
-    echo '<li class="Menuitems" style="float:right;">' . $_SESSION['UserName'] . '</li>';
+    echo '<li class="Menuitems" style="float:right;">' . WebLib::GetVal($_SESSION, 'UserName') . '</li>';
     echo '</ul></div>';
   }
 
