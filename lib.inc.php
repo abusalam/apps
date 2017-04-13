@@ -1,6 +1,13 @@
 <?php
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
+
+/**
+ * Defined Version for application
+ * @version v1.0.1 SCA_11911 20170413
+ */
+define('APPS_Version', 'v1.0.1 SCA_11911 20170413');
+
 /**
  * @todo Unique Random ID Generator function to be included
  * @todo HelpLine has to be added
@@ -379,7 +386,7 @@ class WebLib {
     echo 'Designed and Developed By '
       . '<strong>National Informatics Centre</strong>, '
       . 'Paschim Medinipur District Centre<br/>';
-    echo $_SESSION['Version'];
+    echo APPS_Version;
     $_SESSION['ED']            = round(microtime(true) - self::GetVal($_SESSION,
         'ET'), 3);
     $reg                       = new MySQLiDBHelper();
