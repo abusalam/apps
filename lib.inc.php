@@ -602,6 +602,7 @@ class WebLib {
         echo self::ShowMenuitem(self::GetVal($MenuItem, 'Caption'), self::GetVal($MenuItem, 'URL'));
       }
     }
+    echo '<li class="Menuitems" style="float:right;">' . $_SESSION['UserName'] . '</li>';
     echo '</ul></div>';
   }
 
