@@ -7,7 +7,7 @@ error_reporting(E_ALL);
  * @version v1.0.1 SCA_11911 20170413
  */
 define('APPS_Version', 'v1.0.1 SCA_11911 20170413');
-
+date_default_timezone_set('Asia/Kolkata');
 /**
  * @todo Unique Random ID Generator function to be included
  * @todo HelpLine has to be added
