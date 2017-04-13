@@ -21,8 +21,9 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
       case 'Create':
         if (strlen(WebLib::GetVal($_POST, 'UserName')) > 2) {
           $Query = 'Insert Into `' . MySQL_Pre . 'Users` '
-            . '(`UserName`,`CtrlMapID`,`Registered`,`Activated`)'
-            . ' Values(\'' . WebLib::GetVal($_POST, 'UserName', true)
+            . '(`UserName`,`DisplayName`,`CtrlMapID`,`Registered`,`Activated`)'
+            . ' Values(\'' . WebLib::GetVal($_POST, 'Designation', true)
+            . '\',\'' . WebLib::GetVal($_POST, 'UserName', true)
             . '\',' . WebLib::GetVal($_SESSION, 'UserMapID', true) . ',0,0)';
         } else {
           $Query           = '';

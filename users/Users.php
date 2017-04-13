@@ -56,6 +56,9 @@ $Data = new MySQLiDB();
         <label for="UserName">User Name: </label>
         <input type="text" name="UserName" id="UserName" required/>
         <br/>
+        <label for="UserName">Desgination: </label>
+        <input type="text" name="Designation" id="UserDesg" required/>
+        <br/>
         <input type="hidden" name="FormToken"
                value="<?php
                echo WebLib::GetVal($_SESSION, 'FormToken')

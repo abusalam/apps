@@ -120,11 +120,11 @@ function SQLDefs($ObjectName) {
       break;
 
     case 'UsersData':
-      // Super Admin Password 'test@123'
+      //TODO:: Super Admin Password 'test@123'
       $SqlDB = 'INSERT INTO `' . MySQL_Pre . 'Users`'
-          . '(`UserID`, `UserName`, `UserPass`, `UserMapID`, `CtrlMapID`,'
+          . '(`UserID`, `MobileNo`, `DisplayName`, `UserName`, `UserPass`, `UserMapID`, `CtrlMapID`,'
           . '`Registered`, `Activated`) '
-          . 'VALUES (\'Admin\',\'Super Administrator\','
+          . 'VALUES (\'Admin\', \'9876543210\', \'Default User\', \'Super Administrator\','
           . '\'ceb6c970658f31504a901b89dcd3e461\',1,0,1,1);';
       break;
 
