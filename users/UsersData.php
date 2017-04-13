@@ -114,8 +114,8 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $TxtBody = 'UserID: ' . $User['UserID'] . "\r\n" . 'Password: ' . $Pass;
         $SentSMS = '';
         if ($Inserted > 0) {
+          SMSGW::SendSMS($TxtBody, $User['MobileNo']);
           if (UseSMSGW === true) {
-            SMSGW::SendSMS($TxtBody, $User['MobileNo']);
             $_SESSION['Msg'] = 'Password Sent To: ' . $User['MobileNo'] . '<br/>';
           } else {
             $_SESSION['Msg'] = 'Password has been Reset: ' . $TxtBody . '<br/>';

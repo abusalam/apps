@@ -60,10 +60,8 @@ WebLib::ShowMenuBar('WebSite');
           $TxtBody = 'UserID: ' . $email . "\r\n" . 'Password: ' . $Pass;
           $SentSMS = '';
 
-          if (UseSMSGW === TRUE) {
-            SMSGW::SendSMS($TxtBody, $MobileNo);
-            $SentSMS = ' and ' . $MobileNo;
-          }
+          SMSGW::SendSMS($TxtBody, $MobileNo);
+          $SentSMS = ' and ' . $MobileNo;
 
           $MailSent = json_decode(GMailSMTP($email, $UserName[0]['UserName'],
             $Subject, $Body, $TxtBody));
@@ -78,12 +76,10 @@ WebLib::ShowMenuBar('WebSite');
               . "<p>$TxtBody</p>";
           }
           WebLib::ShowMsg();
-        }
-        else {
+        } else {
           echo "<h3>Unable to send request.</h3>";
         }
-      }
-      else {
+      } else {
         echo "<h3>You solution of the Math in the image is wrong.</h3>";
       }
     }
@@ -128,8 +124,7 @@ WebLib::ShowMenuBar('WebSite');
         </div>
       </form>
     <?php
-    }
-    else {
+    } else {
       echo "<h3>All Users are registered.</h3>";
     }
     ?>

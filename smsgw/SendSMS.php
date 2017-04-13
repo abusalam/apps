@@ -9,9 +9,7 @@ if (($_SERVER['REMOTE_ADDR'] === '208.91.198.76') || ($_SERVER['REMOTE_ADDR'] ==
   require_once(__DIR__ . '/../class.MySQLiDBHelper.php');
   $Data = new MySQLiDBHelper(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
   $saveData['PostData'] = json_encode($_POST);
-  if (UseSMSGW === true) {
-    $saveData['Response'] = SMSGW::SendSMS($saveData['TxtSMS'], $saveData['MobileNo']);
-  }
+  $saveData['Response'] = SMSGW::SendSMS($saveData['TxtSMS'], $saveData['MobileNo']);
   $Resp['GatewayResp'] = $saveData;
   $Resp['Sent'] = $Data->insert(MySQL_Pre . 'GatewaySMS', $saveData);
   $Resp['Msg'] = ($Resp['Sent'] > 0 ? 'SMS Submitted for Delivery!' : 'Unable to Submit for Delivery!');

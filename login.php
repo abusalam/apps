@@ -147,14 +147,12 @@ WebLib::ShowMenuBar('APPS');
         break;
       case "JustLoggedIn":
         echo "<h2>Welcome {$_SESSION['UserName']}!</h2>";
-        if (UseSMSGW === true) {
-          $TxtSMS = $action . '-' . $_SESSION['UserMapID'] . ': ' . $_SESSION['UserName'] . "\n"
+        $TxtSMS = $action . '-' . $_SESSION['UserMapID'] . ': ' . $_SESSION['UserName'] . "\n"
             . ' E-Mail: ' . $_SESSION['UserID'] . "\n"
             . ' Mobile: ' . $_SESSION['MobileNo'] . "\n"
             . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
             . ' On: ' . date('d/m/Y l H:i:s A', time());
-          SMSGW::SendSMS($TxtSMS, AdminMobile);
-        }
+        SMSGW::SendSMS($TxtSMS, AdminMobile);
         break;
       case "Valid":
         echo "<h2>Already logged In as {$_SESSION['UserName']}!</h2>";

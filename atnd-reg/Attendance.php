@@ -59,25 +59,21 @@ function PrintArr($Arr) {
           if ($AtndDone > 0) {
             $_SESSION['Msg'] = 'Attendance Registered!';
             $_SESSION['AtndDone'] = '1';
-            if (UseSMSGW === true) {
-              $TxtSMS = $_SESSION['InOut'] . ': ' . $_SESSION['UserName'] . "\n"
+            $TxtSMS = $_SESSION['InOut'] . ': ' . $_SESSION['UserName'] . "\n"
                       . ' Mobile No: ' . $MobileNo . "\n"
                       . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
                       . ' On: ' . date('d/m/Y l H:i:s A', $_SESSION['ATND_TIME']);
-              SMSGW::SendSMS($TxtSMS, AdminMobile);
-            }
+            SMSGW::SendSMS($TxtSMS, AdminMobile);
           } else {
             $_SESSION['Msg'] = 'Unable to Register Attendance!';
           }
         } else {
-          if (UseSMSGW === true) {
-            $TxtSMS = 'UnAuthorised Access!' . "\n" . $_SESSION['InOut'] . ': '
+          $TxtSMS = 'UnAuthorised Access!' . "\n" . $_SESSION['InOut'] . ': '
               . $_SESSION['UserName'] . "\n"
               . ' Mobile No: ' . $MobileNo . "\n"
               . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
               . ' On: ' . date('d/m/Y l H:i:s A', $_SESSION['ATND_TIME']);
-            SMSGW::SendSMS($TxtSMS, AdminMobile);
-          }
+          SMSGW::SendSMS($TxtSMS, AdminMobile);
           $_SESSION['Msg'] = 'Attendance Not Permitted From IP:' . WebLib::GetVal($_SERVER, 'REMOTE_ADDR');
         }
       }
