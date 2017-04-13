@@ -135,13 +135,13 @@ class MySQLiDB {
    * @return int|string Returns 0 if Max is null otherwise Max Value
    */
   public function do_max_query($Query) {
-    $this->do_sel_query($Query);
-    $row = $this->get_n_row();
+    $Record = $this->DB->query($Query);
+    $RowData = array_values($Record[0]);
     //echo "Whole Row: ".$row[0].$row[1];
-    if ($row[0] == null)
+    if ($RowData[0] == null)
       return 0;
     else
-      return htmlentities($row[0]);
+      return htmlentities($RowData[0]);
   }
 
   /**

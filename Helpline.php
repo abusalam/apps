@@ -12,6 +12,10 @@ WebLib::JQueryInclude();
       heightStyle: "content",
       collapsible: true
     });
+      $("#UserNotes").accordion({
+          heightStyle: "content",
+          collapsible: true
+      });
   });
   function limitChars(textarea, limit, infodiv)
   {
@@ -101,6 +105,7 @@ WebLib::JQueryInclude();
                 . ' ON (`H`.`UserMapID`=`U`.`UserMapID`) '
                 . ' Where `H`.`UserMapID`=' . $_SESSION['UserMapID'] . ' AND Replied=0';
         $AskedUnReplied = $Data->do_max_query($QryAsked);
+        unset($Data);
         ?>
         <form method="post">
           <div class="FieldGroup">
@@ -117,13 +122,14 @@ WebLib::JQueryInclude();
         <br/>
         <h2>Frequently Asked Questions:</h2>
         <?php
-        $Data->do_sel_query('Select * from `' . MySQL_Pre . 'Helpline` `H` JOIN `' . MySQL_Pre . 'Users` `U`'
+        $Data = new MySQLiDBHelper();
+        $FAQs = $Data->query('Select * from `' . MySQL_Pre . 'Helpline` `H` JOIN `' . MySQL_Pre . 'Users` `U`'
                 . ' ON (`H`.UserMapID=`U`.UserMapID) '
                 . ' Where Replied=1'
                 . ' Order by ReplyTime DESC,HelpID desc');
-        if ($Data->RowCount > 0)
+        if (count($FAQs) > 0)
           echo '<div id="HelpLineNotes">';
-        while ($row = $Data->get_row()) {
+        foreach ($FAQs as $row) {
           ?>
           <h3>
             <b>
@@ -153,10 +159,51 @@ WebLib::JQueryInclude();
           </div>
           <?php
         }
-        if ($Data->RowCount > 0)
+        if (count($FAQs) > 0)
           echo '</div>';
         ?>
         <div style="clear:both;"></div>
+        <?php
+        $FAQs = $Data->query('Select * from `' . MySQL_Pre . 'Helpline` `H` JOIN `' . MySQL_Pre . 'Users` `U`'
+          . ' ON (`H`.UserMapID=`U`.UserMapID) '
+          . ' Where Replied=2 and `U`.UserMapID=' . $_SESSION['UserMapID']
+          . ' Order by ReplyTime DESC,HelpID desc');
+        if (count($FAQs) > 0)
+          echo '<h2>Your Questions:</h2><div id="UserNotes">';
+        foreach ($FAQs as $row) {
+          ?>
+            <h3>
+                <b>
+                  <?php
+                  echo '[' . WebLib::GetVal($row,'HelpID') . '] ' . htmlentities($row['UserName'])
+                    . " [Replied On: " . date("l d F Y g:i:s A ", strtotime($row['ReplyTime'])) . ']';
+                  ?>
+                </b>
+            </h3>
+            <div>
+              <?php echo str_replace("\r\n", "<br />", htmlentities($row['TxtQry'])); ?><br/>
+                <small><i>
+                    <?php
+                    echo 'From IP: ' . WebLib::GetVal($row,'IP') . ' On: ' . date("l d F Y g:i:s A ", strtotime($row['QryTime']));
+                    ?>
+                    </i>
+                </small>
+                <br/><br/>
+                <b>Reply:</b>
+                <p>
+                    <i>&ldquo;
+                      <?php
+                      echo str_replace("\r\n", "<br />", htmlentities($row['ReplyTxt']));
+                      ?>
+                        &rdquo;</i>
+                </p>
+            </div>
+          <?php
+        }
+        if (count($FAQs) > 0)
+          echo '</div>';
+        ?>
+          <div style="clear:both;"></div>
         <?php
       }
     }

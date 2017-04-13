@@ -13,7 +13,7 @@ if ($_REQUEST['Reply'] == '1') {
     $DB                    = new MySQLiDBHelper();
     $HelpData['ReplyTxt']  = WebLib::GetVal($_POST, 'ReplyTxt', true);
     $HelpData['Replied']   = intval(WebLib::GetVal($_POST, 'ShowFAQ', true));
-    $HelpData['ReplyTime'] = time();
+    $HelpData['ReplyTime'] = date('Y-m-d H:i:s', time());
     $DB->where('HelpID', WebLib::GetVal($_POST, 'ReplyTo', true));
     $DB->update(MySQL_Pre . 'Helpline', $HelpData);
     unset($DB);
@@ -39,16 +39,21 @@ if ($_REQUEST['Reply'] == '1') {
         <input style="width: 80px;" type="submit" value="Reply"/>
     </form>
   <?php
-  $Data->do_sel_query('Select * from `' . MySQL_Pre . 'Helpline` `H` JOIN `' . MySQL_Pre . 'Users` `U`'
+  $Query = 'Select * from `' . MySQL_Pre . 'Helpline` `H` JOIN `' . MySQL_Pre . 'Users` `U`'
     . ' ON (`H`.UserMapID=`U`.UserMapID) '
-    . ' Where CtrlMapID=' . $_SESSION['UserMapID'] . ' AND Replied!=1 Order by Replied,HelpID DESC');
+    . ' Where CtrlMapID=' . $_SESSION['UserMapID'] . ' AND Replied!=1 Order by Replied,HelpID DESC';
 } else {
-  $Data->do_sel_query('Select * from `' . MySQL_Pre . 'Helpline` `H` JOIN `' . MySQL_Pre . 'Users` `U`'
+  $Query = 'Select * from `' . MySQL_Pre . 'Helpline` `H` JOIN `' . MySQL_Pre . 'Users` `U`'
     . ' ON (`H`.UserMapID=`U`.UserMapID) '
-    . ' Where CtrlMapID=' . $_SESSION['UserMapID'] . ' AND Replied<2 Order by HelpID DESC');
+    . ' Where CtrlMapID=' . $_SESSION['UserMapID'] . ' AND Replied<2 Order by HelpID DESC';
 }
+unset($Data);
 
-while ($row = $Data->get_row()) {
+$Data = new MySQLiDBHelper();
+$FAQs = $Data->query($Query);
+unset($Data);
+
+foreach ($FAQs as $row) {
   ?>
     <div class="Notice">
         <b><?php echo '[' . $row['HelpID'] . '] ' . htmlentities($row['UserName']); ?>
