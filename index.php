@@ -52,6 +52,12 @@ WebLib::ShowMenuBar('APPS');
               }
               ?>
                 <li>Default User ID: admin Password: test@123</li>
+                <li>Download Android App <a href="android/app-release.apk">Project-AIO.apk</a></li>
+                <?php if(isset($_SESSION['MobileNo']) && strlen($_SESSION['MobileNo'])>0): ?>
+                <li>Get Android App <a href="android">Activation Key</a>
+                    for Mobile No. <?php echo $_SESSION['MobileNo']; ?>
+                </li>
+                <?php endif ?>
             </ul>
             <hr/>
             Note: The above information to be removed after Security Audit.

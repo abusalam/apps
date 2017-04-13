@@ -11,19 +11,9 @@ $AuthOTP = new AuthOTP(AuthOTP::TOKEN_DATA_TEMP);
 
 //echo $AuthOTP->getData('8972096989');
 ?>
-<h2>Users</h2>
-<table border="1">
-  <tr>
-    <th>Mobile No</th>
-    <th>Has Token?</th>
-    <th>Key</th>
-    <th>Secret Key</th>
-  </tr>
+
+<div>
   <?php
-  // now we get our list of users - this part of the page just has a list of users
-  // and the ability to create new ones. This isnt really in the scope of the
-  // GA4PHP, but for this example, we need to be able to create users, so heres where
-  // you do it.
   $MobileNo =$_SESSION['MobileNo'];// $_GET['mdn'];
   $CheckCodes = '';
   if ($AuthOTP->hasToken($MobileNo)) {
@@ -45,18 +35,14 @@ $AuthOTP = new AuthOTP(AuthOTP::TOKEN_DATA_TEMP);
       . "<br/>2. " . $AuthOTP->oath_hotp($hexkey, 2)
       . "<br/>3. " . $AuthOTP->oath_hotp($hexkey, 3)
       . "<br/>Counter:" . $UserData['tokencounter'];
+    // now we generate the qrcode for the user
+
+    echo  '<h2>Scan the QR Code or Enter the Key</h2>'
+      . '<b>User:</b> ' . $_SESSION['UserName']
+      . '<br/><b>MobileNo:</b> ' . $MobileNo . '<br/>'
+      . $keyurl . '<br/><b>Activation Key:</b> '.  $b32key;
   } else {
-    $b32key   = "";
-    $hexkey   = "";
-    $type     = "";
-    $hastoken = "no";
-    $keyurl   = "";
+      echo '<h1>Please open the Android App and Register your Mobile No. ' . $_SESSION['MobileNo'] . '</h1>';
   }
-
-
-  // now we generate the qrcode for the user
-
-  echo "<tr><td>" . $MobileNo . "</td><td>$hastoken $type</td><td>$keyurl</td><td>$b32key $CheckCodes</td></tr>";
-
   ?>
-</table>
+</div>
