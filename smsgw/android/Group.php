@@ -33,8 +33,9 @@ class Group {
 
   static function getContactGroups($ContactID) {
     $DB     = new MySQLiDBHelper();
-    $DB->where('ContactID', $ContactID);
-    $Groups = $DB->get(MySQL_Pre . 'SMS_GroupDetails');
+    //$DB->where('ContactID', $ContactID);
+    //$Groups = $DB->get(MySQL_Pre . 'SMS_GroupDetails');
+    $Groups = $DB->get(MySQL_Pre . 'SMS_Groups');
 
     return $Groups;
   }
