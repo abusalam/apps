@@ -16,7 +16,7 @@ if (isset($_POST['BtnPrg']) == 1) {
   $tableData['WorkID'] = WebLib::GetVal($_POST, 'Work');
   $tableData['ExpenditureAmount'] = $_POST['txtAmount'];
   $tableData['Progress'] = $_POST['PhyPrgValue'];
-  $tableData['Balance'] = $_POST['txtBalance'];
+  $tableData['Balance'] = str_replace(',', '', $_POST['txtBalance']);
   $ReportDate = WebLib::GetVal($_POST, 'txtDate');
   if ($ReportDate == "") {
     $ReportDate = WebLib::ToDBDate('');
