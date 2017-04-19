@@ -38,7 +38,7 @@ switch (WebLib::GetVal($_POST, 'CallAPI')) {
   case 'Reports_GetWorkFunds':
     $DB = new MySQLiDBHelper();
     $DB->where('SchemeID', WebLib::GetVal($_POST, 'Scheme'));
-    $DB->where('CtrlMapID', 80); //$_SESSION['UserMapID']);
+    $DB->where('CtrlMapID', $_SESSION['UserMapID']);
     $DB->where('UserMapID', WebLib::GetVal($_POST, 'User'));
     WebLib::ShowTable($DB->query('Select CONCAT(`WorkID`,\' - \',`Work`) as '
       . '`Work Description`, `EstimatedCost` as `Estimated Cost`,'
