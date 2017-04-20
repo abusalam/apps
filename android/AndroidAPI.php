@@ -230,7 +230,6 @@ class AndroidAPI {
       $this->Resp['SendSMS'] = true;
     } elseif ((time() - strtotime($Profile[0]['LastAccessTime'])) > $this->IntervalRU) {
       $this->Resp['SendSMS']     = true;
-      $this->Resp['TimeElapsed'] = time() - strtotime($Profile[0]['LastAccessTime']);
     } else {
       $this->Resp['TimeElapsed'] = $Profile[0]['LastAccessTime'];
     }
