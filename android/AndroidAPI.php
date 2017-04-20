@@ -37,8 +37,8 @@ class AndroidAPI {
   private $NoAuthMode;
   private $IntervalRU;
 
-  function __construct($jsonData, $mNoAuthMode = false) {
-    $this->IntervalRU = 3600;
+  function __construct($jsonData, $mNoAuthMode = false, $IntervalRU = 3600) {
+    $this->IntervalRU = $IntervalRU; // Default Register Interval 1 Hour
     $this->Resp['ET'] = microtime();
     $this->Expiry     = null;
     $this->Req        = $jsonData;
