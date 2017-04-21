@@ -7,7 +7,7 @@ WebLib::CreateDB();
 $json     = file_get_contents('php://input');
 $jsonData = @json_decode($json);
 if ($jsonData !== null) {
-  $mAPI = new MprAPI($jsonData);
+  $mAPI = new MprAPI($jsonData, true);
   $mAPI();
 }
 exit();
