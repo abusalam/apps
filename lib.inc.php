@@ -4,9 +4,9 @@ error_reporting(E_ALL);
 
 /**
  * Defined Version for application
- * @version v1.0.1 SCA_11911 20170413
+ * @version v1.0.1 SCA_11911 20170421-1345
  */
-define('APPS_Version', 'v1.0.1 SCA_11911 20170421-1203');
+define('APPS_Version', 'v1.0.1 SCA_11911 20170421-1345');
 date_default_timezone_set('Asia/Kolkata');
 /**
  * @todo Unique Random ID Generator function to be included

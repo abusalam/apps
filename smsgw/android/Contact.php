@@ -12,6 +12,15 @@ class Contact {
     return $ContactID;
   }
 
+  function updateContact($Mobile, $Name, $Designation) {
+    $DB                        = new MySQLiDBHelper();
+    $insertData['ContactName'] = $Name;
+    $insertData['Designation'] = $Designation;
+    $DB->where('MobileNo', $Mobile);
+    $ContactID = $DB->update(MySQL_Pre . 'SMS_Contacts', $insertData);
+    return $ContactID;
+  }
+
   function getAllContacts() {
     $DB       = new MySQLiDBHelper();
     $Contacts = $DB->get(MySQL_Pre . 'SMS_ViewContacts');

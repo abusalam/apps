@@ -362,6 +362,46 @@ class MessageAPI extends AndroidAPI {
   }
 
   /**
+   * Add Update Existing Contact
+   *
+   * Request:
+   *   JSONObject={"API":"UC",
+   *               "MDN":"9876543210",
+   *               "MN":"9876543210",
+   *               "NM":"Contact Name",
+   *               "DG":"Designation",
+   *               "OTP":"987654"}
+   *
+   * Response:
+   *   JSONObject={"API":true,
+   *               "DB":10,
+   *               "MSG":"Contact Updated Successfully!",
+   *               "ET":2.0987,
+   *               "ST":"Wed 20 Aug 08:31:23 PM"}
+   */
+  protected function UC() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'MN', 'NM', 'DG'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $Contact   = new Contact();
+      $ContactID = $Contact->updateContact($this->Req->MN, $this->Req->NM, $this->Req->DG);
+      if ($ContactID > 0) {
+        $this->Resp['API'] = true;
+        $this->Resp['MSG'] = 'Contact Updated Successfully!';
+      } else {
+        $this->Resp['API'] = false;
+        $this->Resp['MSG'] = 'Unable to update Contact!';
+      }
+
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+  }
+
+  /**
    * Add a Member to a Group
    *
    * Request:
