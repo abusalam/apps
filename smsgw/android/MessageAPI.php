@@ -310,7 +310,59 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function CG() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'CID'))) {
+      return false;
+    }
     $this->Resp['DB']  = Group::getContactGroups($this->Req->CID);
+    $this->Resp['API'] = true;
+    $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
+    //$this->setExpiry(3600); // 60 Minutes
+  }
+
+  /**
+   * Search Contact: Retrieve Contact Groups by Mobile No
+   *
+   * Request:
+   *   JSONObject={"API":"SC",
+   *               "MDN":"9876543210",
+   *               "MN":"9000000001",
+   *               "OTP":"987654"}
+   *
+   * Response:
+   *    JSONObject={"API":true,
+   *               "DB":[{
+   *                      "ContactID": 18,
+   *                      "ContactName": "Ritwik Hazra",
+   *                      "Designation": "BDO Medinipur Sadar",
+   *                      "MobileNo": "9000000001",
+   *                      "GroupName": "All BDOs",
+   *                      "GroupID": 1
+   *                     },
+   *                     {
+   *                      "ContactID": 18,
+   *                      "ContactName": "Ritwik Hazra",
+   *                      "Designation": "BDO Medinipur Sadar",
+   *                      "MobileNo": "9000000001",
+   *                      "GroupName": "PUP BDOs",
+   *                      "GroupID": 11
+   *                     },
+   *                     {
+   *                      "ContactID": 18,
+   *                      "ContactName": "Ritwik Hazra",
+   *                      "Designation": "BDO Medinipur Sadar",
+   *                      "MobileNo": "9000000001",
+   *                      "GroupName": "ACA BDOs",
+   *                      "GroupID": 12
+   *                    }],
+   *               "MSG":"Total Groups: 2",
+   *               "ET":2.0987,
+   *               "ST":"Wed 20 Aug 08:31:23 PM"}
+   */
+  protected function SC() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'MN'))) {
+      return false;
+    }
+    $this->Resp['DB']  = Contact::getContactByMobileNo($this->Req->MN);
     $this->Resp['API'] = true;
     $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
     //$this->setExpiry(3600); // 60 Minutes

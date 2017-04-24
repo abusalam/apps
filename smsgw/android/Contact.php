@@ -38,6 +38,15 @@ class Contact {
     return $Contacts;
   }
 
+  static function getContactByMobileNo($MobileNo) {
+    $DB = new MySQLiDBHelper();
+    $DB->where('MobileNo', $MobileNo);
+    $Contacts = $DB->get(MySQL_Pre . 'SMS_GroupWiseContacts');
+
+    //print_r($Contacts);
+    return $Contacts;
+  }
+
   function getGroupMembers($GroupName) {
     $Group = new Group();
     $Group->setGroup($GroupName);
