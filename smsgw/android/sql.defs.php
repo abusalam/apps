@@ -8,6 +8,7 @@ function CreateSchemas() {
   $ObjDB->ddlQuery(SQLDefs('SMS_GroupDetails'));
   $ObjDB->ddlQuery(SQLDefs('SMS_GroupMembers'));
   $ObjDB->ddlQuery(SQLDefs('SMS_ViewContacts'));
+  $ObjDB->ddlQuery(SQLDefs('SMS_GroupWiseContacts'));
   $ObjDB->ddlQuery(SQLDefs('SMS_Status'));
   $ObjDB->ddlQuery(SQLDefs('SMS_Usage'));
   unset($ObjDB);
@@ -94,6 +95,17 @@ function SQLDefs($ObjectName) {
         . '`Script` text,'
         . 'PRIMARY KEY (`MsgID`)'
         . ') ENGINE=InnoDB  DEFAULT CHARSET=utf8;';
+      break;
+
+    case 'SMS_GroupWiseContacts':
+      $SqlDB = 'CREATE OR REPLACE VIEW `' . MySQL_Pre . $ObjectName . '`'
+        . '  AS  select `C`.`ContactID` AS `ContactID`,'
+        . '`C`.`ContactName` AS `ContactName`,'
+        . '`C`.`Designation` AS `Designation`,`C`.`MobileNo` AS `MobileNo`,'
+        . '`G`.`GroupName` AS `GroupName`,`G`.`GroupID` AS `GroupID` '
+        . 'from ((`' . MySQL_Pre . 'SMS_GroupDetails` `GD` right join '
+        . '`' . MySQL_Pre . 'SMS_Contacts` `C` on((`C`.`ContactID` = `GD`.`ContactID`)))'
+        . ' left join `' . MySQL_Pre . 'SMS_Groups` `G` on((`G`.`GroupID` = `GD`.`GroupID`)));';
       break;
   }
 
