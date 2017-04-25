@@ -60,7 +60,7 @@ class MessageAPI extends AndroidAPI {
             $this->Resp['MSG'] = "Invalid PayLoad";
             return false;
           } else {
-            if (!preg_match('/^\d$/', $this->Req->$Param)) {
+            if (!preg_match('/^\d+$/', $this->Req->$Param)) {
               $this->Resp['MSG'] = "Invalid Contact ID";
               return false;
             }
