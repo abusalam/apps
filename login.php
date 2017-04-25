@@ -69,7 +69,7 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
   $rows = $Data->rawQuery($QueryLogin, $filter);
 
   if (count($rows) > 0) {
-    session_regenerate_id();
+    session_regenerate_id(true);
     $Row                     = $rows[0];
     $_SESSION['CheckAuth']   = "Valid";
     $_SESSION['UserName']    = $Row['UserName'];
