@@ -67,6 +67,42 @@ class MessageAPI extends AndroidAPI {
           }
           break;
 
+        case 'MN':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^\d{10}$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Mobile Number should be 10 digits only.";
+              return false;
+            }
+          }
+          break;
+
+        case 'NM':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^[A-Za-z\s]+$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Name should contain alphabets only.";
+              return false;
+            }
+          }
+          break;
+
+        case 'DG':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^[A-Za-z()-\s]+$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Designation should contain alphabets, () and - only.";
+              return false;
+            }
+          }
+          break;
+
         default:
           array_push($checkParams, $Param);
           break;
@@ -362,10 +398,16 @@ class MessageAPI extends AndroidAPI {
     if (!$this->checkPayLoad(array('MDN', 'OTP', 'MN'))) {
       return false;
     }
-    $this->Resp['DB']  = Contact::getContactByMobileNo($this->Req->MN);
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
-    //$this->setExpiry(3600); // 60 Minutes
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $this->Resp['DB']  = Contact::getContactByMobileNo($this->Req->MN);
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
+      //$this->setExpiry(3600); // 60 Minutes
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
   }
 
   /**
