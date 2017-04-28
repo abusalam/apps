@@ -8,7 +8,7 @@ WebLib::CreateDB();
 $json     = file_get_contents('php://input');
 $jsonData = @json_decode($json);
 if ($jsonData !== null) {
-  $mAPI = new AndroidAPI($jsonData, true);
+  $mAPI = new AndroidAPI($jsonData);
   $mAPI();
 }
 exit();
