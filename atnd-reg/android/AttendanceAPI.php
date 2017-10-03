@@ -16,7 +16,7 @@ require_once(__DIR__ . '/../../android/AndroidAPI.php');
  * @example Sample API Call
  *
  * Request:
- *   JSONObject={"API":"AG",
+ *   JSONObject={"API":"AR",
  *               "MDN":"9876543210",
  *               "OTP":"987654"}
  *
@@ -35,7 +35,8 @@ class AttendanceAPI extends AndroidAPI {
    *
    * Request:
    *   JSONObject={"API":"AR",
-   *               "MDN":"8348691719"}
+   *               "MDN":"8348691719",
+   *               "OTP":"987654"}
    *
    * Response:
    *    JSONObject={"API":true,
@@ -49,13 +50,13 @@ class AttendanceAPI extends AndroidAPI {
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
       OR $this->getNoAuthMode()
     ) {
-      if($this->Req->MDN=="8348691719"){
-        $DB                = new MySQLiDBHelper();
-	$Data		   = array();
-	//array_push($Data, $DB->get(MySQL_Pre . 'AR_View'));
-	//array_push($Data, $DB->get(MySQL_Pre . 'SMS_NoDefsUsage'));
-	$Data['AR']	   = $DB->get(MySQL_Pre . 'ATND_View');
-	$this->Resp['DB']  = array();
+      if ($this->Req->MDN == "8348691719") {
+        $DB   = new MySQLiDBHelper();
+        $Data = array();
+        //array_push($Data, $DB->get(MySQL_Pre . 'AR_View'));
+        //array_push($Data, $DB->get(MySQL_Pre . 'SMS_NoDefsUsage'));
+        //$Data['AR']       = $DB->get(MySQL_Pre . 'ATND_View');
+        $this->Resp['DB'] = array();
         array_push($this->Resp['DB'], $Data);
 
         $this->Resp['API'] = true;

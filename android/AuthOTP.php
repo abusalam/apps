@@ -5,6 +5,7 @@ require_once(__DIR__ . '/ga4php.php');
 class AuthOTP extends GoogleAuthenticator {
 
   private $Mode;
+  private $UserMapID;
   const TOKEN_DATA_TEMP=1;
   const TOKEN_DATA_USER=0;
 
@@ -28,12 +29,20 @@ class AuthOTP extends GoogleAuthenticator {
     $MySQLiDB = new MySQLiDBHelper();
     $User     = $MySQLiDB->where('MobileNo', $UserID)->get(MySQL_Pre . 'APP_Users');
     if (count($User) > 0) {
+      $this->UserMapID=$User[0]['UserMapID'];
       if ($this->Mode == self::TOKEN_DATA_USER) {
         return $User[0]['UserData'];
       } else {
         return $User[0]['TempData'];
       }
     }
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getUserMapID() {
+    return $this->UserMapID;
   }
 
   /**

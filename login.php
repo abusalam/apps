@@ -6,7 +6,7 @@
  *  $_SESSION['UserName'] = $Row['UserName'];
  *  $_SESSION['UserMapID'] = $Row['UserMapID'];
  */
-$FailedTry = 2; //No of Allowed failed login without captcha
+$FailedTry = 0; //No of Allowed failed login without captcha
 
 require_once __DIR__ . '/lib.inc.php';
 require_once __DIR__ . '/smsgw/smsgw.inc.php';
@@ -61,14 +61,14 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
       'UserPass') !== null) && $ValidCaptcha
 ) {
   $QueryLogin = "Select UserMapID,UserName,UserID,MobileNo from `" . MySQL_Pre . "Users` "
-    . " Where `UserID`=? AND MD5(CONCAT(`UserPass`,MD5(?)))=? AND Activated";
+    . " Where `UserID`=? AND SHA2(CONCAT(`UserPass`,SHA2(?,512)),512)=? AND Activated";
   $filter[]   = WebLib::GetVal($_POST, 'UserID', true);
   $filter[]   = WebLib::GetVal($_SESSION, 'Token', true);
   $filter[]   = WebLib::GetVal($_POST, 'UserPass', true);
 
   $rows = $Data->rawQuery($QueryLogin, $filter);
 
-  if ((count($rows) > 0) && (WebLib::GetVal($_POST, 'LoginToken') == WebLib::GetVal($_SESSION, 'Token'))) {
+  if (count($rows) > 0) {
     session_regenerate_id(true);
     $Row                     = $rows[0];
     $_SESSION['CheckAuth']   = "Valid";
@@ -124,7 +124,7 @@ WebLib::IncludeCSS();
 WebLib::IncludeCSS('css/forms.css');
 WebLib::JQueryInclude();
 WebLib::IncludeJS('js/forms.js');
-WebLib::IncludeJS('js/jQuery-MD5/jquery.md5.js');
+WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
 ?>
 </head>
 <body>
@@ -186,15 +186,12 @@ WebLib::ShowMenuBar('APPS');
         ?>
         <hr/>
         <div class="formControl">
-          <input type="hidden" id="LoginToken" name="LoginToken"
-                 value="<?php
-                 echo WebLib::GetVal($_SESSION, 'Token');
-                 ?>"/>
-          <input type="submit" class="formButton" value="Login"/>
+            <a href="users/Reset.php">Forgot password?</a> <input type="submit" class="formButton" value="Login"/>
         </div>
       </form>
-
-      <?php
+      <input type="hidden" id="LoginToken" name="LoginToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
+    <?php
       //echo WebLib::GetVal($_SESSION,'Debug');
     }
     ?>

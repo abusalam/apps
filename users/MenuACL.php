@@ -69,7 +69,7 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
                   . '<label for="User' . $User['UserMapID'] . '" >'
                   . '<input id="User' . $User['UserMapID'] . '" type="checkbox" name="UserMapID[]" '
                   . 'value="' . $User['UserMapID'] . '" />'
-                  . $User['UserName']
+                  . htmlentities($User['UserName'])
                   . '</label></li>';
               }
               ?>

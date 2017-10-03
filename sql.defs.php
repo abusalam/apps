@@ -102,7 +102,7 @@ function SQLDefs($ObjectName) {
           . '`MobileNo` varchar(10) DEFAULT NULL,'
           . '`DisplayName` varchar(50) DEFAULT NULL,'
           . '`UserName` varchar(50) DEFAULT NULL,'
-          . '`UserPass` varchar(32) DEFAULT NULL,'
+          . '`UserPass` varchar(128) DEFAULT NULL,'
           . '`CtrlMapID` int(10) NOT NULL,'
           . '`Remarks` varchar(25) DEFAULT NULL,'
           . '`HOD` varchar(80) NOT NULL,'
@@ -125,7 +125,7 @@ function SQLDefs($ObjectName) {
           . '(`UserID`, `MobileNo`, `DisplayName`, `UserName`, `UserPass`, `UserMapID`, `CtrlMapID`,'
           . '`Registered`, `Activated`) '
           . 'VALUES (\'Admin\', \'9876543210\', \'Default User\', \'Super Administrator\','
-          . '\'ceb6c970658f31504a901b89dcd3e461\',1,0,1,1);';
+          . '\'8ad17dadafdf341124084e302023fc75bc5cf7b265b7ff84e383a5da182aa7f48d70e9e70b96b0045c10c911dadbcff9817ab7b1760c5366e6df3f33af5fc51c\',1,0,1,1);';
       break;
 
     case 'MenuItems':

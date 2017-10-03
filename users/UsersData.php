@@ -1,10 +1,5 @@
 <?php
 
-/*
- * @ todo Fetch District AC and Parts Combo Data on seperate request via ajax
- * @todo Keep All District, AC, Parts available for parent users
- */
-
 $DB = new MySQLiDBHelper();
 $Inserted = 0;
 $RunQuery = true;
@@ -19,10 +14,15 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
     // Authenticated Inputs
     switch (WebLib::GetVal($_POST, 'CmdSubmit')) {
       case 'Create':
-        if (strlen(WebLib::GetVal($_POST, 'UserName')) > 2) {
+        $DB->where('UserName', WebLib::GetVal($_POST, 'UserName',true));
+        $Users = $DB->get(MySQL_Pre . 'Users');
+        if (count($Users) > 0) {
+          $Query           = '';
+          $_SESSION['Msg'] = 'UserName already exists.';
+        } elseif (strlen(WebLib::GetVal($_POST, 'UserName')) > 2) {
           $Query = 'Insert Into `' . MySQL_Pre . 'Users` '
-            . '(`UserName`,`DisplayName`,`CtrlMapID`,`Registered`,`Activated`)'
-            . ' Values(\'' . WebLib::GetVal($_POST, 'Designation', true)
+            . '(`DisplayName`,`UserName`,`CtrlMapID`,`Registered`,`Activated`)'
+            . ' Values(\'' . WebLib::GetVal($_POST, 'DisplayName', true)
             . '\',\'' . WebLib::GetVal($_POST, 'UserName', true)
             . '\',' . WebLib::GetVal($_SESSION, 'UserMapID', true) . ',0,0)';
         } else {
@@ -102,7 +102,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $DB->where('CtrlMapID', WebLib::GetVal($_SESSION, 'UserMapID', true));
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
 
-        $Inserted = $DB->update(MySQL_Pre . 'Users', array('UserPass' => md5($Pass)));
+        $Inserted = $DB->update(MySQL_Pre . 'Users', array('UserPass' => hash('sha512', $Pass)));
 
         $QueryUser = 'Select `UserName`,`UserID`,`MobileNo`'
           . ' FROM `' . MySQL_Pre . 'Users`';
@@ -118,7 +118,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
           if (UseSMSGW === true) {
             $_SESSION['Msg'] = 'Password Sent To: ' . $User['MobileNo'] . '<br/>';
           } else {
-            $_SESSION['Msg'] = 'Password has been Reset: ' . $TxtBody . '<br/>';
+            $_SESSION['Msg'] = 'Password has been Reset: '; // . $TxtBody . '<br/>';
           }
         } else {
           $_SESSION['Msg'] = 'Unable to reset Password. May be due to locked account.<br/>';

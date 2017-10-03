@@ -14,13 +14,17 @@ function CreateSchemas() {
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewWorkExpenses'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewLatestProgressID'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewLatestProgress'));
+  //echo SQLDefs('MPR_ViewLatestProgress'); TODO: Unable to Create MPR_ViewLatestProgress
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewUserWorks'));
+  //echo SQLDefs('MPR_ViewUserWorks'); TODO: Unable to Create MPR_ViewUserWorks
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewWorkerSchemes'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewUserSchemeAllotments'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewSchemeWiseExpenditure'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewSchemeWiseAllotments'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewSchemeWiseFunds'));
+  //echo SQLDefs('MPR_ViewSchemeWiseFunds'); TODO: Unable to Create MPR_ViewSchemeWiseFunds
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewUserFunds'));
+  //echo SQLDefs('MPR_ViewUserFunds'); TODO: Unable to Create MPR_ViewUserFunds
   unset($ObjDB);
 }
 

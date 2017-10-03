@@ -127,10 +127,20 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function AG() {
-    $this->Resp['DB']  = Group::getAllGroups();
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'All Groups Loaded';
-    //$this->setExpiry(3600); // 60 Minutes
+    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $this->Resp['DB']  = Group::getAllGroups();
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'All Groups Loaded';
+      //$this->setExpiry(3600); // 60 Minutes
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+    return true;
   }
 
   /**
@@ -349,10 +359,16 @@ class MessageAPI extends AndroidAPI {
     if (!$this->checkPayLoad(array('MDN', 'OTP', 'CID'))) {
       return false;
     }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
     $this->Resp['DB']  = Group::getContactGroups($this->Req->CID);
     $this->Resp['API'] = true;
     $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
     //$this->setExpiry(3600); // 60 Minutes
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
   }
 
   /**

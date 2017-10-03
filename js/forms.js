@@ -6,8 +6,8 @@
 $(function() {
   $('input[type="submit"]').button();
   $('#UserPass').on({"blur": function() {
-      $(this).val($.md5($.md5($(this).val()).toString()
-              + $.md5($('#LoginToken').val())));
+      $(this).val(sha512(sha512($(this).val()).toString()
+              + sha512($('#LoginToken').val())));
     }
   });
 

@@ -51,13 +51,13 @@ class MprAPI extends AndroidAPI {
     foreach ($Params as $Param) {
 
       switch ($Param) {
-        case 'UID':
+        case 'SID':
           if (!property_exists($this->Req, $Param)) {
             $this->Resp['MSG'] = "Invalid PayLoad";
             return false;
           } else {
             if (!preg_match('/^\d$/', $this->Req->$Param)) {
-              $this->Resp['MSG'] = "Invalid User ID";
+              $this->Resp['MSG'] = "Invalid Scheme ID";
               return false;
             }
           }
@@ -77,7 +77,8 @@ class MprAPI extends AndroidAPI {
    *
    * Request:
    *   JSONObject={"API":"US",
-   *               "UID":"35"}
+   *               "MDN":"35",
+   *               "OTP":"123456"}
    *
    * Response:
    *    JSONObject={"API":true,
@@ -87,22 +88,30 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function US() {
-    if (!$this->checkPayLoad(array('UID'))) {
+    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
       return false;
     }
-    $DB = new MySQLiDBHelper();
-    $DB->where('UserMapID', $this->Req->UID);
-    $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
-      . MySQL_Pre . 'MPR_ViewWorkerSchemes');
-    if (count($Schemes) == 0) {
-      $DB->where('UserMapID', $this->Req->UID);
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
+      OR $this->getNoAuthMode()
+    ) {
+      $DB = new MySQLiDBHelper();
+      $DB->where('UserMapID', $AuthUser->getUserMapID());
       $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
-        . MySQL_Pre . 'MPR_Schemes');
+        . MySQL_Pre . 'MPR_ViewWorkerSchemes');
+      if (count($Schemes) == 0) {
+        $DB->where('UserMapID', $AuthUser->getUserMapID());
+        $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
+          . MySQL_Pre . 'MPR_Schemes');
+      }
+      $this->Resp['DB']  = $Schemes;
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'Total Schemes: ' . count($Schemes);
+      //$this->setExpiry(3600);
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP';
     }
-    $this->Resp['DB']  = $Schemes;
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'Total Schemes: ' . count($Schemes);
-    //$this->setExpiry(3600);
     unset($DB);
     unset($Schemes);
   }
@@ -112,7 +121,8 @@ class MprAPI extends AndroidAPI {
    *
    * Request:
    *   JSONObject={"API":"SF",
-   *               "UID":"35"}
+   *               "MDN":"9876543210",
+   *               "OTP":"123456"}
    *
    * Response:
    *    JSONObject={"API":true,
@@ -123,23 +133,31 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SF() {
-    if (!$this->checkPayLoad(array('UID'))) {
+    if (!$this->checkPayLoad(array('MDN','OTP'))) {
       return false;
     }
-    $DB = new MySQLiDBHelper();
-    $DB->where('UserMapID', $this->Req->UID);
-    $Schemes = $DB->query('Select `SchemeName` as `SN`, '
-      . '`Funds` as `F`, `Expenses` as `E`, `Balance` as `B` FROM '
-      . MySQL_Pre . 'MPR_ViewUserFunds');
-    if (count($Schemes) == 0) {
-      $Schemes = $DB->query('Select `SchemeName` as `SN`,'
-        . '`Funds` as `F`,`Expense` as `E`,`Balance` as `B` '
-        . 'from ' . MySQL_Pre . 'MPR_ViewSchemeWiseFunds');
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
+      OR $this->getNoAuthMode()
+    ) {
+      $DB = new MySQLiDBHelper();
+      $DB->where('UserMapID', $AuthUser->getUserMapID());
+      $Schemes = $DB->query('Select `SchemeName` as `SN`, '
+        . '`Funds` as `F`, `Expenses` as `E`, `Balance` as `B` FROM '
+        . MySQL_Pre . 'MPR_ViewUserFunds');
+      if (count($Schemes) == 0) {
+        $Schemes = $DB->query('Select `SchemeName` as `SN`,'
+          . '`Funds` as `F`,`Expense` as `E`,`Balance` as `B` '
+          . 'from ' . MySQL_Pre . 'MPR_ViewSchemeWiseFunds');
+      }
+      $this->Resp['DB']  = $Schemes;
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'Total Schemes: ' . count($Schemes);
+      //$this->setExpiry(3600);
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP';
     }
-    $this->Resp['DB']  = $Schemes;
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'Total Schemes: ' . count($Schemes);
-    //$this->setExpiry(3600);
     unset($DB);
     unset($Schemes);
   }
@@ -149,7 +167,8 @@ class MprAPI extends AndroidAPI {
    *
    * Request:
    *   JSONObject={"API":"SU",
-   *               "UID":"80",
+   *               "MDN":"9876543210",
+   *               "OTP":"123456",
    *               "SID":"17"}
    *
    * Response:
@@ -161,25 +180,33 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SU() {
-    if (!$this->checkPayLoad(array('UID', 'SID'))) {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'SID'))) {
       return false;
     }
-    $DB = new MySQLiDBHelper();
-    $DB->where('UserMapID', $this->Req->UID);
-    $DB->where('SchemeID', $this->Req->SID);
-    $Users = $DB->query('Select `UserName` as `UN`, `UserMapID` as `ID`,`MobileNo` as `M`, '
-      . ' `Funds` as `F`, `Balance` as `B`, \'Schemes\' as `S` FROM '
-      . MySQL_Pre . 'MPR_ViewUserFunds');
-    if (count($Users) == 0) {
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
+      OR $this->getNoAuthMode()
+    ) {
+      $DB = new MySQLiDBHelper();
+      $DB->where('UserMapID', $AuthUser->getUserMapID());
       $DB->where('SchemeID', $this->Req->SID);
       $Users = $DB->query('Select `UserName` as `UN`, `UserMapID` as `ID`,`MobileNo` as `M`, '
-        . ' `Funds` as `F`, `Balance`  as `B`, \'Schemes\' as `S` FROM '
+        . ' `Funds` as `F`, `Balance` as `B`, \'Schemes\' as `S` FROM '
         . MySQL_Pre . 'MPR_ViewUserFunds');
+      if (count($Users) == 0) {
+        $DB->where('SchemeID', $this->Req->SID);
+        $Users = $DB->query('Select `UserName` as `UN`, `UserMapID` as `ID`,`MobileNo` as `M`, '
+          . ' `Funds` as `F`, `Balance`  as `B`, \'Schemes\' as `S` FROM '
+          . MySQL_Pre . 'MPR_ViewUserFunds');
+      }
+      $this->Resp['DB']  = $Users;
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'Total Users: ' . count($Users);
+      //$this->setExpiry(3600);
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP';
     }
-    $this->Resp['DB']  = $Users;
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'Total Users: ' . count($Users);
-    //$this->setExpiry(3600);
     unset($DB);
     unset($Users);
   }
@@ -189,7 +216,8 @@ class MprAPI extends AndroidAPI {
    *
    * Request:
    *   JSONObject={"API":"UW",
-   *               "UID":"35",
+   *               "MDN":"9876543210",
+   *               "OTP":"123456",
    *               "SID":"5"}
    *
    * Response:
@@ -200,22 +228,30 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function UW() {
-    if (!$this->checkPayLoad(array('UID', 'SID'))) {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'SID'))) {
       return false;
     }
-    $DB = new MySQLiDBHelper();
-    $DB->where('UserMapID', $this->Req->UID);
-    $DB->where('SchemeID', $this->Req->SID);
-    $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
-    if (count($UserWorks) == 0) {
-      $DB->where('CtrlMapID', $this->Req->UID);
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
+      OR $this->getNoAuthMode()
+    ) {
+      $DB = new MySQLiDBHelper();
+      $DB->where('UserMapID', $AuthUser->getUserMapID());
       $DB->where('SchemeID', $this->Req->SID);
       $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
+      if (count($UserWorks) == 0) {
+        $DB->where('CtrlMapID', $AuthUser->getUserMapID());
+        $DB->where('SchemeID', $this->Req->SID);
+        $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
+      }
+      $this->Resp['DB']  = $UserWorks;
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'Total Works : ' . count($UserWorks);
+      //$this->setExpiry(3600);
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP';
     }
-    $this->Resp['DB']  = $UserWorks;
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'Total Works : ' . count($UserWorks);
-    //$this->setExpiry(3600);
     unset($DB);
     unset($UserWorks);
   }
@@ -228,7 +264,6 @@ class MprAPI extends AndroidAPI {
    *   JSONObject={"API":"UP",
    *               "MDN":"9876543210",
    *               "OTP":"987654",
-   *               "UID":"35",
    *               "WID":"5",
    *               "EA":"35000",
    *               "P":"90",
@@ -242,7 +277,7 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function UP() {
-    if (!$this->checkPayLoad(array('MDN','OTP','UID','WID','EA','P','R'))) {
+    if (!$this->checkPayLoad(array('MDN','OTP','WID','EA','P','R'))) {
       return false;
     }
     $AuthUser = new AuthOTP();
@@ -250,7 +285,7 @@ class MprAPI extends AndroidAPI {
       OR $this->getNoAuthMode()
     ) {
       $DB = new MySQLiDBHelper();
-      $DB->where('UserMapID', $this->Req->UID); // TODO: UID Needs to be validated against Mobile No
+      $DB->where('UserMapID', $AuthUser->getUserMapID());
       $DB->where('WorkID', $this->Req->WID);
       $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
 

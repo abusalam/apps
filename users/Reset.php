@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../lib.inc.php';
 require_once __DIR__ . '/../php-mailer/GMail.lib.php';
 require_once __DIR__ . '/../smsgw/smsgw.inc.php';
-WebLib::initHTML5page("Register");
+WebLib::initHTML5page("Reset Password");
 WebLib::IncludeCSS();
 WebLib::IncludeCSS('css/forms.css');
 WebLib::JQueryInclude();
@@ -20,7 +20,7 @@ WebLib::ShowMenuBar('WebSite');
 ?>
 <div class="content">
   <div class="formWrapper-Autofit">
-    <h3 class="formWrapper-h3">User Registration</h3>
+    <h3 class="formWrapper-h3">Reset Password</h3>
     <?php
     $Data = new MySQLiDBHelper();
     $UnregisteredUsers = $Data->where('Registered', 0)
@@ -82,41 +82,32 @@ WebLib::ShowMenuBar('WebSite');
         echo "<h3>You solution of the Math in the image is wrong.</h3>";
       }
     }
-    elseif (count($UnregisteredUsers) > 0) {
       ?>
       <form name="feed_frm" method="post" action="Register.php">
+
           <label for="UserMapID"><strong>User ID:</strong><br/></label>
-          <select id="UserMapID" name="UserMapID">
-            <?php
-            WebLib::showSelect("UserMapID", "UserName",
-              "Select `UserMapID`,`UserName` "
-              . " FROM `" . MySQL_Pre . "Users` "
-              . " Where NOT `Registered` AND NOT `Activated`;",
-              WebLib::GetVal($_POST, 'UserMapID', TRUE));
-            ?>
-          </select>
-          <div style="clear:both;"></div>
+            <input placeholder="Enter your User ID" type="text" id="UserMapID" name="UserMapID" class="form-TxtInput"
+                   value="<?php echo WebLib::GetVal($_POST, 'UserMapID'); ?>" required/>
+
           <label for="UserID"><strong>E-Mail Address:</strong><br/></label>
           <input placeholder="Valid e-Mail Address" type="email" id="UserID" name="UserID" class="form-TxtInput"
                  value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" required/>
+
           <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
           <input placeholder="Mobile Number" maxlength="10" type="text" id="MobileNo" name="MobileNo" class="form-TxtInput"
                  value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>" required/>
-        <?php WebLib::StaticCaptcha(TRUE); ?>
+
+          <input type="hidden" name="LoginToken" value="<?php
+          echo WebLib::GetVal($_SESSION, 'Token');
+          ?>"/>
+
+        <?php WebLib::StaticCaptcha(true); ?>
         <div style="clear:both;"></div>
         <hr/>
         <div class="formControl">
-          <input style="width:80px;" type="submit" value="Register"/>
+          <input style="width:80px;" type="submit" value="Reset"/>
         </div>
       </form>
-    <?php
-    } else {
-      echo "<h3>All Users are registered.</h3>";
-    }
-    ?>
-      <input type="hidden" name="LoginToken" value="<?php
-      echo WebLib::GetVal($_SESSION, 'Token');
-      ?>"/>
     <div style="clear:both;"></div>
   </div>
 </div>

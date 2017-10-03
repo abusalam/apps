@@ -223,8 +223,7 @@ class AndroidAPI {
     $DB                    = new MySQLiDBHelper();
     $Data['MobileNo']      = $this->Req->MDN;
     $DB->where('MobileNo', $Data['MobileNo']);
-    $Profile = $DB->query('Select UserName, Designation, eMailID, LastAccessTime '
-      . 'FROM ' . MySQL_Pre . 'APP_Users');
+    $Profile = $DB->get(MySQL_Pre . 'APP_Users');
     if (count($Profile) == 0) {
       $DB->insert(MySQL_Pre . 'APP_Users', $Data);
       $this->Resp['SendSMS'] = true;
@@ -261,8 +260,7 @@ class AndroidAPI {
    * Response:
    *    JSONObject={"API":true,
    *               "DB": {'KeyUpdated':1,
-   *                      "USER":{"UserName":"John Smith", TODO Send User
-   *                      Profile Data available at server.
+   *                      "USER":{"UserName":"John Smith",
    *                              "Designation":"Operator",
    *                              "eMailID":"jsmith@gmail.com"}
    *                      }
@@ -284,6 +282,12 @@ class AndroidAPI {
       $DB->where('MobileNo', $this->Req->MDN);
       $this->Resp['DB']['USER'] = $DB->query('Select `UserMapID`, `UserID` as `eMailID`,'
         . ' `UserName` as `Designation`, `DisplayName` FROM ' . MySQL_Pre . 'Users');
+
+      $UserData['UserMapID']=$this->Resp['DB']['USER'][0]['UserMapID'];
+      //TODO Import the UserData from Users table into APP_Users
+
+      $DB->where('MobileNo', $this->Req->MDN)
+        ->update(MySQL_Pre . 'APP_Users', $UserData);
 
       $this->Resp['API'] = true;
       $this->Resp['MSG'] = 'Mobile No. ' . $this->Req->MDN . ' is Registered Successfully!'

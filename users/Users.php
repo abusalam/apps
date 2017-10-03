@@ -53,11 +53,11 @@ $Data = new MySQLiDB();
     <div class="FieldGroup" id="CreateUser-dialog-form" style="display:none">
       <form name="frmCreateUser" id="frmCreateUser" method="post"
             action="Users.php">
-        <label for="UserName">User Name: </label>
-        <input type="text" name="UserName" id="UserName" required/>
+        <label for="UserName">Display Name: </label>
+        <input type="text" name="DisplayName" id="DisplayName" required/>
         <br/>
-        <label for="UserName">Desgination: </label>
-        <input type="text" name="Designation" id="UserDesg" required/>
+        <label for="UserDesg">User Name: </label>
+        <input type="text" name="UserName" id="UserName" required/>
         <br/>
         <input type="hidden" name="FormToken"
                value="<?php

@@ -286,7 +286,7 @@ class Securimage {
    * Whether the captcha should be case sensitive (not recommended, use only for maximum protection)
    * @var bool
    */
-  public $case_sensitive = false;
+  public $case_sensitive = true;
 
   /**
    * The character set to use for generating the captcha code

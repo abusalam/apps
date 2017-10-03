@@ -36,21 +36,6 @@ WebLib::ShowMenuBar('APPS');
         <h3 class="formWrapper-h3">Staging Platform Information</h3>
         <span class="Message">
             <ul>
-                <li>PHP <?php echo phpversion(); ?></li>
-              <?php
-              $link = mysqli_connect(HOST_Name, MySQL_User, MySQL_Pass);
-              if (!$link) {
-                printf('<li>Could not connect: %s</li>' . mysqli_error($link));
-              } else {
-                printf('<li>MySQL Server: %s</li>', mysqli_get_server_info($link));
-              }
-              printf('<li>MySQL Client: %s</li>', mysqli_get_client_info());
-              if (function_exists('mcrypt_encrypt')) {
-                echo '<li>The mcrypt extension is available.</li>';
-              } else {
-                echo '<li>The mcrypt extension is missing!</li>';
-              }
-              ?>
                 <li>Default User ID: admin Password: test@123</li>
                 <li>Download Android App <a href="android/app-release.apk">Project-AIO.apk</a></li>
                 <?php if(isset($_SESSION['MobileNo']) && strlen($_SESSION['MobileNo'])>0): ?>

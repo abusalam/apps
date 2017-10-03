@@ -300,14 +300,14 @@ class MySQLiDB {
     foreach($Rows as $Row){
       if($Header){
         foreach($Row as $Field => $Value){
-          echo '<th>' . $Field . '</th>';
+          echo '<th>' . htmlentities($Field) . '</th>';
         }
 
       }
       $Header=false;
       echo "\t<tr>\n";
       foreach($Row as $Value){
-        echo "\t\t<td>" . $Value . "</td>\n";
+        echo "\t\t<td>" . htmlentities($Value) . "</td>\n";
       }
       echo "\t</tr>\n";
     }

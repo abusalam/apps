@@ -6,6 +6,7 @@ class User {
   protected $UserName;
   protected $Designation;
   protected $eMailID;
+  protected $UserMapID;
 
   function __construct($MobileNo) {
     $DB = new MySQLiDBHelper();
@@ -13,6 +14,7 @@ class User {
     $Users             = $DB->get(MySQL_Pre . 'APP_Users');
     $this->eMailID     = $Users[0]['eMailID'];
     $this->UserName    = $Users[0]['UserName'];
+    $this->UserMapID   = $Users[0]['UserMapID'];
     $this->Designation = $Users[0]['Designation'];
     $this->MobileNo    = $MobileNo;
   }
@@ -42,6 +44,12 @@ class User {
     return $this->eMailID;
   }
 
+  /**
+   * @return mixed
+   */
+  public function getUserMapID() {
+    return $this->UserMapID;
+  }
 
   function getMobileNo() {
     return $this->MobileNo;
@@ -51,6 +59,11 @@ class User {
     return true;
   }
 
+  /**
+   * @param $UserName
+   * @param $Password
+   * @return int
+   */
   function createUser($UserName, $Password) {
     $DB                     = new MySQLiDBHelper();
     $Pass                   = md5($Password);
@@ -59,6 +72,6 @@ class User {
     $insertData['Status']   = 'off';
     $UserID                 = $DB->insert(MySQL_Pre . 'APP_Users', $insertData);
 
-    return true;
+    return $UserID;
   }
 }

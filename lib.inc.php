@@ -6,7 +6,7 @@
  * Defined Version for application
  * @version v1.0.1 SCA_11911 20170421-1345
  */
-define('APPS_Version', 'v1.0.1 BBA_11911 20170428-1745');
+define('APPS_Version', 'v1.0.2 Level-4 20171011-1554'); //TODO: Define Application Version
 date_default_timezone_set('Asia/Kolkata');
 /**
  * @todo Unique Random ID Generator function to be included
@@ -170,7 +170,7 @@ class WebLib {
    * Generates call to jQuery Scripts in Head Section
    */
   public static function JQueryInclude() {
-    self::IncludeJS('js/jquery-1.10.2.min.js');
+    self::IncludeJS('js/jquery.min.js');
     self::IncludeJS('js/jquery-ui.min.js');
     self::IncludeCSS('css/smoothness/jquery-ui.min.css');
   }
@@ -632,7 +632,7 @@ class WebLib {
       'database_pass'   => MySQL_Pass,
       'database_name'   => MySQL_DB,
       'database_table'  => MySQL_Pre . 'CaptchaCodes',
-      'captcha_type'    => Securimage::SI_CAPTCHA_MATHEMATIC,
+      'captcha_type'    => Securimage::SI_CAPTCHA_STRING,
       'no_session'      => true
     );
     if ($ShowImage) {
@@ -642,8 +642,8 @@ class WebLib {
         . '<img id="siimage"'
         . ' src="ShowCaptcha.php?captchaId=' . $captchaId . '"'
         . ' alt="captcha image" />'
-        . '<input class="form-TxtInput" placeholder="Solve the math above" '
-        . 'type="text" name="captcha_code" value="" required />';
+        . '<input class="form-TxtInput" placeholder="Type the image code" '
+        . 'type="text" name="captcha_code" value="" autocomplete="off" required />';
       echo $Captcha;
     } else {
       $captcha_code = self::GetVal($_POST, 'captcha_code');
@@ -788,7 +788,7 @@ class WebLib {
       $Proto               = (self::GetVal($_SERVER, 'HTTPS') === 'on') ? 'https://' : 'http://';
       $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER, 'HTTP_HOST') . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
-      //self::DeployInfo(); // TODO :: Update Version for Production
+      //self::DeployInfo(); //
       $_SESSION['Version'] = 'NIC/CSD/IA/11911 Level:01 20170405 {SCA_11911-4-gcae9423 20170406}';
     }
   }

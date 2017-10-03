@@ -14,12 +14,10 @@ function SQLDefs($ObjectName) {
 
     case 'APP_Users':
       $SqlDB = 'CREATE TABLE IF NOT EXISTS `' . MySQL_Pre . $ObjectName . '` ('
-        . '`MobileNo` varchar(10) DEFAULT NULL,'
-        . '`UserName` varchar(50) DEFAULT NULL,'
+        . '`MobileNo` varchar(10) NOT NULL,'
+        . '`UserMapID` varchar(10) NOT NULL,'
         . '`UserData` text DEFAULT NULL,'
         . '`TempData` text DEFAULT NULL,'
-        . '`Designation` varchar(50) DEFAULT NULL,'
-        . '`eMailID` text DEFAULT NULL,'
         . '`UsageCount` int DEFAULT 0,'
         . '`Status` enum(\'Registered\',\'Activated\',\'Inactive\') DEFAULT NULL,'
         . '`LastAccessTime` timestamp NOT NULL '
