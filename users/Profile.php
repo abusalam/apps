@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../lib.inc.php');
 WebLib::AuthSession();
 WebLib::Html5Header("Profile");
 WebLib::IncludeCSS();
-WebLib::IncludeJS("js/md5.js");
+WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
 WebLib::JQueryInclude();
 WebLib::IncludeCSS("Jcrop/css/jquery.Jcrop.min.css");
 WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
@@ -15,9 +15,9 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
             .click(function() {
       if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
         if (scorePassword($('#CnfPassWD').val()) >= 80) {
-          $('#OldPassWD').val(MD5(MD5($('#OldPassWD').val()) + $('#AjaxToken').val()));
-          $('#NewPassWD').val(MD5(MD5($('#NewPassWD').val()) + $('#CnfPassWD').val()));
-          $('#CnfPassWD').val(MD5($('#CnfPassWD').val()));
+          $('#OldPassWD').val(sha512(sha512($('#OldPassWD').val()) + $('#AjaxToken').val()));
+          $('#NewPassWD').val(sha512(sha512($('#NewPassWD').val()) + $('#CnfPassWD').val()));
+          $('#CnfPassWD').val(sha512($('#CnfPassWD').val()));
           $('#ChgPwd-frm').submit();
           $(this).dialog("close");
         }
@@ -89,13 +89,13 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
     </span>
   <?php
 
-  if ((WebLib::GetVal($_POST, 'CnfPassWD') !== null) && ($_SESSION['Token'] === WebLib::GetVal($_POST, 'FormToken'))) {
+  if (WebLib::GetVal($_POST, 'CnfPassWD') !== null) {
     $Data = new MySQLiDBHelper();
     //TODO :: Review Update Password
     $Data->where('UserMapID', $_SESSION['UserMapID']);
     $Users=$Data->get(MySQL_Pre . 'Users',1);
     $Password=WebLib::GetVal($Users[0],'UserPass');
-    if(md5($Password.$_SESSION['Token'])===WebLib::GetVal($_POST, 'OldPassWD')){
+    if(hash('sha512',$Password.$_SESSION['Token'])===WebLib::GetVal($_POST, 'OldPassWD')){
       $Data->where('Registered', 1);
       $Data->where('Activated', 1);
       $Data->where('UserMapID', $_SESSION['UserMapID']);
@@ -119,16 +119,16 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
         <h2>Change Password</h2>
         <div id="chgpwd-dlg" title="Change Password">
             <input type="password" placeholder="Old Password" name="OldPassWD"
-                   id="OldPassWD"/><br/>
+                   id="OldPassWD" required/><br/>
             <input type="password" placeholder="New Password" name="NewPassWD"
-                   id="NewPassWD"/><span id="PwdScore"></span><br/>
+                   id="NewPassWD" required/><span id="PwdScore"></span><br/>
             <input type="password" placeholder="Confirm Password"
-                   name="CnfPassWD" id="CnfPassWD"/><span id="PwdMatch"></span>
+                   name="CnfPassWD" id="CnfPassWD" required/><span id="PwdMatch"></span>
         </div>
-        <input type="hidden" id="AjaxToken" name="FormToken"
-               value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
         <input type="button" id="ChgPwd" value="Change Password"/>
     </form>
+    <input type="hidden" id="AjaxToken" name="FormToken"
+           value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
   </div>
   <div class="pageinfo">
     <?php WebLib::PageInfo(); ?>
