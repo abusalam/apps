@@ -37,7 +37,7 @@ WebLib::ShowMenuBar('USER');
             $Selected='';
           }
           echo '<option value="' . $_SESSION['UserMapID'] . '" '. $Selected .'>'
-            . $_SESSION['UserMapID'] . ' - ' . $_SESSION['UserName'] . '</option>';
+            . $_SESSION['UserMapID'] . ' - ' . htmlentities($_SESSION['UserName']) . '</option>';
           foreach ($Users as $User) {
             if($UserMapID==$User['UserMapID']) {
               $Selected='selected="selected"';
@@ -45,7 +45,7 @@ WebLib::ShowMenuBar('USER');
               $Selected='';
             }
             echo '<option value="' . $User['UserMapID'] . '" '. $Selected .'>'
-              . $User['UserMapID'] . ' - ' . $User['UserName'] . '</option>';
+              . $User['UserMapID'] . ' - ' . htmlentities($User['UserName']) . '</option>';
           } ?>
         </select>
         <input type="Submit" value="Show Activity" name="BtnShow">
@@ -69,7 +69,7 @@ WebLib::ShowMenuBar('USER');
       while ($Log = mysqli_fetch_array($Results, MYSQLI_ASSOC)) {
         array_push($Logs, $Log);
       }
-      WebLib::ShowTable($Logs);
+      //WebLib::ShowTable($Logs);
 
       unset($DB);
       ?>
