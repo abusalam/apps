@@ -6,7 +6,70 @@ WebLib::initHTML5page("Register");
 WebLib::IncludeCSS();
 WebLib::IncludeCSS('css/forms.css');
 WebLib::JQueryInclude();
+WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
 ?>
+<script>
+    $(function() {
+        $('#ChgPwd')
+            .button()
+            .click(function() {
+                if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
+                    if (scorePassword($('#CnfPassWD').val()) >= 80) {
+                        $('#NewPassWD').val(sha512(sha512($('#NewPassWD').val()) + $('#LoginToken').val()));
+                        $('#CnfPassWD').val(sha512($('#CnfPassWD').val()));
+                        $('#ChgPwd-frm').submit();
+                        $(this).dialog("close");
+                    }
+                    else {
+                        alert('Password Complexity atleast 80 is required!');
+                    }
+                } else {
+                    alert('New passwords don\'t match');
+                }
+            });
+
+        $('input[type="button"]').button();
+        $('#Msg').text('');
+        $('#NewPassWD').keyup(function() {
+            $('#PwdScore').html('(' + scorePassword($(this).val()) + '/100)');
+        });
+        $('#CnfPassWD').keyup(function() {
+            if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
+                $('#PwdMatch').html('Matched');
+            } else {
+                $('#PwdMatch').html('Not Matched');
+            }
+        });
+    });
+    function scorePassword(pass) {
+        var score = 0;
+        if (!pass)
+            return score;
+
+        // award every unique letter until 5 repetitions
+        var letters = new Object();
+        for (var i = 0; i < pass.length; i++) {
+            letters[pass[i]] = (letters[pass[i]] || 0) + 1;
+            score += 5.0 / letters[pass[i]];
+        }
+
+        // bonus points for mixing it up
+        var variations = {
+            digits: /\d/.test(pass),
+            lower: /[a-z]/.test(pass),
+            upper: /[A-Z]/.test(pass),
+            nonWords: /\W/.test(pass),
+        }
+
+        variationCount = 0;
+        for (var check in variations) {
+            variationCount += (variations[check] == true) ? 1 : 0;
+        }
+        score += (variationCount - 1) * 10;
+
+        return parseInt(score);
+    }
+</script>
 </head>
 <body>
 <div class="TopPanel">
@@ -32,51 +95,55 @@ WebLib::ShowMenuBar('WebSite');
 
       $email = WebLib::GetVal($_POST, 'UserID', TRUE);
       $MobileNo = WebLib::GetVal($_POST, 'MobileNo', TRUE);
-      $Pass = WebLib::GeneratePassword(10, 2, 2, 2);
+      $Pass = WebLib::GetVal($_POST, 'CnfPassWD', true);
       $UserMapID = WebLib::GetVal($_POST, 'UserMapID', TRUE);
 
       if (WebLib::StaticCaptcha()) {
 
         $RegData['UserID'] = $email;
-        $RegData['UserPass'] = hash('sha512', $Pass);
+        $RegData['UserPass'] = $Pass; //hash('sha512', $Pass);
         $RegData['MobileNo'] = $MobileNo;
         $RegData['Registered'] = 1;
+        if(hash('sha512',$Pass.$_SESSION['Token'])===WebLib::GetVal($_POST, 'NewPassWD')) {
 
-        $Registered = $Data->where('Registered', 0)
-          ->where('Activated', 0)
-          ->where('UserMapID', $UserMapID)
-          ->update(MySQL_Pre . "Users", $RegData);
+          $Registered = $Data->where('Registered', 0)
+            ->where('Activated', 0)
+            ->where('UserMapID', $UserMapID)
+            ->update(MySQL_Pre . "Users", $RegData);
 
-        if ($Registered === TRUE) {
+          if ($Registered === true) {
 
-          $UserName = $Data->where('UserMapID', $UserMapID)
-            ->query("Select `UserName` FROM `" . MySQL_Pre . "Users`");
+            $UserName = $Data->where('UserMapID', $UserMapID)
+              ->query("Select `UserName` FROM `" . MySQL_Pre . "Users`");
 
-          $Subject = "User Account Details - Paschim Medinipur";
-          $Body = "<b>UserID: </b><span> {$email}</span><br/>"
-            . "<b>Password: </b><span> {$Pass}</span>";
+            $Subject = "User Account Details - Paschim Medinipur";
+            $Body    = "<b>UserID: </b><span> {$email}</span><br/>"
+              . "<b>Password: </b><span> {$Pass}</span>";
 
-          $TxtBody = 'UserID: ' . $email . "\r\n" . 'Password: ' . $Pass;
-          $SentSMS = '';
+            $TxtBody = 'UserID: ' . $email . "\r\n" . 'Password: ' . $Pass;
+            $SentSMS = '';
 
-          SMSGW::SendSMS($TxtBody, $MobileNo);
-          $SentSMS = ' and ' . $MobileNo;
+            SMSGW::SendSMS($TxtBody, $MobileNo);
+            $SentSMS = ' and ' . $MobileNo;
 
-          $MailSent = json_decode(GMailSMTP($email, $UserName[0]['UserName'],
-            $Subject, $Body, $TxtBody));
+            $MailSent = json_decode(GMailSMTP($email, $UserName[0]['UserName'],
+              $Subject, $Body, $TxtBody));
 
-          WebLib::ShowMsg();
-          if ($MailSent->Sent) {
-            $_SESSION['Msg'] = "<h3>Registration successful.</h3>";
+            WebLib::ShowMsg();
+            if ($MailSent->Sent) {
+              $_SESSION['Msg'] = "<h3>Registration successful.</h3>";
               //. "<p>$TxtBody</p>" TODO: Display Password for Security Audit
               //. "<b>Please Note: </b>Password is sent to: {$email}" . $SentSMS;
-          } else {
-            $_SESSION['Msg'] = "<h3>Registration successful but Unable to Send Email.</h3>";
+            } else {
+              $_SESSION['Msg'] = "<h3>Registration successful but Unable to Send Email.</h3>";
               //. "<p>$TxtBody</p>"; TODO: Display Password for Security Audit
+            }
+            WebLib::ShowMsg();
+          } else {
+            echo "<h3>Unable to process request. User account is already activated.</h3>";
           }
-          WebLib::ShowMsg();
         } else {
-          echo "<h3>Unable to send request.</h3>";
+          echo "<h3>Request modified during transmission.</h3>";
         }
       } else {
         echo "<h3>You solution of the code in the image is wrong.</h3>";
@@ -84,8 +151,8 @@ WebLib::ShowMenuBar('WebSite');
     }
     elseif (count($UnregisteredUsers) > 0) {
       ?>
-      <form name="feed_frm" method="post" action="Register.php" autocomplete="off">
-          <label for="UserMapID"><strong>User ID:</strong><br/></label>
+      <form name="feed_frm" id="ChgPwd-frm" method="post" action="Register.php" autocomplete="off">
+          <label for="UserMapID"><strong>User Name:</strong><br/></label>
           <select id="UserMapID" name="UserMapID">
             <?php
             WebLib::showSelect("UserMapID", "UserName",
@@ -102,19 +169,27 @@ WebLib::ShowMenuBar('WebSite');
           <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
           <input placeholder="Mobile Number" maxlength="10" type="text" id="MobileNo" name="MobileNo" class="form-TxtInput"
                  value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>" autocomplete="off" required/>
+          <label for="NewPassWD"><strong>Password: </strong><span id="PwdScore"></span></label>
+              <input type="password" placeholder="New Password" name="NewPassWD" class="form-TxtInput"
+                     id="NewPassWD" required/>
+          <label for="CnfPassWD"><strong>Confirm Password: </strong><span id="PwdMatch"></span></label>
+              <input type="password" placeholder="Confirm Password" name="CnfPassWD" class="form-TxtInput"
+                     id="CnfPassWD" required/>
+
         <?php WebLib::StaticCaptcha(TRUE); ?>
         <div style="clear:both;"></div>
         <hr/>
         <div class="formControl">
-          <input style="width:80px;" type="submit" value="Register"/>
+          <input style="width:80px;" type="button" id="ChgPwd" value="Register"/>
         </div>
       </form>
     <?php
     } else {
       echo "<h3>All Users are registered.</h3>";
     }
+    $_SESSION['Token'] = md5($_SERVER['REMOTE_ADDR'] . $ID . time());
     ?>
-      <input type="hidden" name="LoginToken" value="<?php
+      <input type="hidden" id="LoginToken" name="LoginToken" value="<?php
       echo WebLib::GetVal($_SESSION, 'Token');
       ?>"/>
     <div style="clear:both;"></div>
