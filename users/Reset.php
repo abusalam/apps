@@ -30,21 +30,23 @@ WebLib::ShowMenuBar('WebSite');
 
     if (WebLib::GetVal($_POST, 'UserID') !== NULL) {
 
-      $email = WebLib::GetVal($_POST, 'UserID', TRUE);
+      $email = WebLib::GetVal($_POST, 'UserEmail', TRUE);
       $MobileNo = WebLib::GetVal($_POST, 'MobileNo', TRUE);
       $Pass = WebLib::GeneratePassword(10, 2, 2, 2);
-      $UserMapID = WebLib::GetVal($_POST, 'UserMapID', TRUE);
+      $UserID = WebLib::GetVal($_POST, 'UserID', TRUE);
 
       if (WebLib::StaticCaptcha()) {
 
-        $RegData['UserID'] = $email;
+        $RegData['UserID'] = $UserMapID;
         $RegData['UserPass'] = hash('sha512', $Pass);
         $RegData['MobileNo'] = $MobileNo;
         $RegData['Registered'] = 1;
 
         $Registered = $Data->where('Registered', 0)
-          ->where('Activated', 0)
-          ->where('UserMapID', $UserMapID)
+          ->where('Activated', 1)
+          ->where('UserName', $UserID)
+          ->where('UserID', $email)
+          ->where('MobileNo', $MobileNo)
           ->update(MySQL_Pre . "Users", $RegData);
 
         if ($Registered === TRUE) {
@@ -85,13 +87,13 @@ WebLib::ShowMenuBar('WebSite');
       ?>
       <form name="feed_frm" method="post" action="Reset.php" autocomplete="off">
 
-          <label for="UserMapID"><strong>User ID:</strong><br/></label>
-            <input placeholder="Enter your User ID" type="text" id="UserMapID" name="UserMapID" class="form-TxtInput"
-                   value="<?php echo WebLib::GetVal($_POST, 'UserMapID'); ?>" autocomplete="off" required/>
+          <label for="UserID"><strong>User Name:</strong><br/></label>
+            <input placeholder="Enter your User ID" type="text" id="UserID" name="UserID" class="form-TxtInput"
+                   value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" autocomplete="off" required/>
 
-          <label for="UserID"><strong>E-Mail Address:</strong><br/></label>
-          <input placeholder="Valid e-Mail Address" type="email" id="UserID" name="UserID" class="form-TxtInput"
-                 value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" autocomplete="off" required/>
+          <label for="UserEmail"><strong>E-Mail Address:</strong><br/></label>
+          <input placeholder="Valid e-Mail Address" type="email" id="UserEmail" name="UserEmail" class="form-TxtInput"
+                 value="<?php echo WebLib::GetVal($_POST, 'UserEmail'); ?>" autocomplete="off" required/>
 
           <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
           <input placeholder="Mobile Number" maxlength="10" type="text" id="MobileNo" name="MobileNo" class="form-TxtInput"

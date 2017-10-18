@@ -146,7 +146,8 @@ WebLib::ShowMenuBar('APPS');
         echo "<h2>Thank You! You Have Successfully Logged Out!</h2>";
         break;
       case "JustLoggedIn":
-        echo "<h2>Welcome {$_SESSION['UserName']}!</h2>";
+          $UserName=htmlentities($_SESSION['UserName']);
+        echo "<h2>Welcome {$UserName}!</h2>";
         $TxtSMS = $action . '-' . $_SESSION['UserMapID'] . ': ' . $_SESSION['UserName'] . "\n"
             . ' E-Mail: ' . $_SESSION['UserID'] . "\n"
             . ' Mobile: ' . $_SESSION['MobileNo'] . "\n"
@@ -155,7 +156,7 @@ WebLib::ShowMenuBar('APPS');
         SMSGW::SendSMS($TxtSMS, AdminMobile);
         break;
       case "Valid":
-        echo "<h2>Already logged In as {$_SESSION['UserName']}!</h2>";
+        echo "<h2>Already logged In as {$UserName}!</h2>";
         break;
       case "NoAccess":
         $_SESSION['Msg']      = "Sorry! Access Denied!";
