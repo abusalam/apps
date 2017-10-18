@@ -67,35 +67,35 @@ WebLib::ShowMenuBar('WebSite');
 
           WebLib::ShowMsg();
           if ($MailSent->Sent) {
-            $_SESSION['Msg'] = "<h3>Registration successful.</h3>";
+            $_SESSION['Msg'] = "<h3>Password reset link has been sent by email.</h3>";
               //. "<p>$TxtBody</p>" TODO: Display Password for Security Audit
               //. "<b>Please Note: </b>Password is sent to: {$email}" . $SentSMS;
           } else {
-            $_SESSION['Msg'] = "<h3>Registration successful but Unable to Send Email.</h3>";
+            $_SESSION['Msg'] = "<h3>Password reset successful but Unable to Send the link by Email.</h3>";
               //. "<p>$TxtBody</p>"; TODO: Display Password for Security Audit
           }
           WebLib::ShowMsg();
         } else {
-          echo "<h3>Unable to send request.</h3>";
+          echo "<h3>Unable to process request. User details may be invalid or the account is locked.</h3>";
         }
       } else {
-        echo "<h3>You solution of the Math in the image is wrong.</h3>";
+        echo "<h3>You solution of the code in the image is wrong.</h3>";
       }
     }
       ?>
-      <form name="feed_frm" method="post" action="Register.php">
+      <form name="feed_frm" method="post" action="Reset.php" autocomplete="off">
 
           <label for="UserMapID"><strong>User ID:</strong><br/></label>
             <input placeholder="Enter your User ID" type="text" id="UserMapID" name="UserMapID" class="form-TxtInput"
-                   value="<?php echo WebLib::GetVal($_POST, 'UserMapID'); ?>" required/>
+                   value="<?php echo WebLib::GetVal($_POST, 'UserMapID'); ?>" autocomplete="off" required/>
 
           <label for="UserID"><strong>E-Mail Address:</strong><br/></label>
           <input placeholder="Valid e-Mail Address" type="email" id="UserID" name="UserID" class="form-TxtInput"
-                 value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" required/>
+                 value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" autocomplete="off" required/>
 
           <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
           <input placeholder="Mobile Number" maxlength="10" type="text" id="MobileNo" name="MobileNo" class="form-TxtInput"
-                 value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>" required/>
+                 value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>" autocomplete="off" required/>
 
           <input type="hidden" name="LoginToken" value="<?php
           echo WebLib::GetVal($_SESSION, 'Token');

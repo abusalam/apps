@@ -79,12 +79,12 @@ WebLib::ShowMenuBar('WebSite');
           echo "<h3>Unable to send request.</h3>";
         }
       } else {
-        echo "<h3>You solution of the Math in the image is wrong.</h3>";
+        echo "<h3>You solution of the code in the image is wrong.</h3>";
       }
     }
     elseif (count($UnregisteredUsers) > 0) {
       ?>
-      <form name="feed_frm" method="post" action="Register.php">
+      <form name="feed_frm" method="post" action="Register.php" autocomplete="off">
           <label for="UserMapID"><strong>User ID:</strong><br/></label>
           <select id="UserMapID" name="UserMapID">
             <?php
@@ -98,10 +98,10 @@ WebLib::ShowMenuBar('WebSite');
           <div style="clear:both;"></div>
           <label for="UserID"><strong>E-Mail Address:</strong><br/></label>
           <input placeholder="Valid e-Mail Address" type="email" id="UserID" name="UserID" class="form-TxtInput"
-                 value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" required/>
+                 value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" autocomplete="off" required/>
           <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
           <input placeholder="Mobile Number" maxlength="10" type="text" id="MobileNo" name="MobileNo" class="form-TxtInput"
-                 value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>" required/>
+                 value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>" autocomplete="off" required/>
         <?php WebLib::StaticCaptcha(TRUE); ?>
         <div style="clear:both;"></div>
         <hr/>

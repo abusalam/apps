@@ -297,7 +297,9 @@ class AndroidAPI {
       $this->Resp['DB'] = "Authentication Failed!";
       //. $AuthUser->oath_hotp($AuthUser->getKey($this->Req->MDN), $this->Req->TC);
       $this->Resp['API'] = false;
-      $this->Resp['MSG'] = 'Invalid OTP';
+      $DateFormat = 'g:i:s A';
+      $this->Resp['MSG'] = 'Invalid OTP. Please check your date time then retry.'
+        . ' Server Time: ' . date($DateFormat, time());
     }
   }
 
