@@ -325,17 +325,18 @@ class AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SP() {
-    if (!$this->checkPayLoad(array('MDN', 'OTP', 'OTP1', 'OTP2'))) {
+    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
       return;
     };
     $AuthUser = new AuthOTP();
-    $ReSynced = $AuthUser->resyncCode($this->Req->MDN, $this->Req->OTP1, $this->Req->OTP2);
+    //$ReSynced = $AuthUser->resyncCode($this->Req->MDN, $this->Req->OTP1, $this->Req->OTP2);
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
       OR $this->getNoAuthMode()
     ) {
       $DB = new MySQLiDBHelper();
       $DB->where('MobileNo', $this->Req->MDN);
-      $this->Resp['DB']  = $DB->get(MySQL_Pre . 'Users');
+      $this->Resp['DB']  = $DB->query('Select `UserMapID`, `UserID` as `eMailID`,'
+        . ' `UserName` as `Designation`, `DisplayName` FROM ' . MySQL_Pre . 'Users');
       $this->Resp['API'] = true;
       $this->Resp['MSG'] = 'Synchronized Successfully.';
     } else {
