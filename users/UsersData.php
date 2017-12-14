@@ -33,17 +33,24 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
 
       case 'Impersonate':
         if (WebLib::GetVal($_POST, 'UserMapID') !== null) {
-          if (WebLib::GetVal($_SESSION, 'ImpFromUserMapID') === null) {
-            $_SESSION['ImpFromUserMapID'] = $_SESSION['UserMapID'];
-            $_SESSION['ImpFromUserName']  = $_SESSION['UserName'];
-          }
-          $_SESSION['UserMapID'] = WebLib::GetVal($_POST, 'UserMapID');
+          $DB->where("CtrlMapID", $_SESSION['UserMapID']);
+          $DB->where("UserMapID", WebLib::GetVal($_POST, 'UserMapID'));
+          $User = $DB->query('Select UserName From `' . MySQL_Pre . 'Users`');
+          if (count($User)) {
+            if (WebLib::GetVal($_SESSION, 'ImpFromUserMapID') === null) {
+              $_SESSION['ImpFromUserMapID'] = $_SESSION['UserMapID'];
+              $_SESSION['ImpFromUserName']  = $_SESSION['UserName'];
+            }
+            $_SESSION['UserMapID'] = WebLib::GetVal($_POST, 'UserMapID');
 
-          $DB->where("UserMapID", $_SESSION['UserMapID']);
-          $User = $DB->query('Select UserName ' . ' From `' . MySQL_Pre . 'Users`');
-          $_SESSION['UserName']    = 'Impersonated-' . htmlentities($User[0]['UserName']);
-          $_SESSION['Msg']         = $_SESSION['UserName'];
-          $_SESSION['ReloadMenus'] = true;
+            $DB->where("UserMapID", $_SESSION['UserMapID']);
+            $User                    = $DB->query('Select UserName ' . ' From `' . MySQL_Pre . 'Users`');
+            $_SESSION['UserName']    = 'Impersonated-' . htmlentities($User[0]['UserName']);
+            $_SESSION['Msg']         = $_SESSION['UserName'];
+            $_SESSION['ReloadMenus'] = true;
+          } else {
+            $_SESSION['Msg'] = 'Invalid User!';
+          }
         } else {
           $_SESSION['Msg'] = 'Select the User to Impersonate!';
         }
