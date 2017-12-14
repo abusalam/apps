@@ -496,7 +496,7 @@ class WebLib {
       . 'InInitPage(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
       . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN', true) . ')';
     setcookie('SESSION_TOKEN', $sess_id, 0,
-      $_SESSION['BaseDIR'], $_SERVER['HTTP_HOST'], false, true);
+      $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
     $_SESSION['SESSION_TOKEN'] = $sess_id;
     $_SESSION['LifeTime']      = time();
   }
@@ -554,7 +554,7 @@ class WebLib {
           . 'SESSION_TOKEN-Valid';
         $sess_id           = md5(microtime());
         setcookie('SESSION_TOKEN', $sess_id, 0,
-          $_SESSION['BaseDIR'], $_SERVER['HTTP_HOST'], false, true);
+          $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
         $_SESSION['SESSION_TOKEN'] = $sess_id;
         $_SESSION['LifeTime']      = time();
       }
@@ -794,7 +794,7 @@ class WebLib {
       $_SESSION['BaseDIR'] = substr(self::GetVal($_SERVER, 'SCRIPT_NAME'), 0,
         strlen(self::GetVal($_SERVER, 'SCRIPT_NAME')) - $PageLength);
       $Proto               = (self::GetVal($_SERVER, 'HTTPS') === 'on') ? 'https://' : 'http://';
-      $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER, 'HTTP_HOST') . $_SESSION['BaseDIR'];
+      $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER, 'SERVER_NAME') . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
       //self::DeployInfo(); //
       $_SESSION['Version'] = 'NIC/CSD/IA/11911 Level:01 20170405 {SCA_11911-4-gcae9423 20170406}';
