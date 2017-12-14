@@ -69,7 +69,7 @@ WebLib::ShowMenuBar('USER');
       while ($Log = mysqli_fetch_array($Results, MYSQLI_ASSOC)) {
         array_push($Logs, $Log);
       }
-      //WebLib::ShowTable($Logs);
+      WebLib::ShowTable($Logs);
 
       unset($DB);
       ?>

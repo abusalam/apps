@@ -860,17 +860,21 @@ class WebLib {
       if ($Header) {
         echo '<th>Sl No.</th>';
         foreach ($Row as $Field => $Value) {
-          echo '<th>' . $Field . '</th>';
+          echo '<th>' . htmlentities($Field) . '</th>';
         }
       }
       $Header = false;
       echo "\t<tr>\n<td>" . $i . "</td>";
 
       foreach ($Row as $Value) {
-        echo "\t\t<td>" . $Value . "</td>\n";
+        echo "\t\t<td>" . htmlentities($Value) . "</td>\n";
       }
       echo "\t</tr>\n";
       $i++;
+    }
+
+    if ($i==1){
+      echo '<th>User First Login is must to activate Logs.</th>';
     }
     echo "</table>\n";
   }
