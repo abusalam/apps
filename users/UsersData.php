@@ -41,7 +41,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
 
           $DB->where("UserMapID", $_SESSION['UserMapID']);
           $User = $DB->query('Select UserName ' . ' From `' . MySQL_Pre . 'Users`');
-          $_SESSION['UserName']    = 'Impersonated-' . $User[0]['UserName'];
+          $_SESSION['UserName']    = 'Impersonated-' . htmlentities($User[0]['UserName']);
           $_SESSION['Msg']         = $_SESSION['UserName'];
           $_SESSION['ReloadMenus'] = true;
         } else {
