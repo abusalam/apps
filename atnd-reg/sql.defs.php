@@ -34,8 +34,7 @@ function SQLDefs($ObjectName) {
               . '(\'ATND\', 1, 0, \'Home\', \'index.php\', 1),'
               . '(\'ATND\', 2, 1, \'Mark Attendance\', \'atnd-reg/Attendance.php\', 1),'
               . '(\'ATND\', 3, 1, \'Reports\', \'atnd-reg/Reports.php\', 1),'
-              . '(\'ATND\', 4, 1, \'User Profile\', \'atnd-reg/Profile.php\', 1),'
-              . '(\'ATND\', 5, 1, \'Log Out!\', \'login.php?LogOut=1\', 1);';
+              . '(\'ATND\', 4, 1, \'Log Out!\', \'login.php?LogOut=1\', 1);';
       break;
   }
   return $SqlDB;
