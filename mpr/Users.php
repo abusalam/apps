@@ -47,6 +47,8 @@ WebLib::ShowMenuBar('MPR');
         <input type="Submit" value="Add User" name="CmdAction">
         <input type="Submit" value="Remove User" name="CmdAction">
       </div>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
     </form>
     <div id="DataTable"></div>
   </div>

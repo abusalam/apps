@@ -69,6 +69,8 @@ WebLib::ShowMenuBar('MPR');
       <div class="formControl">
         <input type="Submit" value="Save Allotment" name="BtnScheme">
       </div>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
     </form>
     <div id="DataTable"></div>
   </div>
@@ -77,6 +79,8 @@ WebLib::ShowMenuBar('MPR');
       <label for="txtSchemeName"><strong>Scheme Name:</strong></label>
       <input id="txtSchemeName" type="text" name="txtSchemeName" class="form-TxtInput">
       <input type="hidden" name="BtnCreScheme" value="1"/>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
     </form>
   </div>
 </div>

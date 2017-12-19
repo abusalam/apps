@@ -6,7 +6,7 @@
  * Defined Version for application
  * @version v1.0.1 SCA_11911 20170421-1345
  */
-define('APPS_Version', 'v1.0.3 Level-5-II+ 20171120-1642'); //TODO: Define Application Version
+define('APPS_Version', 'v1.0.4 Level-5-III+ 20171219-1446'); //TODO: Define Application Version
 date_default_timezone_set('Asia/Kolkata');
 /**
  * @todo Unique Random ID Generator function to be included

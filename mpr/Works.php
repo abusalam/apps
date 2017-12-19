@@ -116,6 +116,8 @@ WebLib::ShowMenuBar('MPR');
       <div class="formControl">
         <input type="Submit" value="Release Fund" name="CmdAction">
       </div>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
     </form>
   </div>
   <div id="SanctionData"></div>

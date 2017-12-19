@@ -11,43 +11,45 @@ WebLib::IncludeJS('mpr/js/Progress.js');
 WebLib::IncludeCSS('mpr/css/forms.css');
 
 if (isset($_POST['BtnPrg']) == 1) {
-  require_once __DIR__ . '/../lib.inc.php';
-  $DB = new MySQLiDBHelper();
-  $tableData['WorkID'] = WebLib::GetVal($_POST, 'Work');
-  $tableData['ExpenditureAmount'] = $_POST['txtAmount'];
-  $tableData['Progress'] = $_POST['PhyPrgValue'];
-  $tableData['Balance'] = str_replace(',', '', $_POST['txtBalance']);
-  $ReportDate = WebLib::GetVal($_POST, 'txtDate');
-  if ($ReportDate == "") {
-    $ReportDate = WebLib::ToDBDate('');
+  if (WebLib::GetVal($_SESSION, 'FormToken') == WebLib::GetVal($_POST, 'FormToken')) {
+    require_once __DIR__ . '/../lib.inc.php';
+    $DB                             = new MySQLiDBHelper();
+    $tableData['WorkID']            = WebLib::GetVal($_POST, 'Work');
+    $tableData['ExpenditureAmount'] = $_POST['txtAmount'];
+    $tableData['Progress']          = $_POST['PhyPrgValue'];
+    $tableData['Balance']           = str_replace(',', '', $_POST['txtBalance']);
+    $ReportDate                     = WebLib::GetVal($_POST, 'txtDate');
+    if ($ReportDate == "") {
+      $ReportDate = WebLib::ToDBDate('');
+    } else {
+      $ReportDate = preg_replace('/(\d{2})\/(\d{2})\/(\d{4})/', '$3-$2-$1', $ReportDate);
+    }
+    $tableData['ReportDate'] = $ReportDate;
+    $tableData['Remarks']    = $_POST['txtRemark'];
+    $SchemeID                = $DB->insert(MySQL_Pre . 'MPR_Progress', $tableData);
+    unset($tableData);
+    $TenderDate    = WebLib::GetVal($_POST, 'txtTenderDate');
+    $WorkOrderDate = WebLib::GetVal($_POST, 'txtWorkOrderDate');
+    if ($TenderDate == "") {
+      $TenderDate = null;
+    } else {
+      $TenderDate = preg_replace('/(\d{2})\/(\d{2})\/(\d{4})/', '$3-$2-$1', $TenderDate);
+    }
+    if ($WorkOrderDate == "") {
+      $WorkOrderDate = null;
+    } else {
+      $WorkOrderDate = preg_replace('/(\d{2})\/(\d{2})\/(\d{4})/', '$3-$2-$1', $WorkOrderDate);
+    }
+    $tableData['TenderDate']    = $TenderDate;
+    $tableData['WorkOrderDate'] = $WorkOrderDate;
+    $DB->where('WorkID', WebLib::GetVal($_POST, 'Work'));
+    $SchemeID = $DB->update(MySQL_Pre . 'MPR_Works', $tableData);
+    unset($tableData);
+  } else {
+    $_SESSION['Msg'] .= "Request may have been modified!";
   }
-  else {
-    $ReportDate = preg_replace('/(\d{2})\/(\d{2})\/(\d{4})/', '$3-$2-$1', $ReportDate);
-  }
-  $tableData['ReportDate'] = $ReportDate;
-  $tableData['Remarks'] = $_POST['txtRemark'];
-  $SchemeID = $DB->insert(MySQL_Pre . 'MPR_Progress', $tableData);
-  unset($tableData);
-  $TenderDate = WebLib::GetVal($_POST, 'txtTenderDate');
-  $WorkOrderDate = WebLib::GetVal($_POST, 'txtWorkOrderDate');
-  if ($TenderDate == "") {
-    $TenderDate = NULL;
-  }
-  else {
-    $TenderDate = preg_replace('/(\d{2})\/(\d{2})\/(\d{4})/', '$3-$2-$1', $TenderDate);
-  }
-  if ($WorkOrderDate == "") {
-    $WorkOrderDate = NULL;
-  }
-  else {
-    $WorkOrderDate = preg_replace('/(\d{2})\/(\d{2})\/(\d{4})/', '$3-$2-$1', $WorkOrderDate);
-  }
-  $tableData['TenderDate'] = $TenderDate;
-  $tableData['WorkOrderDate'] = $WorkOrderDate;
-  $DB->where('WorkID', WebLib::GetVal($_POST, 'Work'));
-  $SchemeID = $DB->update(MySQL_Pre . 'MPR_Works', $tableData);
-  unset($tableData);
 }
+$_SESSION['FormToken'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . microtime());
 ?>
 </head>
 <body>
@@ -137,6 +139,8 @@ WebLib::ShowMenuBar('MPR');
       <div class="formControl">
         <input type="Submit" value="Save Report" name="BtnPrg">
       </div>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
     </form>
   </div>
   <div id="ProgressTable"></div>
