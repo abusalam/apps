@@ -42,7 +42,7 @@ WebLib::ShowMenuBar('WebSite');
         $RegData['MobileNo'] = $MobileNo;
         $RegData['Registered'] = 1;
 
-        $Registered = $Data->where('Registered', 0)
+        $Registered = $Data->where('Registered', 1)
           ->where('Activated', 1)
           ->where('UserName', $UserID)
           ->where('UserID', $email)
