@@ -15,6 +15,11 @@ if (version_compare(phpversion(), '5.3.0', 'ge')) {
 }
 
 WebLib::SetPATH();
+$ResetToken = WebLib::GetVal($_REQUEST,'PasswordResetToken');
+if($ResetToken!==null){
+    header('Location: ' . $_SESSION['BaseURL'] . 'users/Reset.php?Token='.$ResetToken);
+    exit();
+}
 WebLib::InitHTML5page('Home');
 WebLib::IncludeCSS();
 WebLib::IncludeCSS('css/forms.css');

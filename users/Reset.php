@@ -6,112 +6,230 @@ WebLib::initHTML5page("Reset Password");
 WebLib::IncludeCSS();
 WebLib::IncludeCSS('css/forms.css');
 WebLib::JQueryInclude();
+WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
 ?>
+<script>
+  $(function () {
+    $('#ChgPwd')
+      .button()
+      .click(function () {
+        if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
+          if (validatePassword($('#CnfPassWD').val())) {
+            $('#NewPassWD').val(sha512(sha512($('#CnfPassWD').val()) + $('#AjaxToken').val()));
+            $('#CnfPassWD').val(sha512($('#CnfPassWD').val()));
+            $('#ChgPwd-frm').submit();
+          } else {
+            alert('Complex Password is required!');
+          }
+        } else {
+          alert('New passwords don\'t match');
+        }
+      });
+
+    $('input[type="button"]').button();
+    $('#NewPassWD').keyup(function () {
+      $('#PwdScore').html('' + (validatePassword($(this).val()) ? 'Strong' : 'Weak'));
+    });
+    $('#CnfPassWD').keyup(function () {
+      if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
+        $('#PwdMatch').html('Matched');
+      } else {
+        $('#PwdMatch').html('Not Matched');
+      }
+    });
+  });
+
+  function validatePassword(newPassword) {
+    var minNumberofChars = 8;
+    var maxNumberofChars = 20;
+    var regularExpression = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
+    if (newPassword.length < minNumberofChars || newPassword.length > maxNumberofChars) {
+      return false;
+    }
+    return regularExpression.test(newPassword);
+  }
+</script>
 </head>
 <body>
 <div class="TopPanel">
-  <div class="LeftPanelSide"></div>
-  <div class="RightPanelSide"></div>
-  <h1><?php echo AppTitle; ?></h1>
+    <div class="LeftPanelSide"></div>
+    <div class="RightPanelSide"></div>
+    <h1><?php echo AppTitle; ?></h1>
 </div>
 <div class="Header"></div>
 <?php
 WebLib::ShowMenuBar('WebSite');
 ?>
 <div class="content">
-  <div class="formWrapper-Autofit">
-    <h3 class="formWrapper-h3">Reset Password</h3>
-    <?php
-    $Data = new MySQLiDBHelper();
-    $UnregisteredUsers = $Data->where('Registered', 0)
-      ->where('Activated', 0)
-      ->query('Select `UserMapID`,`UserName`'
-        . ' FROM `' . MySQL_Pre . 'Users`');
+    <div class="formWrapper-Autofit">
+        <h3 class="formWrapper-h3">Reset Password</h3>
+      <?php
+      $Token = WebLib::GetVal($_REQUEST, 'Token');
+      if ($Token !== null) {
+        $TokenURL = '?Token=' . $Token;
+        if (WebLib::GetVal($_POST, 'NewPassWD')) {
+          if (WebLib::StaticCaptcha()) {
+            $Data     = new MySQLiDBHelper();
+            $Password = WebLib::GetVal($_POST, 'CnfPassWD');
 
-    if (WebLib::GetVal($_POST, 'UserID') !== NULL) {
+            $Data->where('WebSiteURL', $Token);
+            $Users   = $Data->get(MySQL_Pre . 'Users', 1);
+            $OldPass = WebLib::GetVal($Users[0], 'UserPass');
 
-      $email = WebLib::GetVal($_POST, 'UserEmail', TRUE);
-      $MobileNo = WebLib::GetVal($_POST, 'MobileNo', TRUE);
-      $Pass = WebLib::GeneratePassword(10, 2, 2, 2);
-      $UserID = WebLib::GetVal($_POST, 'UserID', TRUE);
+            if (hash('sha512', $Password . $_SESSION['Token']) === WebLib::GetVal($_POST, 'NewPassWD')) {
+              if ($OldPass == $Password) {
+                $_SESSION['Msg'] = 'Previous password is not allowed!';
+              } else {
+                $Data->where('WebSiteURL', $Token);
+                $Data->where('Registered', 1);
+                $Data->where('Activated', 1);
 
-      if (WebLib::StaticCaptcha()) {
+                $PassData['UserPass']   = $Password;
+                $PassData['WebSiteURL'] = null;
+                $Updated                = $Data->update(MySQL_Pre . 'Users', $PassData);
 
-        $RegData['UserID'] = $UserMapID;
-        $RegData['UserPass'] = hash('sha512', $Pass);
-        $RegData['MobileNo'] = $MobileNo;
-        $RegData['Registered'] = 1;
-
-        $Registered = $Data->where('Registered', 1)
-          ->where('Activated', 1)
-          ->where('UserName', $UserID)
-          ->where('UserID', $email)
-          ->where('MobileNo', $MobileNo)
-          ->update(MySQL_Pre . "Users", $RegData);
-
-        if ($Registered === TRUE) {
-
-          $UserName = $Data->where('UserMapID', $UserMapID)
-            ->query("Select `UserName` FROM `" . MySQL_Pre . "Users`");
-
-          $Subject = "User Account Details - Paschim Medinipur";
-          $Body = "<b>UserID: </b><span> {$email}</span><br/>"
-            . "<b>Password: </b><span> {$Pass}</span>";
-
-          $TxtBody = 'UserID: ' . $email . "\r\n" . 'Password: ' . $Pass;
-          $SentSMS = '';
-
-          SMSGW::SendSMS($TxtBody, $MobileNo);
-          $SentSMS = ' and ' . $MobileNo;
-
-          $MailSent = json_decode(GMailSMTP($email, $UserName[0]['UserName'],
-            $Subject, $Body, $TxtBody));
-
-          WebLib::ShowMsg();
-          if ($MailSent->Sent) {
-            $_SESSION['Msg'] = "<h3>Password reset link has been sent by email.</h3>";
-              //. "<p>$TxtBody</p>" TODO: Display Password for Security Audit
-              //. "<b>Please Note: </b>Password is sent to: {$email}" . $SentSMS;
+                if ($Updated > 0) {
+                  $_SESSION['Msg'] = 'Password Changed Successfully!';
+                } else {
+                  $_SESSION['Msg'] = 'Invalid Token or User to change password!';
+                }
+              }
+            } else {
+              $_SESSION['Msg'] = 'Typed Passwords do not match!';
+            }
+            unset($Data);
           } else {
-            $_SESSION['Msg'] = "<h3>Password reset successful but Unable to Send the link by Email.</h3>";
-              //. "<p>$TxtBody</p>"; TODO: Display Password for Security Audit
+            echo "<h3>You solution of the code in the image is wrong.</h3>";
           }
-          WebLib::ShowMsg();
-        } else {
-          echo "<h3>Unable to process request. User details may be invalid or the account is locked.</h3>";
         }
       } else {
-        echo "<h3>You solution of the code in the image is wrong.</h3>";
+        $TokenURL = null;
       }
-    }
+      $Data = new MySQLiDBHelper();
+
+      if (WebLib::GetVal($_POST, 'UserName') !== null) {
+
+        $email    = WebLib::GetVal($_POST, 'UserEmail', true);
+        $MobileNo = WebLib::GetVal($_POST, 'MobileNo', true);
+        $Pass     = WebLib::GeneratePassword(10, 2, 2, 2);
+        $UserName = WebLib::GetVal($_POST, 'UserName', true);
+
+        if (WebLib::StaticCaptcha()) {
+
+          $RegData['WebSiteURL'] = md5(WebLib::GetVal($_SESSION, 'Token') . microtime()); //TODO: Reset Password by link
+
+          $Registered = $Data->where('Registered', 1)
+            ->where('Activated', 1)
+            ->where('UserName', $UserName)
+            ->where('UserID', $email)
+            ->where('MobileNo', $MobileNo)
+            ->update(MySQL_Pre . "Users", $RegData);
+
+          if ($Registered === true) {
+
+            $User = $Data->where('UserID', $email)
+              ->query("Select `UserName` FROM `" . MySQL_Pre . "Users`");
+
+            $ResetLink = $_SESSION['BaseURL'] . '?PasswordResetToken=' . $RegData['WebSiteURL'];
+
+            $Subject = "Reset Password - Paschim Medinipur";
+            $Body    = "<b>UserID: </b><span> {$email}</span><br/>"
+              . "<b>Link: </b><span> {$ResetLink}</span><br/>"
+              . '<strong>Please click on the above link to reset your password.</strong>';
+
+            $TxtBody = 'UserID: ' . $email . "\r\n" . 'Link: ' . $ResetLink
+              . "\r\n" . 'Please open the above link to reset your password.';
+            $SentSMS = '';
+
+            SMSGW::SendSMS($TxtBody, $MobileNo);
+            $SentSMS = ' and ' . $MobileNo;
+
+            $MailSent = json_decode(GMailSMTP($email, $User[0]['UserName'],
+              $Subject, $Body, $TxtBody));
+
+            if ($MailSent->Sent) {
+              $_SESSION['Msg'] = '<h3>Password reset link has been sent by email.</h3><br/>Token: ' . $RegData['WebSiteURL'];
+              //. "<p>$TxtBody</p>" TODO: Display Password for Security Audit
+              //. "<b>Please Note: </b>Password is sent to: {$email}" . $SentSMS;
+            } else {
+              $_SESSION['Msg'] = "<h3>Password reset successful but Unable to Send the link by Email.</h3>";
+              //. "<p>$TxtBody</p>"; TODO: Display Password for Security Audit
+              echo '<pre>' . $MailSent->Status . '</pre>';
+            }
+
+          } else {
+            echo "<h3>Unable to process request. User details may be invalid or the account is locked.</h3>";
+          }
+        } else {
+          echo "<h3>You solution of the code in the image is wrong.</h3>";
+        }
+      }
+      $_SESSION['FormToken'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . microtime());
+      WebLib::ShowMsg();
       ?>
-      <form name="feed_frm" method="post" action="Reset.php" autocomplete="off">
+        <form id="ChgPwd-frm" name="ChgPwd-frm" method="post"
+              action="Reset.php<?php echo $TokenURL; ?>" autocomplete="off">
 
-          <label for="UserID"><strong>User Name:</strong><br/></label>
-            <input placeholder="Enter your User ID" type="text" id="UserID" name="UserID" class="form-TxtInput"
-                   value="<?php echo WebLib::GetVal($_POST, 'UserID'); ?>" autocomplete="off" required/>
+          <?php if ($Token !== null) { ?>
+              <label for="txtBalance"><strong>New Password: </strong><span
+                          id="PwdScore"></span><br/></label>
+              <input type="password" placeholder="New Password"
+                     name="NewPassWD"
+                     id="NewPassWD" required
+                     class="form-TxtInput"/>
 
-          <label for="UserEmail"><strong>E-Mail Address:</strong><br/></label>
-          <input placeholder="Valid e-Mail Address" type="email" id="UserEmail" name="UserEmail" class="form-TxtInput"
-                 value="<?php echo WebLib::GetVal($_POST, 'UserEmail'); ?>" autocomplete="off" required/>
+              <label for="txtBalance"><strong>Confirm New
+                      Password: </strong><span
+                          id="PwdMatch"></span><br/></label>
+              <input type="password" placeholder="Confirm New Password"
+                     name="CnfPassWD" id="CnfPassWD" required
+                     class="form-TxtInput"/>
+            <?php WebLib::StaticCaptcha(true); ?>
+              <h4>Password Policy:</h4>
+              <ul>
+                  <li>Password must at least be 8 characters.</li>
+                  <li>Password must not be the same as the previous 1
+                      passwords.
+                  </li>
+                  <li>Password must contain Uppercase, lower case, number and
+                      Special Characters.
+                  </li>
+              </ul>
+              <hr/>
+              <div class="formControl">
+                  <input type="button" name="CmdReset" id="ChgPwd"
+                         value="Reset Password"/>
+              </div>
+          <?php } else { ?>
 
-          <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
-          <input placeholder="Mobile Number" maxlength="10" type="text" id="MobileNo" name="MobileNo" class="form-TxtInput"
-                 value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>" autocomplete="off" required/>
+              <label for="UserID"><strong>User Name:</strong><br/></label>
+              <input placeholder="Enter your User Name" type="text" id="UserID"
+                     name="UserName" class="form-TxtInput"
+                     value="<?php echo WebLib::GetVal($_POST, 'UserName'); ?>"
+                     autocomplete="off" required/>
 
-          <input type="hidden" name="LoginToken" value="<?php
-          echo WebLib::GetVal($_SESSION, 'Token');
-          ?>"/>
+              <label for="UserEmail"><strong>E-Mail
+                      Address:</strong><br/></label>
+              <input placeholder="Registered e-Mail Address" type="email"
+                     id="UserEmail" name="UserEmail" class="form-TxtInput"
+                     value="<?php echo WebLib::GetVal($_POST, 'UserEmail'); ?>"
+                     autocomplete="off" required/>
 
-        <?php WebLib::StaticCaptcha(true); ?>
-        <div style="clear:both;"></div>
-        <hr/>
-        <div class="formControl">
-          <input style="width:80px;" type="submit" value="Reset"/>
-        </div>
-      </form>
-    <div style="clear:both;"></div>
-  </div>
+              <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
+              <input placeholder="Mobile Number" maxlength="10" type="text"
+                     id="MobileNo" name="MobileNo" class="form-TxtInput"
+                     value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>"
+                     autocomplete="off" required/>
+            <?php WebLib::StaticCaptcha(true); ?>
+              <hr/>
+              <div class="formControl">
+                  <input type="submit" name="CmdReset" value="Reset Password"/>
+              </div>
+          <?php } ?>
+            <input type="hidden" name="FormToken" id="AjaxToken"
+                   value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
+        </form>
+    </div>
 </div>
 <div class="pageinfo">
   <?php WebLib::PageInfo(); ?>

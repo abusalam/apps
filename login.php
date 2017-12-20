@@ -81,12 +81,8 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
     $_SESSION['REFERER1']    = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
     $action                  = "JustLoggedIn";
 
-    $Data->ddlQuery("Update " . MySQL_Pre . "Users Set LoginCount=LoginCount+1"
-      . " Where `UserID`='" . WebLib::GetVal($_POST, 'UserID', true) . "'"
-      . " AND MD5(concat(`UserPass`,MD5('" . WebLib::GetVal($_POST,
-        'LoginToken', true) . "')))='" . WebLib::GetVal($_POST,
-        'UserPass',
-        true) . "'");
+    $Data->ddlQuery("Update " . MySQL_Pre . "Users Set LoginCount=LoginCount+1,"
+      . " WebSiteURL=null Where `UserMapID`=" . $Row['UserMapID']);
 
     $QueryData['SessionID'] = WebLib::GetVal($_SESSION, 'ID');
     $QueryData['IP']        = $_SERVER['REMOTE_ADDR'];
