@@ -42,41 +42,47 @@ function PrintArr($Arr) {
       $Data = new MySQLiDBHelper();
 
       if ((WebLib::GetVal($_POST, 'CmdAtnd') !== null) && (WebLib::GetVal($_SESSION, 'AtndDone') !== '1')) {
-        $MobileNo=@explode('', $Data->query('Select MobileNo FROM `' . MySQL_Pre . 'Users`'
-                            .' WHERE `UserMapID`=' . $_SESSION['UserMapID']));
+        if (WebLib::GetVal($_SESSION, 'FormToken') == WebLib::GetVal($_POST, 'FormToken')) {
+          $MobileNo = @explode('', $Data->query('Select MobileNo FROM `' . MySQL_Pre . 'Users`'
+            . ' WHERE `UserMapID`=' . $_SESSION['UserMapID']));
 
-        if (strstr($_SERVER['REMOTE_ADDR'], AtndAllowedIP) !== false) {
-          if ($_SESSION['InOut'] === 'In') {
-            $AtndData['UserMapID']=WebLib::GetVal($_SESSION,'UserMapID',true);
-            $AtndData['InDateTime']=date('Y-m-d H:i:s', $_SESSION['ATND_TIME']);
-            $AtndDone=$Data->insert(MySQL_Pre . 'ATND_Register',$AtndData);
+          if (strstr($_SERVER['REMOTE_ADDR'], AtndAllowedIP) !== false) {
+            if ($_SESSION['InOut'] === 'In') {
+              $AtndData['UserMapID']  = WebLib::GetVal($_SESSION, 'UserMapID', true);
+              $AtndData['InDateTime'] = date('Y-m-d H:i:s', $_SESSION['ATND_TIME']);
+              $AtndDone               = $Data->insert(MySQL_Pre . 'ATND_Register', $AtndData);
+            } else {
+              $Data->where('AtndID', WebLib::GetVal($_SESSION, 'AtndID', true));
+              $AtndData['OutDateTime'] = date('Y-m-d H:i:s', $_SESSION['ATND_TIME']);
+              $AtndDone                = $Data->update(MySQL_Pre . 'ATND_Register', $AtndData);
+            }
+            unset($Data);
+            if ($AtndDone > 0) {
+              $_SESSION['Msg']      = 'Attendance Registered!';
+              $_SESSION['AtndDone'] = '1';
+              $TxtSMS               = $_SESSION['InOut'] . ': ' . $_SESSION['UserName'] . "\n"
+                . ' Mobile No: ' . $MobileNo . "\n"
+                . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
+                . ' On: ' . date('d/m/Y l H:i:s A', $_SESSION['ATND_TIME']);
+              SMSGW::SendSMS($TxtSMS, AdminMobile);
+            } else {
+              $_SESSION['Msg'] = 'Unable to Register Attendance!';
+            }
           } else {
-            $Data->where('AtndID',WebLib::GetVal($_SESSION,'AtndID',true));
-            $AtndData['OutDateTime']=date('Y-m-d H:i:s', $_SESSION['ATND_TIME']);
-            $AtndDone=$Data->update(MySQL_Pre . 'ATND_Register',$AtndData);
-          }
-          unset($Data);
-          if ($AtndDone > 0) {
-            $_SESSION['Msg'] = 'Attendance Registered!';
-            $_SESSION['AtndDone'] = '1';
-            $TxtSMS = $_SESSION['InOut'] . ': ' . $_SESSION['UserName'] . "\n"
-                      . ' Mobile No: ' . $MobileNo . "\n"
-                      . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
-                      . ' On: ' . date('d/m/Y l H:i:s A', $_SESSION['ATND_TIME']);
-            SMSGW::SendSMS($TxtSMS, AdminMobile);
-          } else {
-            $_SESSION['Msg'] = 'Unable to Register Attendance!';
-          }
-        } else {
-          $TxtSMS = 'UnAuthorised Access!' . "\n" . $_SESSION['InOut'] . ': '
+            $TxtSMS = 'UnAuthorised Access!' . "\n" . $_SESSION['InOut'] . ': '
               . $_SESSION['UserName'] . "\n"
               . ' Mobile No: ' . $MobileNo . "\n"
               . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
               . ' On: ' . date('d/m/Y l H:i:s A', $_SESSION['ATND_TIME']);
-          SMSGW::SendSMS($TxtSMS, AdminMobile);
-          $_SESSION['Msg'] = 'Attendance Not Permitted From IP:' . WebLib::GetVal($_SERVER, 'REMOTE_ADDR');
+            SMSGW::SendSMS($TxtSMS, AdminMobile);
+            $_SESSION['Msg'] = 'Attendance Not Permitted From IP:' . WebLib::GetVal($_SERVER, 'REMOTE_ADDR');
+          }
+        } else {
+          $_SESSION['Msg'] .= "Request may have been modified!";
         }
       }
+      $_SESSION['FormToken'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . microtime());
+
       WebLib::ShowMsg();
 
       $Data = new MySQLiDBHelper();
@@ -103,6 +109,8 @@ function PrintArr($Arr) {
         <?php
       }
       ?>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
     </form>
     <?php
     //PrintArr($_SESSION);
