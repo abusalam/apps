@@ -156,12 +156,9 @@ class WebLib {
   public static function Html5Header($PageTitle = 'Paschim Medinipur') {
     $AppTitle = AppTitle;
     header('Content-type: text/html; charset=utf-8');
-    header('Cache-control: private');
-    header('Cache-control: no-cache');
-    header('Cache-control: no-store');
-    header('Cache-control: pre-check=0');
-    header('Cache-control: post-check=0');
-    header('Cache-control: must-revalidate');
+    header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Expires: 0');
     header('Pragma: no-cache');
     echo '<!DOCTYPE html>';
     echo '<html xmlns="http://www.w3.org/1999/xhtml">';
