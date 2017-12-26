@@ -524,7 +524,7 @@ class WebLib {
       $LogData['IP']        = $_SERVER['REMOTE_ADDR'];
       $LogData['Referrer']  = self::GetVal($_SERVER, 'HTTP_REFERER', true);
       $LogData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-      $LogData['UserID']    = self::GetVal($_SESSION, 'UserMapID');
+      $LogData['UserMapID']    = self::GetVal($_SESSION, 'UserMapID');
       $LogData['URL']       = $_SERVER['PHP_SELF'];
       $LogData['Action']    = $SessRet . ' (' . $_SERVER['SCRIPT_NAME'] . ')';
       $LogData['Method']    = $_SERVER['REQUEST_METHOD'];

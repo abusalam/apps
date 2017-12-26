@@ -48,7 +48,7 @@ function SQLDefs($ObjectName) {
           . '`IP` varchar(15) DEFAULT NULL,'
           . '`Referrer` longtext,'
           . '`UserAgent` longtext,'
-          . '`UserID` varchar(20) NOT NULL,'
+          . '`UserMapID` int(10) NOT NULL,'
           . '`URL` longtext,'
           . '`Action` longtext,'
           . '`Method` varchar(10) DEFAULT NULL,'

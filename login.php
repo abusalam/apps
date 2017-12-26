@@ -31,7 +31,7 @@ if ($action == "LogOut") {
   $QueryData['IP']        = $_SERVER['REMOTE_ADDR'];
   $QueryData['Referrer']  = $Data->escape($_SERVER["HTTP_REFERER"]);
   $QueryData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-  $QueryData['UserID']    = WebLib::GetVal($_SESSION, 'UserMapID');
+  $QueryData['UserMapID']    = WebLib::GetVal($_SESSION, 'UserMapID');
   $QueryData['URL']       = $Data->escape($_SERVER['PHP_SELF']);
   $QueryData['Action']    = $action . ': (' . $_SERVER['SCRIPT_NAME'] . ')';
   $QueryData['Method']    = $Data->escape($_SERVER['REQUEST_METHOD']);
@@ -88,7 +88,7 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
     $QueryData['IP']        = $_SERVER['REMOTE_ADDR'];
     $QueryData['Referrer']  = $Data->escape($_SERVER["HTTP_REFERER"]);
     $QueryData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-    $QueryData['UserID']    = WebLib::GetVal($_SESSION, 'UserMapID');
+    $QueryData['UserMapID']    = WebLib::GetVal($_SESSION, 'UserMapID');
     $QueryData['URL']       = $Data->escape($_SERVER['PHP_SELF']);
     $QueryData['Action']    = 'Login: Success';
     $QueryData['Method']    = $Data->escape($_SERVER['REQUEST_METHOD']);
@@ -104,7 +104,7 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
     $QueryData['IP']        = $_SERVER['REMOTE_ADDR'];
     $QueryData['Referrer']  = $Data->escape($_SERVER["HTTP_REFERER"]);
     $QueryData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-    $QueryData['UserID']    = WebLib::GetVal($_SESSION, 'UserMapID');
+    $QueryData['UserMapID']    = WebLib::GetVal($_SESSION, 'UserMapID');
     $QueryData['URL']       = $Data->escape($_SERVER['PHP_SELF']);
     $QueryData['Action']    = 'Login: Failed[' . WebLib::GetVal($_POST, 'UserID', true) . ']';
     $QueryData['Method']    = $Data->escape($_SERVER['REQUEST_METHOD']);

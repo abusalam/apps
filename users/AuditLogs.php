@@ -58,17 +58,26 @@ WebLib::ShowMenuBar('USER');
       //$DB->where('UserID',WebLib::GetVal($_POST,'User'));
       $DB = new mysqli(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
 
-      if ($UserMapID == NULL) {
-        $Results = $DB->query('Select * from ' . MySQL_Pre . 'Logs Order By LogID Desc limit 50');
+      if ($_SESSION['UserMapID'] == $UserMapID || is_null($UserMapID)) {
+        $LogQuery = 'Select * from ' . MySQL_Pre . 'Logs Where UserMapID='
+          . $_SESSION['UserMapID'] . ' Order By LogID Desc limit 50';
+      } else {
+        $LogQuery = 'Select L.* from ' . MySQL_Pre . 'Logs L inner join '
+          . MySQL_Pre . 'Users U' . ' on L.UserMapID=U.UserMapID Where L.UserMapID='
+          . $UserMapID . ' AND U.CtrlMapID=' . $_SESSION['UserMapID']
+          . ' Order By LogID Desc limit 50';
       }
-      else {
-        $Results = $DB->query('Select * from ' . MySQL_Pre . 'Logs'
-          . ' Where UserID=' . $UserMapID . ' Order By LogID Desc limit 50');
-      }
+
+      $Results = $DB->query($LogQuery);
       $Logs = array();
-      while ($Log = mysqli_fetch_array($Results, MYSQLI_ASSOC)) {
-        array_push($Logs, $Log);
+
+      if ($Results) {
+        while ($Log = mysqli_fetch_array($Results, MYSQLI_ASSOC)) {
+          array_push($Logs, $Log);
+        }
       }
+
+      //echo $LogQuery;
       WebLib::ShowTable($Logs);
 
       unset($DB);
