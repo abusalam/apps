@@ -34,7 +34,7 @@ WebLib::ShowMenuBar('MPR');
           $Schemes = $DB->get(MySQL_Pre . 'MPR_Schemes');
           foreach ($Schemes as $SchemeID) {
             echo '<option value="' . $SchemeID['SchemeID'] . '">'
-              . $SchemeID['SchemeID'] . ' - ' . $SchemeID['SchemeName'] . '</option>';
+              . $SchemeID['SchemeID'] . ' - ' . htmlentities($SchemeID['SchemeName']) . '</option>';
           } ?>
         </select>
       </div>
@@ -48,7 +48,7 @@ WebLib::ShowMenuBar('MPR');
           $Users = $DB->get(MySQL_Pre . 'MPR_ViewMappedUsers');
           foreach ($Users as $User) {
             echo '<option value="' . $User['UserMapID'] . '">'
-              . $User['UserMapID'] . ' - ' . $User['UserName'] . '</option>';
+              . $User['UserMapID'] . ' - ' . htmlentities($User['UserName']) . '</option>';
           } ?>
         </select>
       </div>
