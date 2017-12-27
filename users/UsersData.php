@@ -1,10 +1,10 @@
 <?php
 
-$DB = new MySQLiDBHelper();
-$Inserted = 0;
-$RunQuery = true;
+$DB                 = new MySQLiDBHelper();
+$Inserted           = 0;
+$RunQuery           = true;
 $_SESSION['action'] = 0;
-$Query = '';
+$Query              = '';
 if (WebLib::GetVal($_POST, 'FormToken') !== null) {
   if (WebLib::GetVal($_POST, 'FormToken') !==
     WebLib::GetVal($_SESSION, 'FormToken')
@@ -14,7 +14,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
     // Authenticated Inputs
     switch (WebLib::GetVal($_POST, 'CmdSubmit')) {
       case 'Create':
-        $DB->where('UserName', WebLib::GetVal($_POST, 'UserName',true));
+        $DB->where('UserName', WebLib::GetVal($_POST, 'UserName', true));
         $Users = $DB->get(MySQL_Pre . 'Users');
         if (count($Users) > 0) {
           $Query           = '';
@@ -91,7 +91,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $DB->where('CtrlMapID', WebLib::GetVal($_SESSION, 'UserMapID', true));
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
         $Inserted = $DB->update(MySQL_Pre . 'Users', array('Activated' => 0));
-        
+
         $DB->where("UserMapID", $_SESSION['UserMapID']);
         $User = $DB->query('Select `UserName`,`UserID`' . ' From `' . MySQL_Pre . 'Users`');
 
@@ -99,42 +99,6 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $Body    = '<span>Your UserID: <b>' . $User[0]['UserID']
           . '</b> is now De-Activated</span>';
 
-        $RunQuery = false;
-        break;
-
-      case 'Reset Password':
-        $Pass = WebLib::GeneratePassword(10, 2, 2, 2);
-        $DB->where('Registered', 1);
-        $DB->where('Activated', 1);
-        $DB->where('CtrlMapID', WebLib::GetVal($_SESSION, 'UserMapID', true));
-        $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
-
-        $Inserted = $DB->update(MySQL_Pre . 'Users', array('UserPass' => hash('sha512', $Pass)));
-
-        $QueryUser = 'Select `UserName`,`UserID`,`MobileNo`'
-          . ' FROM `' . MySQL_Pre . 'Users`';
-        $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
-        $Rows = $DB->query($QueryUser);
-        $User = $Rows[0];
-        unset($Rows);
-
-        $TxtBody = 'UserID: ' . $User['UserID'] . "\r\n" . 'Password: ' . $Pass;
-        $SentSMS = '';
-        if ($Inserted > 0) {
-          SMSGW::SendSMS($TxtBody, $User['MobileNo']);
-          if (UseSMSGW === true) {
-            $_SESSION['Msg'] = 'Password Sent To: ' . $User['MobileNo'] . '<br/>';
-          } else {
-            $_SESSION['Msg'] = 'Password has been Reset: '; // . $TxtBody . '<br/>';
-          }
-        } else {
-          $_SESSION['Msg'] = 'Unable to reset Password. May be due to locked account.<br/>';
-        }
-
-        $Subject  = 'User Account Password Reset - Paschim Medinipur District Portal';
-        $Body     = '<span>Password Your UserID: <b>' . $User['UserID']
-          . '</b> is: </span>' . $Pass . '<br/>'
-          . '<b>Please Login to change the Current Password</b>';
         $RunQuery = false;
         break;
     }

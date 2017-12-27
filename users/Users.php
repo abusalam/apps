@@ -100,7 +100,6 @@ $Data = new MySQLiDB();
         ?>
         <input type="submit" name="CmdSubmit" value="Activate"/>
         <input type="submit" name="CmdSubmit" value="De-Activate"/>
-        <input type="submit" name="CmdSubmit" value="Reset Password"/>
         <hr/>
       </div>
     </form>
