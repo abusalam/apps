@@ -23,6 +23,7 @@ WebLib::ShowMenuBar('MPR');
 ?>
 <div class="content">
   <?php require_once(__DIR__ . '/WorkData.php'); ?>
+  <?php WebLib::ShowMsg(); ?>
   <div class="formWrapper-Autofit">
     <h3 class="formWrapper-h3">Works for Schemes</h3>
 
@@ -77,6 +78,8 @@ WebLib::ShowMenuBar('MPR');
       <div class="formControl">
         <input type="Submit" value="Create Work" name="CmdAction">
       </div>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
     </form>
   </div>
   <div class="formWrapper-Autofit">

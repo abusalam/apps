@@ -1,5 +1,5 @@
 <?php
-if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
+if (WebLib::GetVal($_POST, 'FormToken') != NULL) {
   if (WebLib::GetVal($_POST, 'FormToken') == WebLib::GetVal($_SESSION, 'FormToken')) {
     switch (WebLib::GetVal($_POST, 'CmdAction')) {
 
@@ -11,6 +11,11 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
         $tableData['EstimatedCost']   = $_POST['txtCost'];
         $tableData['WorkRemarks']     = $_POST['txtWorkRemarks'];
         $SchemeID                     = $DB->insert(MySQL_Pre . 'MPR_Works', $tableData);
+        if($SchemeID){
+          $_SESSION['Msg'] = "Work Created!";
+        } else {
+          $_SESSION['Msg'] = "Unable to Create Work!";
+        }
         unset($tableData);
         unset($DB);
         break;
@@ -23,12 +28,17 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
         $tableData['SanctionAmount']  = $_POST['txtAmount'];
         $tableData['SanctionRemarks'] = $_POST['txtSanctionRemarks'];
         $SchemeID                     = $DB->insert(MySQL_Pre . 'MPR_Sanctions', $tableData);
+        if($SchemeID){
+          $_SESSION['Msg'] = "Fund Released!";
+        } else {
+          $_SESSION['Msg'] = "Unable to Release Fund!";
+        }
         unset($tableData);
         unset($DB);
         break;
     }
   } else {
-    $_SESSION['Msg'] .= "Request may have been modified!";
+    $_SESSION['Msg'] = "Request may have been modified!";
   }
 }
 $_SESSION['FormToken'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . microtime());
