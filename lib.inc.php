@@ -871,7 +871,7 @@ class WebLib {
     }
 
     if ($i==1){
-      echo '<th>User First Login is must to activate Logs.</th>';
+      echo '<th>No Data available!</th>';
     }
     echo "</table>\n";
   }

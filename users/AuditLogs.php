@@ -25,7 +25,6 @@ WebLib::ShowMenuBar('USER');
       <div class="FieldGroup">
         <label for="UserMapID"><strong>User:</strong></label><br/>
         <select id="UserMapID" name="UserMapID">
-          <option></option>
           <?php
           $UserMapID = WebLib::GetVal($_POST, 'UserMapID');
           $DB = new MySQLiDBHelper();
@@ -59,10 +58,10 @@ WebLib::ShowMenuBar('USER');
       $DB = new mysqli(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
 
       if ($_SESSION['UserMapID'] == $UserMapID || is_null($UserMapID)) {
-        $LogQuery = 'Select * from ' . MySQL_Pre . 'Logs Where UserMapID='
+        $LogQuery = 'Select IP as `IP Address`, Referrer, UserAgent as `Client Browser`, URI as `Request URI`, `Action`, Method, AccessTime as `Access Date Time` from ' . MySQL_Pre . 'Logs Where UserMapID='
           . $_SESSION['UserMapID'] . ' Order By LogID Desc limit 50';
       } else {
-        $LogQuery = 'Select L.* from ' . MySQL_Pre . 'Logs L inner join '
+        $LogQuery = 'Select L.IP as `IP Address`, L.Referrer, L.UserAgent as `Client Browser`, L.URI as `Request URI`, L.Action, L.Method, L.AccessTime as `Access Date Time` from ' . MySQL_Pre . 'Logs L inner join '
           . MySQL_Pre . 'Users U' . ' on L.UserMapID=U.UserMapID Where L.UserMapID='
           . $UserMapID . ' AND U.CtrlMapID=' . $_SESSION['UserMapID']
           . ' Order By LogID Desc limit 50';
