@@ -37,7 +37,7 @@ class AndroidAPI {
   private $NoAuthMode;
   private $IntervalRU;
 
-  function __construct($jsonData, $mNoAuthMode = false, $IntervalRU = 3600) {
+  function __construct($jsonData, $mNoAuthMode = false, $IntervalRU = 60) {
     $this->IntervalRU = $IntervalRU; // Default Register Interval 1 Hour
     $this->Resp['ET'] = microtime();
     $this->Expiry     = null;
@@ -132,6 +132,18 @@ class AndroidAPI {
           } else {
             if (!preg_match('/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/', $this->Req->$Param)) {
               $this->Resp['MSG'] = "IP should be digits in valid range and in xxx.xxx.xxx.xxx format!";
+              return false;
+            }
+          }
+          break;
+
+        case 'TS':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!strtotime($this->Req->$Param)) {
+              $this->Resp['MSG'] = "Date Time should be in valid ISO format!";
               return false;
             }
           }
@@ -269,7 +281,7 @@ class AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function OT() {
-    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'TS'))) {
       return;
     };
     $AuthUser = new AuthOTP(AuthOTP::TOKEN_DATA_TEMP);
@@ -277,7 +289,7 @@ class AndroidAPI {
       $DB = new MySQLiDBHelper();
 
       $this->Resp['DB']['KeyUpdated'] = $DB->where('MobileNo', $this->Req->MDN)
-        ->ddlQuery('Update ' . MySQL_Pre . 'APP_Users Set UserData=TempData');
+        ->ddlQuery('Update ' . MySQL_Pre . 'APP_Users Set UserData=TempData,TempData=null');
 
       $DB->where('MobileNo', $this->Req->MDN);
       $this->Resp['DB']['USER'] = $DB->query('Select `UserMapID`, `UserID` as `eMailID`,'
@@ -298,8 +310,18 @@ class AndroidAPI {
       //. $AuthUser->oath_hotp($AuthUser->getKey($this->Req->MDN), $this->Req->TC);
       $this->Resp['API'] = false;
       $DateFormat = 'g:i:s A';
-      $this->Resp['MSG'] = 'Invalid OTP. Please check your date time then retry.'
-        . ' Server Time: ' . date($DateFormat, time());
+
+      $TimeGap = time() - strtotime($this->Req->TS);
+      $TimeMsg = 'Invalid Activation Key!';
+
+      if (abs($TimeGap) > 29) {
+        $TimeMsg = 'Please make the time gap less than 30s then retry.'
+          . ' Server Time: ' . date($DateFormat, time())
+          . ' Your Time:' . date($DateFormat, strtotime($this->Req->TS))
+        .' Difference: ' . $TimeGap;
+      }
+
+      $this->Resp['MSG'] = $TimeMsg;
     }
   }
 
