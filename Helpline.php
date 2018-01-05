@@ -80,20 +80,29 @@ WebLib::JQueryInclude();
                       name="feed_txt" onkeyup="limitChars(this, 1024, 'info')"><?php echo $fd; ?></textarea><br/>
             <input name="button" type="button" style="width: 80px;" onclick="do_submit()" value="Send" />
             <input name="CmdCancel" type="submit" style="width: 80px;" value="Cancel" />
+            <input type="hidden" name="FormToken"
+                   value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
           </form>
           <?php
         } else {
           echo '<h3>Thankyou for your valuable time and appreciation.</h3>'; //.$message;
           $Data = new MySQLiDBHelper();
-          $HelpData['IP']= $_SERVER['REMOTE_ADDR'];
-          $HelpData['SessionID']= session_id();
-          $HelpData['UserMapID']= $_SESSION['UserMapID'];
-          $HelpData['TxtQry']= $fd;
-          $Submitted = $Data->insert(MySQL_Pre . 'Helpline',$HelpData);
-          if ($Submitted > 0)
-            $_SESSION['SendQry'] = "0";
-          else
-            echo "<h3>Unable to send request.</h3>";
+          if (WebLib::GetVal($_POST, 'FormToken') != null) {
+            if (WebLib::GetVal($_POST, 'FormToken') == WebLib::GetVal($_SESSION, 'FormToken')) {
+              $HelpData['IP']        = $_SERVER['REMOTE_ADDR'];
+              $HelpData['SessionID'] = session_id();
+              $HelpData['UserMapID'] = $_SESSION['UserMapID'];
+              $HelpData['TxtQry']    = $fd;
+              $Submitted             = $Data->insert(MySQL_Pre . 'Helpline', $HelpData);
+              if ($Submitted > 0) {
+                $_SESSION['SendQry'] = "0";
+              } else {
+                echo "<h3>Unable to send request.</h3>";
+              }
+            } else {
+              $_SESSION['Msg'] = "Request may have been modified!";
+            }
+          }
         }
       } else {
         $Data = new MySQLiDB();
@@ -106,6 +115,7 @@ WebLib::JQueryInclude();
                 . ' Where `H`.`UserMapID`=' . $_SESSION['UserMapID'] . ' AND Replied=0';
         $AskedUnReplied = $Data->do_max_query($QryAsked);
         unset($Data);
+        $_SESSION['FormToken'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . microtime());
         ?>
         <form method="post">
           <div class="FieldGroup">
