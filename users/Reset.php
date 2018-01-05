@@ -148,13 +148,13 @@ WebLib::ShowMenuBar('WebSite');
               $Subject, $Body, $TxtBody));
 
             if ($MailSent->Sent) {
-              $_SESSION['Msg'] = '<h3>Password reset link has been sent by email.</h3>'
-                .'<br/>Link: <a href="' . $ResetLink.'">'.$ResetLink.'</a>';
+              $_SESSION['Msg'] = "<h3>Password reset link has been sent to your email-id{$SentSMS}.</h3>";
+              //.'<br/>Link: <a href="' . $ResetLink.'">'.$ResetLink.'</a>';
               //. "<p>$TxtBody</p>" TODO: Display Password for Security Audit
               //. "<b>Please Note: </b>Password is sent to: {$email}" . $SentSMS;
             } else {
-              $_SESSION['Msg'] = "<h3>Password reset successful but Unable to Send the link by Email.</h3>"
-                .'<br/>Link: <a href="' . $ResetLink.'">'.$ResetLink.'</a>';
+              $_SESSION['Msg'] = "<h3>Password reset successful but Unable to Send the link by Email.</h3>";
+              //.'<br/>Link: <a href="' . $ResetLink.'">'.$ResetLink.'</a>';
               //. "<p>$TxtBody</p>"; TODO: Display Password for Security Audit
               echo '<pre>' . $MailSent->Status . '</pre>';
             }
