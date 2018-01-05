@@ -56,8 +56,8 @@ class MprAPI extends AndroidAPI {
             $this->Resp['MSG'] = "Invalid PayLoad";
             return false;
           } else {
-            if (!preg_match('/^\d$/', $this->Req->$Param)) {
-              $this->Resp['MSG'] = "Invalid Scheme ID";
+            if (!preg_match('/^[0-9]*$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Invalid Scheme ID:" . $this->Req->$Param;
               return false;
             }
           }
