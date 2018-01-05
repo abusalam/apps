@@ -482,7 +482,7 @@ class WebLib {
       session_start();
       date_default_timezone_set('Asia/Kolkata');
     }
-    if (self::GetVal($_SESSION, 'BaseDIR') === null) {
+    if ((self::GetVal($_SESSION, 'BaseDIR') === null) or ($_SERVER['SERVER_NAME']!=Server_Name)) {
       header("HTTP/1.1 404 Not Found");
       exit();
     }

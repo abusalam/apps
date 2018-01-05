@@ -10,6 +10,11 @@
 define('HOST_Name', 'localhost');
 
 /**
+ * Defines Web Server Hostname
+ */
+define('Server_Name', 'localhost');
+
+/**
  * Defines MySQL Server Username
  */
 define('MySQL_User', 'root');

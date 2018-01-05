@@ -78,7 +78,7 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
     $_SESSION['MobileNo']    = $Row['MobileNo'];
     $_SESSION['ID']          = session_id();
     $_SESSION['FingerPrint'] = md5($_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'] . "KeyLeft");
-    $_SESSION['REFERER1']    = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    $_SESSION['REFERER1']    = "http://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
     $action                  = "JustLoggedIn";
 
     $Data->ddlQuery("Update " . MySQL_Pre . "Users Set LoginCount=LoginCount+1,"
