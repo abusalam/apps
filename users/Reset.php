@@ -66,7 +66,7 @@ WebLib::ShowMenuBar('WebSite');
         <h3 class="formWrapper-h3">Reset Password</h3>
       <?php
       $IsValidToken = false;
-      $Token = WebLib::GetVal($_REQUEST, 'Token');
+      $Token        = WebLib::GetVal($_REQUEST, 'Token');
       if ($Token !== null) {
         $TokenURL = '?Token=' . $Token;
         if (WebLib::GetVal($_POST, 'NewPassWD')) {
@@ -124,12 +124,9 @@ WebLib::ShowMenuBar('WebSite');
       }
       $Data = new MySQLiDBHelper();
 
-      if (WebLib::GetVal($_POST, 'UserName') !== null) {
+      if (WebLib::GetVal($_POST, 'UserEmail') !== null) {
 
-        $email    = WebLib::GetVal($_POST, 'UserEmail', true);
-        $MobileNo = WebLib::GetVal($_POST, 'MobileNo', true);
-        $Pass     = WebLib::GeneratePassword(10, 2, 2, 2);
-        $UserName = WebLib::GetVal($_POST, 'UserName', true);
+        $email = WebLib::GetVal($_POST, 'UserEmail', true);
 
         if (WebLib::StaticCaptcha()) {
 
@@ -137,9 +134,7 @@ WebLib::ShowMenuBar('WebSite');
 
           $Registered = $Data->where('Registered', 1)
             ->where('Activated', 1)
-            ->where('UserName', $UserName)
             ->where('UserID', $email)
-            ->where('MobileNo', $MobileNo)
             ->update(MySQL_Pre . "Users", $RegData);
 
           $TokenValidUpto = date('d/m/Y h:i A', time() + 1800);
@@ -147,7 +142,10 @@ WebLib::ShowMenuBar('WebSite');
           if ($Registered === true) {
 
             $User = $Data->where('UserID', $email)
-              ->query("Select `UserName` FROM `" . MySQL_Pre . "Users`");
+              ->query("Select `UserName`, `MobileNo` FROM `" . MySQL_Pre . "Users`");
+
+            $MobileNo = $User[0]['MobileNo'];
+            $UserName = $User[0]['UserName'];
 
             $ResetLink = $_SESSION['BaseURL'] . '?PasswordResetToken=' . $RegData['WebSiteURL'];
 
@@ -199,7 +197,7 @@ WebLib::ShowMenuBar('WebSite');
                      id="NewPassWD" required
                      class="form-TxtInput"/>
 
-              <label for="txtBalance"><strong>Confirm New
+              <label for="CnfPassWD"><strong>Confirm New
                       Password: </strong><span
                           id="PwdMatch"></span><br/></label>
               <input type="password" placeholder="Confirm New Password"
@@ -222,13 +220,6 @@ WebLib::ShowMenuBar('WebSite');
                          value="Reset Password"/>
               </div>
           <?php } else { ?>
-
-              <label for="UserID"><strong>User Name:</strong><br/></label>
-              <input placeholder="Enter your User Name" type="text" id="UserID"
-                     name="UserName" class="form-TxtInput"
-                     value="<?php echo WebLib::GetVal($_POST, 'UserName'); ?>"
-                     autocomplete="off" required/>
-
               <label for="UserEmail"><strong>E-Mail
                       Address:</strong><br/></label>
               <input placeholder="Registered e-Mail Address" type="email"
@@ -236,11 +227,6 @@ WebLib::ShowMenuBar('WebSite');
                      value="<?php echo WebLib::GetVal($_POST, 'UserEmail'); ?>"
                      autocomplete="off" required/>
 
-              <label for="MobileNo"><strong>Mobile No:</strong><br/></label>
-              <input placeholder="Mobile Number" maxlength="10" type="text"
-                     id="MobileNo" name="MobileNo" class="form-TxtInput"
-                     value="<?php echo WebLib::GetVal($_POST, 'MobileNo'); ?>"
-                     autocomplete="off" required/>
             <?php WebLib::StaticCaptcha(true); ?>
               <hr/>
               <div class="formControl">
