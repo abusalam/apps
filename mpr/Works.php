@@ -15,7 +15,7 @@ WebLib::IncludeJS('mpr/js/Works.js');
 <div class="TopPanel">
   <div class="LeftPanelSide"></div>
   <div class="RightPanelSide"></div>
-  <h1><?php echo $_SESSION['UserName']; ?></h1>
+  <h1><?php echo htmlentities($_SESSION['UserName']); ?></h1>
 </div>
 <div class="Header"></div>
 <?php
@@ -37,7 +37,7 @@ WebLib::ShowMenuBar('MPR');
           $DB->where('UserMapID', $_SESSION['UserMapID']);
           $Schemes = $DB->get(MySQL_Pre . 'MPR_Schemes');
           foreach ($Schemes as $Scheme) {
-            echo '<option value="' . $Scheme['SchemeID'] . '">' . $Scheme['SchemeName'] . '</option>';
+            echo '<option value="' . $Scheme['SchemeID'] . '">' . htmlentities($Scheme['SchemeName']) . '</option>';
           } ?>
         </select>
       </div>
@@ -50,7 +50,7 @@ WebLib::ShowMenuBar('MPR');
           $DB->where('CtrlMapID', $_SESSION['UserMapID']);
           $Users = $DB->get(MySQL_Pre . 'MPR_ViewMappedUsers');
           foreach ($Users as $User) {
-            echo '<option value="' . $User['MprMapID'] . '">' . $User['UserName'] . '</option>';
+            echo '<option value="' . $User['MprMapID'] . '">' . htmlentities($User['UserName']) . '</option>';
           } ?>
         </select>
       </div>

@@ -133,7 +133,7 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SF() {
-    if (!$this->checkPayLoad(array('MDN','OTP'))) {
+    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
       return false;
     }
     $AuthUser = new AuthOTP();
@@ -277,7 +277,7 @@ class MprAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function UP() {
-    if (!$this->checkPayLoad(array('MDN','OTP','WID','EA','P','R'))) {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'WID', 'EA', 'P', 'R'))) {
       return false;
     }
     $AuthUser = new AuthOTP();

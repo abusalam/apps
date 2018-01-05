@@ -19,7 +19,7 @@ require_once('SchemesData.php');
 <div class="TopPanel">
   <div class="LeftPanelSide"></div>
   <div class="RightPanelSide"></div>
-  <h1><?php echo $_SESSION['UserName']; ?></h1>
+  <h1><?php echo htmlentities($_SESSION['UserName']); ?></h1>
 </div>
 <div class="Header"></div>
 <?php
@@ -39,7 +39,7 @@ WebLib::ShowMenuBar('MPR');
           $DB->where('UserMapID', $_SESSION['UserMapID']);
           $Schemes = $DB->get(MySQL_Pre . 'MPR_Schemes');
           foreach ($Schemes as $SchemeID) {
-            echo '<option value="' . $SchemeID['SchemeID'] . '">' . $SchemeID['SchemeName'] . '</option>';
+            echo '<option value="' . $SchemeID['SchemeID'] . '">' . $SchemeID['SchemeID'] . ' - ' . htmlentities($SchemeID['SchemeName']) . '</option>';
           } ?>
           <option value="NewScheme">Create New...</option>
         </select>

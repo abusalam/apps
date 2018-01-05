@@ -79,15 +79,15 @@ switch (WebLib::GetVal($_POST, 'CallAPI')) {
           ?>
           <tr>
             <td><?php echo $i; ?></td>
-            <td><?php echo $Work['WorkID'] . ' - ' . $Work['Work'] ?></td>
-            <td><?php echo $Work['EstimatedCost'] ?></td>
-            <td><?php echo $Work['Funds'] ?></td>
-            <td><?php echo $Work['Expenses'] ?></td>
-            <td><?php echo $Work['Balance'] ?></td>
-            <td><?php echo $Work['Progress'] ?></td>
-            <td><?php echo $Work['TenderDate'] ?></td>
-            <td><?php echo $Work['WorkOrderDate'] ?></td>
-            <td><?php echo $Work['WorkRemarks'] ?></td>
+            <td><?php echo $Work['WorkID'] . ' - ' . htmlentities($Work['Work']) ?></td>
+            <td><?php echo htmlentities($Work['EstimatedCost']) ?></td>
+            <td><?php echo htmlentities($Work['Funds']) ?></td>
+            <td><?php echo htmlentities($Work['Expenses']) ?></td>
+            <td><?php echo htmlentities($Work['Balance']) ?></td>
+            <td><?php echo htmlentities($Work['Progress']) ?></td>
+            <td><?php echo htmlentities($Work['TenderDate']) ?></td>
+            <td><?php echo htmlentities($Work['WorkOrderDate']) ?></td>
+            <td><?php echo htmlentities($Work['WorkRemarks']) ?></td>
           </tr>
           <?php
           $i++;
@@ -121,7 +121,7 @@ switch (WebLib::GetVal($_POST, 'CallAPI')) {
     $Works = $DB->get(MySQL_Pre . 'MPR_Works');
     echo '<option></option>';
     foreach ($Works as $Work) {
-      echo '<option value="' . $Work['WorkID'] . '">'  . $Work['WorkID'] . '-' . $Work['WorkDescription'] . '</option>';
+      echo '<option value="' . $Work['WorkID'] . '">'  . $Work['WorkID'] . '-' . htmlentities($Work['WorkDescription']) . '</option>';
     }
     //print_r($_POST);
     unset($DB);
@@ -139,7 +139,7 @@ switch (WebLib::GetVal($_POST, 'CallAPI')) {
               $Sel = 'Selected';
             }
             echo '<option value="' . $Work['WorkID'] . '" ' . $Sel . '>'
-              . $Work['SchemeName'] . ' - ' . $Work['Work'] . '</option>';
+              . htmlentities($Work['SchemeName']) . ' - ' . htmlentities($Work['Work']) . '</option>';
           }
     break;
 
@@ -183,11 +183,11 @@ switch (WebLib::GetVal($_POST, 'CallAPI')) {
         foreach ($PrgReports as $PrgReport) {
           ?>
           <tr>
-            <td><?php echo $PrgReport['ReportDate']; ?></td>
-            <td><?php echo $PrgReport['Balance']; ?></td>
-            <td><?php echo $PrgReport['ExpenditureAmount']; ?></td>
-            <td><?php echo $PrgReport['Progress']; ?> %</td>
-            <td><?php echo $PrgReport['Remarks']; ?></td>
+            <td><?php echo htmlentities($PrgReport['ReportDate']); ?></td>
+            <td><?php echo htmlentities($PrgReport['Balance']); ?></td>
+            <td><?php echo htmlentities($PrgReport['ExpenditureAmount']); ?></td>
+            <td><?php echo htmlentities($PrgReport['Progress']); ?> %</td>
+            <td><?php echo htmlentities($PrgReport['Remarks']); ?></td>
           </tr>
         <?php
         } ?>
@@ -223,15 +223,15 @@ switch (WebLib::GetVal($_POST, 'CallAPI')) {
           ?>
           <tr>
             <td><?php echo $i; ?></td>
-            <td><?php echo $Work['Work'] ?></td>
-            <td><?php echo $Work['EstimatedCost'] ?></td>
-            <td><?php echo $Work['Funds'] ?></td>
-            <td><?php echo $Work['Expenses'] ?></td>
-            <td><?php echo $Work['Balance'] ?></td>
-            <td><?php echo $Work['Progress'] ?></td>
-            <td><?php echo $Work['TenderDate'] ?></td>
-            <td><?php echo $Work['WorkOrderDate'] ?></td>
-            <td><?php echo $Work['WorkRemarks'] ?></td>
+            <td><?php echo htmlentities($Work['Work']); ?></td>
+            <td><?php echo htmlentities($Work['EstimatedCost']); ?></td>
+            <td><?php echo htmlentities($Work['Funds']); ?></td>
+            <td><?php echo htmlentities($Work['Expenses']); ?></td>
+            <td><?php echo htmlentities($Work['Balance']); ?></td>
+            <td><?php echo htmlentities($Work['Progress']); ?></td>
+            <td><?php echo htmlentities($Work['TenderDate']); ?></td>
+            <td><?php echo htmlentities($Work['WorkOrderDate']); ?></td>
+            <td><?php echo htmlentities($Work['WorkRemarks']); ?></td>
           </tr>
           <?php
           $i++;
