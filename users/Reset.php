@@ -2,11 +2,12 @@
 require_once __DIR__ . '/../lib.inc.php';
 require_once __DIR__ . '/../php-mailer/GMail.lib.php';
 require_once __DIR__ . '/../smsgw/smsgw.inc.php';
-WebLib::initHTML5page("Reset Password");
+WebLib::InitHTML5page("Reset Password");
 WebLib::IncludeCSS();
 WebLib::IncludeCSS('css/forms.css');
 WebLib::JQueryInclude();
 WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
+$TokenValidity = 1800; // Allowed Elapsed Time in Seconds Since Token Generation
 ?>
 <script>
   $(function () {
@@ -19,7 +20,7 @@ WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
             $('#CnfPassWD').val(sha512($('#CnfPassWD').val()));
             $('#ChgPwd-frm').submit();
           } else {
-            alert('Complex Password is required!');
+            alert('Strong Password is required!');
           }
         } else {
           alert('New passwords don\'t match');
@@ -64,6 +65,7 @@ WebLib::ShowMenuBar('WebSite');
     <div class="formWrapper-Autofit">
         <h3 class="formWrapper-h3">Reset Password</h3>
       <?php
+      $IsValidToken = false;
       $Token = WebLib::GetVal($_REQUEST, 'Token');
       if ($Token !== null) {
         $TokenURL = '?Token=' . $Token;
@@ -99,7 +101,22 @@ WebLib::ShowMenuBar('WebSite');
             }
             unset($Data);
           } else {
-            echo "<h3>You solution of the code in the image is wrong.</h3>";
+            echo "<h3>Code in the image is not matched with that you typed.</h3>";
+          }
+        } else {
+          $Data = new MySQLiDBHelper();
+          $Data->where('WebSiteURL', $Token);
+          $TokenData = $Data->get(MySQL_Pre . 'Users');
+          if (count($TokenData) > 0) {
+            $ResetUser   = $TokenData[0];
+            $TimeElapsed = time() - strtotime($ResetUser['LastLoginTime']);
+            if ($TimeElapsed > $TokenValidity) {
+              $_SESSION['Msg'] = 'Password reset Link Expired!';
+            } else {
+              $IsValidToken = true;
+            }
+          } else {
+            $_SESSION['Msg'] = 'Password reset Link is not valid!';
           }
         }
       } else {
@@ -125,6 +142,8 @@ WebLib::ShowMenuBar('WebSite');
             ->where('MobileNo', $MobileNo)
             ->update(MySQL_Pre . "Users", $RegData);
 
+          $TokenValidUpto = date('d/m/Y h:i A', time() + 1800);
+
           if ($Registered === true) {
 
             $User = $Data->where('UserID', $email)
@@ -134,17 +153,17 @@ WebLib::ShowMenuBar('WebSite');
 
             $Subject = "Reset Password - Paschim Medinipur";
             $Body    = "<b>UserID: </b><span> {$email}</span><br/>"
-              . "<b>Link: </b><span> {$ResetLink}</span><br/>"
-              . '<strong>Please click on the above link to reset your password.</strong>';
+              . "<b>Link: </b><span>{$ResetLink}</span> valid upto {$TokenValidUpto}<br/>"
+              . '<strong>Please click or open the above link to reset your password.</strong>';
 
             $TxtBody = 'UserID: ' . $email . "\r\n" . 'Link: ' . $ResetLink
               . "\r\n" . 'Please open the above link to reset your password.';
             $SentSMS = '';
 
             SMSGW::SendSMS($TxtBody, $MobileNo);
-            $SentSMS = ' and ' . $MobileNo;
+            $SentSMS = ' and registered mobile no. ' . substr_replace($MobileNo, 'xxxxxx', 2, 6);
 
-            $MailSent = json_decode(GMailSMTP($email, $User[0]['UserName'],
+            $MailSent = json_decode(GMailSMTP($email, $UserName,
               $Subject, $Body, $TxtBody));
 
             if ($MailSent->Sent) {
@@ -160,10 +179,10 @@ WebLib::ShowMenuBar('WebSite');
             }
 
           } else {
-            echo "<h3>Unable to process request. User details may be invalid or the account is locked.</h3>";
+            echo "<h3>Unable to process request. Invalid email-id or the account is locked.</h3>";
           }
         } else {
-          echo "<h3>You solution of the code in the image is wrong.</h3>";
+          echo "<h3>Code in the image is not matched with that you typed.</h3>";
         }
       }
       $_SESSION['FormToken'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . microtime());
@@ -172,8 +191,8 @@ WebLib::ShowMenuBar('WebSite');
         <form id="ChgPwd-frm" name="ChgPwd-frm" method="post"
               action="Reset.php<?php echo $TokenURL; ?>" autocomplete="off">
 
-          <?php if ($Token !== null) { ?>
-              <label for="txtBalance"><strong>New Password: </strong><span
+          <?php if ($IsValidToken) { ?>
+              <label for="NewPassWD"><strong>New Password: </strong><span
                           id="PwdScore"></span><br/></label>
               <input type="password" placeholder="New Password"
                      name="NewPassWD"
