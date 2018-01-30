@@ -100,9 +100,9 @@ WebLib::ShowMenuBar('WebSite');
 
               $Subject = "User Account Details - Paschim Medinipur";
               $Body    = "<b>UserID: </b><span> {$email}</span><br/>"
-                . "<b>Password: </b><span> {$Pass}</span>";
+                . "<b>Currently pending for activation.</b>";
 
-              $TxtBody = 'UserID: ' . $email . "\r\n" . 'Password: ' . $Pass;
+              $TxtBody = 'UserID: ' . $email . "\r\n" . 'Pending for activation.';
               $SentSMS = '';
 
               SMSGW::SendSMS($TxtBody, $MobileNo);

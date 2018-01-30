@@ -23,11 +23,15 @@ class User {
    * @return mixed
    */
   public function getDesignation() {
-    if($this->Designation=="") {
+    if ($this->Designation == "") {
       return $this->getMobileNo();
     } else {
       return $this->Designation;
     }
+  }
+
+  function getMobileNo() {
+    return $this->MobileNo;
   }
 
   /**
@@ -49,10 +53,6 @@ class User {
    */
   public function getUserMapID() {
     return $this->UserMapID;
-  }
-
-  function getMobileNo() {
-    return $this->MobileNo;
   }
 
   function isAuthUser() {

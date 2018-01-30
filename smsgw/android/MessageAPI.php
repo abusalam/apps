@@ -35,6 +35,38 @@ require_once(__DIR__ . '/User.php');
 class MessageAPI extends AndroidAPI {
 
   /**
+   * All Groups: Retrieve All Groups
+   *
+   * Request:
+   *   JSONObject={"API":"AG",
+   *               "MDN":"9876543210",
+   *               "OTP":"987654"}
+   *
+   * Response:
+   *    JSONObject={"API":true,
+   *               "DB":[{"GRP":"All BDOs"},{"GRP":"All SDOs"}],
+   *               "MSG":"Total Groups: 2",
+   *               "ET":2.0987,
+   *               "ST":"Wed 20 Aug 08:31:23 PM"}
+   */
+  protected function AG() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $this->Resp['DB']  = Group::getAllGroups();
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'All Groups Loaded';
+      //$this->setExpiry(3600); // 60 Minutes
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+    return true;
+  }
+
+  /**
    * Input validation for API PayLoads in this class
    *
    * Following keys are checked in the parent class:
@@ -109,38 +141,6 @@ class MessageAPI extends AndroidAPI {
       }
     }
     return parent::checkPayLoad($checkParams);
-  }
-
-  /**
-   * All Groups: Retrieve All Groups
-   *
-   * Request:
-   *   JSONObject={"API":"AG",
-   *               "MDN":"9876543210",
-   *               "OTP":"987654"}
-   *
-   * Response:
-   *    JSONObject={"API":true,
-   *               "DB":[{"GRP":"All BDOs"},{"GRP":"All SDOs"}],
-   *               "MSG":"Total Groups: 2",
-   *               "ET":2.0987,
-   *               "ST":"Wed 20 Aug 08:31:23 PM"}
-   */
-  protected function AG() {
-    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
-      return false;
-    }
-    $AuthUser = new AuthOTP();
-    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
-      $this->Resp['DB']  = Group::getAllGroups();
-      $this->Resp['API'] = true;
-      $this->Resp['MSG'] = 'All Groups Loaded';
-      //$this->setExpiry(3600); // 60 Minutes
-    } else {
-      $this->Resp['API'] = false;
-      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
-    }
-    return true;
   }
 
   /**
@@ -361,10 +361,10 @@ class MessageAPI extends AndroidAPI {
     }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
-    $this->Resp['DB']  = Group::getContactGroups($this->Req->CID);
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
-    //$this->setExpiry(3600); // 60 Minutes
+      $this->Resp['DB']  = Group::getContactGroups($this->Req->CID);
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
+      //$this->setExpiry(3600); // 60 Minutes
     } else {
       $this->Resp['API'] = false;
       $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;

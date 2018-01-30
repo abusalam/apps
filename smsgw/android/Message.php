@@ -6,20 +6,12 @@ class Message {
   protected $MsgID;
   protected $Msg;
 
-  public function setUser($User) {
-    $this->User = $User;
-  }
-
-  public function getUser() {
-    return $this->User;
+  public function getMsg() {
+    return $this->Msg;
   }
 
   public function setMsg($Msg) {
     $this->Msg = $Msg;
-  }
-
-  public function getMsg() {
-    return $this->Msg;
   }
 
   function createSMS($User, $Message, $GroupName) {
@@ -60,6 +52,15 @@ class Message {
     return $Status;
   }
 
+  function CreateStatus($MessageID, $Report, $MobileNo, $Status) {
+    $DB                      = new MySQLiDBHelper();
+    $insertData['MessageID'] = $MessageID;
+    $insertData['Report']    = $Report;
+    $insertData['MobileNo']  = $MobileNo;
+    $insertData['Status']    = $Status;
+    $StatusID                = $DB->insert(MySQL_Pre . 'SMS_Status', $insertData);
+  }
+
   function getAllSMS() {
     $DB  = new MySQLiDBHelper();
     $SMS = $DB->get(MySQL_Pre . 'SMS_Messages');
@@ -77,13 +78,12 @@ class Message {
     return $SMS;
   }
 
-  function CreateStatus($MessageID, $Report, $MobileNo, $Status) {
-    $DB                      = new MySQLiDBHelper();
-    $insertData['MessageID'] = $MessageID;
-    $insertData['Report']    = $Report;
-    $insertData['MobileNo']  = $MobileNo;
-    $insertData['Status']    = $Status;
-    $StatusID                = $DB->insert(MySQL_Pre . 'SMS_Status', $insertData);
+  public function getUser() {
+    return $this->User;
+  }
+
+  public function setUser($User) {
+    $this->User = $User;
   }
 }
 

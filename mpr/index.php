@@ -9,9 +9,9 @@ WebLib::CreateDB();
 </head>
 <body>
 <div class="TopPanel">
-  <div class="LeftPanelSide"></div>
-  <div class="RightPanelSide"></div>
-  <h1><?php echo $_SESSION['UserName']; ?></h1>
+    <div class="LeftPanelSide"></div>
+    <div class="RightPanelSide"></div>
+    <h1><?php echo htmlentities($_SESSION['UserName']); ?></h1>
 </div>
 <div class="Header"></div>
 <?php

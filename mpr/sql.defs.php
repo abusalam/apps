@@ -2,6 +2,7 @@
 
 function CreateSchemas() {
   $ObjDB = new MySQLiDBHelper();
+  $DB    = new mysqli(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
   $ObjDB->ddlQuery(SQLDefs('MPR_UserMaps'));
   $ObjDB->ddlQuery(SQLDefs('MPR_Schemes'));
   $ObjDB->ddlQuery(SQLDefs('MPR_SchemeAllotments'));
@@ -13,18 +14,18 @@ function CreateSchemas() {
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewWorkAllotments'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewWorkExpenses'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewLatestProgressID'));
-  $ObjDB->ddlQuery(SQLDefs('MPR_ViewLatestProgress'));
-  //echo SQLDefs('MPR_ViewLatestProgress'); TODO: Unable to Create MPR_ViewLatestProgress
-  $ObjDB->ddlQuery(SQLDefs('MPR_ViewUserWorks'));
-  //echo SQLDefs('MPR_ViewUserWorks'); TODO: Unable to Create MPR_ViewUserWorks
+  $DB->query(SQLDefs('MPR_ViewLatestProgress'));
+  //echo SQLDefs('MPR_ViewLatestProgress'); //TODO: Unable to Create MPR_ViewLatestProgress
+  $DB->query(SQLDefs('MPR_ViewUserWorks'));
+  //echo SQLDefs('MPR_ViewUserWorks'); //TODO: Unable to Create MPR_ViewUserWorks
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewWorkerSchemes'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewUserSchemeAllotments'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewSchemeWiseExpenditure'));
   $ObjDB->ddlQuery(SQLDefs('MPR_ViewSchemeWiseAllotments'));
-  $ObjDB->ddlQuery(SQLDefs('MPR_ViewSchemeWiseFunds'));
-  //echo SQLDefs('MPR_ViewSchemeWiseFunds'); TODO: Unable to Create MPR_ViewSchemeWiseFunds
-  $ObjDB->ddlQuery(SQLDefs('MPR_ViewUserFunds'));
-  //echo SQLDefs('MPR_ViewUserFunds'); TODO: Unable to Create MPR_ViewUserFunds
+  $DB->query(SQLDefs('MPR_ViewSchemeWiseFunds'));
+  //echo SQLDefs('MPR_ViewSchemeWiseFunds'); //TODO: Unable to Create MPR_ViewSchemeWiseFunds
+  $DB->query(SQLDefs('MPR_ViewUserFunds'));
+  //echo SQLDefs('MPR_ViewUserFunds'); //TODO: Unable to Create MPR_ViewUserFunds
   unset($ObjDB);
 }
 
@@ -166,7 +167,7 @@ function SQLDefs($ObjectName) {
         . 'COALESCE(SUM(`S`.`SanctionAmount`),0) AS `Funds`'
         . ' FROM `' . MySQL_Pre . 'MPR_Works` `W`'
         . ' LEFT join `' . MySQL_Pre . 'MPR_Sanctions` `S` on(`S`.`WorkID`=`W`.`WorkID`)'
-        . ' GROUP BY `W`.`WorkID`';
+        . ' GROUP BY `W`.`WorkID`;';
       break;
 
     case 'MPR_ViewWorkExpenses':
@@ -175,7 +176,7 @@ function SQLDefs($ObjectName) {
         . 'COALESCE(SUM(`P`.`ExpenditureAmount`),0) AS `Expenses`, MAX(`Progress`) AS `Progress`'
         . ' FROM `' . MySQL_Pre . 'MPR_Works` `W`'
         . ' LEFT join `' . MySQL_Pre . 'MPR_Progress` `P` on(`P`.`WorkID`=`W`.`WorkID`)'
-        . ' GROUP BY `W`.`WorkID`';
+        . ' GROUP BY `W`.`WorkID`;';
       break;
 
     case 'MPR_ViewLatestProgressID':
@@ -184,7 +185,7 @@ function SQLDefs($ObjectName) {
         . 'MAX(`ProgressID`) AS `ProgressID`'
         . ' FROM `' . MySQL_Pre . 'MPR_Works` `W`'
         . ' LEFT join `' . MySQL_Pre . 'MPR_Progress` `P` on(`P`.`WorkID`=`W`.`WorkID`)'
-        . ' GROUP BY `W`.`WorkID`';
+        . ' GROUP BY `W`.`WorkID`;';
       break;
 
     case 'MPR_ViewLatestProgress':
@@ -192,7 +193,7 @@ function SQLDefs($ObjectName) {
         . 'select `W`.`WorkID` AS `WorkID`,`P`.`ProgressID` AS `ProgressID`,'
         . '`Progress`,`Remarks`'
         . ' FROM `' . MySQL_Pre . 'MPR_ViewLatestProgressID` `W`'
-        . ' LEFT join `' . MySQL_Pre . 'MPR_Progress` `P` on(`P`.`ProgressID`=`W`.`ProgressID`)';
+        . ' LEFT join `' . MySQL_Pre . 'MPR_Progress` `P` on(`P`.`ProgressID`=`W`.`ProgressID`);';
       break;
 
     case 'MPR_ViewUserWorks':
@@ -210,7 +211,7 @@ function SQLDefs($ObjectName) {
         . ' LEFT JOIN `' . MySQL_Pre . 'MPR_UserMaps` `M` on(`M`.`MprMapID` = `W`.`MprMapID`))'
         . ' LEFT JOIN `' . MySQL_Pre . 'MPR_ViewWorkAllotments` `A` on(`A`.`WorkID`=`W`.`WorkID`))'
         . ' LEFT JOIN `' . MySQL_Pre . 'MPR_ViewWorkExpenses` `E` on(`E`.`WorkID`=`W`.`WorkID`)'
-        . ' LEFT JOIN `' . MySQL_Pre . 'MPR_ViewLatestProgress` `P` on(`P`.`WorkID`=`W`.`WorkID`)';
+        . ' LEFT JOIN `' . MySQL_Pre . 'MPR_ViewLatestProgress` `P` on(`P`.`WorkID`=`W`.`WorkID`);';
       break;
 
     case 'MPR_ViewWorkerSchemes':

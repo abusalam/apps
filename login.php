@@ -17,8 +17,8 @@ if (WebLib::GetVal($_SESSION, 'BaseDIR') === null) {
   exit();
 }
 $_SESSION['ET'] = microtime(true);
-$Data = new MySQLiDBHelper();
-$ID = WebLib::GetVal($_SESSION, 'ID');
+$Data           = new MySQLiDBHelper();
+$ID             = WebLib::GetVal($_SESSION, 'ID');
 $_SESSION['ID'] = session_id();
 if (WebLib::GetVal($_SESSION, 'LifeTime') === null) {
   $_SESSION['LifeTime'] = time();
@@ -31,7 +31,7 @@ if ($action == "LogOut") {
   $QueryData['IP']        = $_SERVER['REMOTE_ADDR'];
   $QueryData['Referrer']  = $Data->escape($_SERVER["HTTP_REFERER"]);
   $QueryData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-  $QueryData['UserMapID']    = WebLib::GetVal($_SESSION, 'UserMapID');
+  $QueryData['UserMapID'] = WebLib::GetVal($_SESSION, 'UserMapID');
   $QueryData['URL']       = $Data->escape($_SERVER['PHP_SELF']);
   $QueryData['Action']    = $action . ': (' . $_SERVER['SCRIPT_NAME'] . ')';
   $QueryData['Method']    = $Data->escape($_SERVER['REQUEST_METHOD']);
@@ -44,7 +44,7 @@ if ($action == "LogOut") {
   session_start();
   $_SESSION          = array();
   $_SESSION['ET']    = microtime(true);
-  $_SESSION['Debug'] = WebLib::GetVal($_SESSION, 'Debug') . $action . "TOKEN-!Valid";
+  $_SESSION['Debug'] = WebLib::GetVal($_SESSION, 'Debug') . $action . "TOKEN-!Valid\r\n";
   header("Location: index.php");
   exit();
 } elseif ($action != "Valid") {
@@ -88,7 +88,7 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
     $QueryData['IP']        = $_SERVER['REMOTE_ADDR'];
     $QueryData['Referrer']  = $Data->escape($_SERVER["HTTP_REFERER"]);
     $QueryData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-    $QueryData['UserMapID']    = WebLib::GetVal($_SESSION, 'UserMapID');
+    $QueryData['UserMapID'] = WebLib::GetVal($_SESSION, 'UserMapID');
     $QueryData['URL']       = $Data->escape($_SERVER['PHP_SELF']);
     $QueryData['Action']    = 'Login: Success';
     $QueryData['Method']    = $Data->escape($_SERVER['REQUEST_METHOD']);
@@ -104,7 +104,7 @@ if ((WebLib::GetVal($_POST, 'UserID') !== null) && (WebLib::GetVal($_POST,
     $QueryData['IP']        = $_SERVER['REMOTE_ADDR'];
     $QueryData['Referrer']  = $Data->escape($_SERVER["HTTP_REFERER"]);
     $QueryData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-    $QueryData['UserMapID']    = WebLib::GetVal($_SESSION, 'UserMapID');
+    $QueryData['UserMapID'] = WebLib::GetVal($_SESSION, 'UserMapID');
     $QueryData['URL']       = $Data->escape($_SERVER['PHP_SELF']);
     $QueryData['Action']    = 'Login: Failed[' . WebLib::GetVal($_POST, 'UserID', true) . ']';
     $QueryData['Method']    = $Data->escape($_SERVER['REQUEST_METHOD']);
@@ -125,9 +125,9 @@ WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
 </head>
 <body>
 <div class="TopPanel">
-  <div class="LeftPanelSide"></div>
-  <div class="RightPanelSide"></div>
-  <h1><?php echo AppTitle; ?></h1>
+    <div class="LeftPanelSide"></div>
+    <div class="RightPanelSide"></div>
+    <h1><?php echo AppTitle; ?></h1>
 </div>
 <div class="Header">
 </div>
@@ -135,64 +135,67 @@ WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
 WebLib::ShowMenuBar('APPS');
 ?>
 <div class="content">
-  <div class="formWrapper-Autofit">
-    <?php
-    switch ($action) {
-      case "LogOut":
-        echo "<h2>Thank You! You Have Successfully Logged Out!</h2>";
-        break;
-      case "JustLoggedIn":
-          $UserName=htmlentities($_SESSION['UserName']);
-        echo "<h2>Welcome {$UserName}!</h2>";
-        $TxtSMS = $action . '-' . $_SESSION['UserMapID'] . ': ' . $_SESSION['UserName'] . "\n"
+    <div class="formWrapper-Autofit">
+      <?php
+      switch ($action) {
+        case "LogOut":
+          echo "<h2>Thank You! You Have Successfully Logged Out!</h2>";
+          break;
+        case "JustLoggedIn":
+          $UserName = htmlentities($_SESSION['UserName']);
+          echo "<h2>Welcome {$UserName}!</h2>";
+          $TxtSMS = $action . '-' . $_SESSION['UserMapID'] . ': ' . $_SESSION['UserName'] . "\n"
             . ' E-Mail: ' . $_SESSION['UserID'] . "\n"
             . ' Mobile: ' . $_SESSION['MobileNo'] . "\n"
             . ' From: ' . $_SERVER['REMOTE_ADDR'] . "\n"
             . ' On: ' . date('d/m/Y l H:i:s A', time());
-        SMSGW::SendSMS($TxtSMS, AdminMobile);
-        break;
-      case "Valid":
-        echo "<h2>Already logged In as {$UserName}!</h2>";
-        break;
-      case "NoAccess":
-        $_SESSION['Msg']      = "Sorry! Access Denied!";
-        $_SESSION['TryCount'] = WebLib::GetVal($_SESSION, 'TryCount') + 1;
-        //echo "Try Count:" . WebLib::GetVal($_SESSION, 'TryCount');
-        break;
-    }
-    if (($action != "JustLoggedIn") && ($action != "Valid")) {
-      echo '<h3 class="formWrapper-h3">Login</h3>';
-      WebLib::ShowMsg();
-      ?>
-      <form name="frmLogin" method="post"
-            action="login.php">
-        <label for="UserID">
-          <strong>User ID</strong> (Registered E-Mail)
-          <input type="text" id="UserID" class="form-TxtInput"
-                 name="UserID" value="" autocomplete="off"/>
-        </label>
-        <label for="UserPass">
-          <strong>Password</strong>
-          <input type="password" id="UserPass" class="form-TxtInput"
-                 name="UserPass" value="" autocomplete="off"/>
-        </label>
-        <?php
-        if ((WebLib::GetVal($_SESSION, 'TryCount') >= $FailedTry) && UseCaptcha) {
-            WebLib::StaticCaptcha(true);
-        }
+          SMSGW::SendSMS($TxtSMS, AdminMobile);
+          break;
+        case "Valid":
+          $UserName = htmlentities($_SESSION['UserName']);
+          echo "<h2>Already logged In as {$UserName}!</h2>";
+          //echo '<pre>' . var_dump($_SESSION) . '</pre>';
+          break;
+        case "NoAccess":
+          $_SESSION['Msg']      = "Sorry! Access Denied!";
+          $_SESSION['TryCount'] = WebLib::GetVal($_SESSION, 'TryCount') + 1;
+          //echo "Try Count:" . WebLib::GetVal($_SESSION, 'TryCount');
+          break;
+      }
+      if (($action != "JustLoggedIn") && ($action != "Valid")) {
+        echo '<h3 class="formWrapper-h3">Login</h3>';
+        WebLib::ShowMsg();
         ?>
-        <hr/>
-        <div class="formControl">
-            <a href="users/Reset.php">Forgot password?</a> <input type="submit" class="formButton" value="Login"/>
-        </div>
-      </form>
-      <input type="hidden" id="LoginToken" name="LoginToken"
-               value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
-    <?php
-      //echo WebLib::GetVal($_SESSION,'Debug');
-    }
-    ?>
-  </div>
+          <form name="frmLogin" method="post"
+                action="login.php">
+              <label for="UserID">
+                  <strong>User ID</strong> (Registered E-Mail)
+                  <input type="text" id="UserID" class="form-TxtInput"
+                         name="UserID" value="" autocomplete="off"/>
+              </label>
+              <label for="UserPass">
+                  <strong>Password</strong>
+                  <input type="password" id="UserPass" class="form-TxtInput"
+                         name="UserPass" value="" autocomplete="off"/>
+              </label>
+            <?php
+            if ((WebLib::GetVal($_SESSION, 'TryCount') >= $FailedTry) && UseCaptcha) {
+              WebLib::StaticCaptcha(true);
+            }
+            ?>
+              <hr/>
+              <div class="formControl">
+                  <a href="users/Reset.php">Forgot password?</a> <input
+                          type="submit" class="formButton" value="Login"/>
+              </div>
+          </form>
+          <input type="hidden" id="LoginToken" name="LoginToken"
+                 value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
+        <?php
+        //echo WebLib::GetVal($_SESSION,'Debug');
+      }
+      ?>
+    </div>
 </div>
 <div class="pageinfo">
   <?php WebLib::PageInfo(); ?>

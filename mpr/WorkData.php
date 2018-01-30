@@ -28,9 +28,9 @@ if (WebLib::GetVal($_POST, 'FormToken') != null) {
         break;
 
       case 'Release Fund':
-        $DB                           = new MySQLiDBHelper();
-        $DB->where('UserMapID', $_SESSION['UserMapID']);
-        $DB->where('SchemeID', WebLib::GetVal($_POST, 'WorkID'));
+        $DB = new MySQLiDBHelper();
+        $DB->where('CtrlMapID', $_SESSION['UserMapID']);
+        $DB->where('WorkID', WebLib::GetVal($_POST, 'WorkID'));
         $Works = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
         if (count($Works) > 0) {
           $tableData['WorkID']          = $_POST['WorkID'];
@@ -45,7 +45,7 @@ if (WebLib::GetVal($_POST, 'FormToken') != null) {
             $_SESSION['Msg'] = "Unable to Release Fund!";
           }
         } else {
-          $_SESSION['Msg'] .= "Invalid Work: Unable to Release Fund!";
+          $_SESSION['Msg'] = "Invalid Work: Unable to Release Fund!";
         }
         unset($tableData);
         unset($DB);

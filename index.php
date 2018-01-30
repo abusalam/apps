@@ -15,10 +15,10 @@ if (version_compare(phpversion(), '5.3.0', 'ge')) {
 }
 
 WebLib::SetPATH();
-$ResetToken = WebLib::GetVal($_REQUEST,'PasswordResetToken');
-if($ResetToken!==null){
-    header('Location: ' . $_SESSION['BaseURL'] . 'users/Reset.php?Token='.$ResetToken);
-    exit();
+$ResetToken = WebLib::GetVal($_REQUEST, 'PasswordResetToken');
+if ($ResetToken !== null) {
+  header('Location: ' . $_SESSION['BaseURL'] . 'users/Reset.php?Token=' . $ResetToken);
+  exit();
 }
 WebLib::InitHTML5page('Home');
 WebLib::IncludeCSS();
@@ -43,11 +43,11 @@ WebLib::ShowMenuBar('APPS');
             <ul>
                 <li>Default User ID: admin Password: test@123</li>
                 <li>Download Android App <a href="android/app-release.apk">Project-AIO.apk</a></li>
-                <?php if(isset($_SESSION['MobileNo']) && strlen($_SESSION['MobileNo'])>0): ?>
-                <li>Get Android App <a href="android">Activation Key</a>
+              <?php if (isset($_SESSION['MobileNo']) && strlen($_SESSION['MobileNo']) > 0): ?>
+                  <li>Get Android App <a href="android">Activation Key</a>
                     for Mobile No. <?php echo $_SESSION['MobileNo']; ?>
                 </li>
-                <?php endif ?>
+              <?php endif ?>
             </ul>
             <hr/>
             Note: The above information to be removed after Security Audit.

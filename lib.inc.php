@@ -6,7 +6,7 @@
  * Defined Version for application
  * @version v1.0.1 SCA_11911 20170421-1345
  */
-define('APPS_Version', 'v1.2.0 Level-5-V+ 20180109-1642'); //TODO: Define Application Version
+define('APPS_Version', 'v1.3.0 Level-5-VI+ 20180130-1616'); //TODO: Define Application Version
 date_default_timezone_set('Asia/Kolkata');
 /**
  * @todo Unique Random ID Generator function to be included
@@ -147,30 +147,6 @@ class WebLib {
   }
 
   /**
-   * Generates DOCTYPE and Page Title for HTML5
-   *
-   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in Database
-   * Config.inc.php
-   * @param string $PageTitle Title of the page
-   */
-  public static function Html5Header($PageTitle = 'Paschim Medinipur') {
-    $AppTitle = AppTitle;
-    header('Content-type: text/html; charset=utf-8');
-    header('Cache-Control: private, no-cache, no-store, must-revalidate');
-    header('Cache-Control: post-check=0, pre-check=0', false);
-    header('Expires: 0');
-    header('Pragma: no-cache');
-    echo '<!DOCTYPE html>';
-    echo '<html xmlns="http://www.w3.org/1999/xhtml">';
-    echo '<head>';
-    echo '<title>' . $PageTitle . ' - ' . $AppTitle . '</title>';
-    echo '<meta name="robots" content="noarchive,noodp">';
-    echo '<meta name=viewport content="width=device-width, initial-scale=1">';
-    //echo '<script src="' . $_SESSION['BaseURL'] . 'js/modernizr-latest.js"'
-    //.' type="text/javascript"></script>';
-  }
-
-  /**
    * Generates call to jQuery Scripts in Head Section
    */
   public static function JQueryInclude() {
@@ -188,29 +164,6 @@ class WebLib {
    */
   public static function IncludeJS($PathToJS) {
     echo '<script type="text/javascript" src="' . self::GetVal($_SESSION, 'BaseURL') . $PathToJS . '"></script>';
-  }
-
-  /**
-   * IncludeCSS([$CSS = 'css/Style.css'])
-   *
-   * Generates link to css specified by $CSS
-   *
-   * @param string $PathToCSS href including path
-   */
-  public static function IncludeCSS($PathToCSS = 'css/Style.css') {
-    echo '<link type="text/css" href="' . self::GetVal($_SESSION, 'BaseURL') . $PathToCSS . '" rel="Stylesheet" />';
-  }
-
-  /**
-   * initHTML5page([$PageTitle = ''])
-   *
-   * Starts a Session and Html5Header function
-   *
-   * @param string $PageTitle Title of the page
-   */
-  public static function InitHTML5page($PageTitle = '') {
-    self::InitSess();
-    self::Html5Header($PageTitle);
   }
 
   /**
@@ -254,6 +207,93 @@ class WebLib {
   }
 
   /**
+   * IncludeCSS([$CSS = 'css/Style.css'])
+   *
+   * Generates link to css specified by $CSS
+   *
+   * @param string $PathToCSS href including path
+   */
+  public static function IncludeCSS($PathToCSS = 'css/Style.css') {
+    echo '<link type="text/css" href="' . self::GetVal($_SESSION, 'BaseURL') . $PathToCSS . '" rel="Stylesheet" />';
+  }
+
+  /**
+   * initHTML5page([$PageTitle = ''])
+   *
+   * Starts a Session and Html5Header function
+   *
+   * @param string $PageTitle Title of the page
+   */
+  public static function InitHTML5page($PageTitle = '') {
+    self::InitSess();
+    self::Html5Header($PageTitle);
+  }
+
+  /**
+   * Initiates an UnAuthenticated Session
+   *
+   */
+  public static function InitSess() {
+    if (!isset($_SESSION)) {
+      session_start();
+      date_default_timezone_set('Asia/Kolkata');
+    }
+    if ((self::GetVal($_SESSION, 'BaseDIR') === null) or ($_SERVER['SERVER_NAME'] != Server_Name)) {
+      header("HTTP/1.1 404 Not Found");
+      exit();
+    }
+    self::SetURI();
+    $sess_id           = md5(microtime());
+    $_SESSION['ET']    = microtime(true);
+    $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
+      . 'InInitPage(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
+      . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN', true) . ')';
+    setcookie('SESSION_TOKEN', $sess_id, 0,
+      $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
+    $_SESSION['SESSION_TOKEN'] = $sess_id;
+    $_SESSION['LifeTime']      = time();
+  }
+
+  /**
+   * Sets the REQUEST_URI if not set
+   */
+  public static function SetURI() {
+    $_SESSION['ET'] = microtime(true);
+    if (!isset($_SERVER['REQUEST_URI'])) {
+      $_SERVER['REQUEST_URI'] = substr($_SERVER['PHP_SELF'], 1);
+      if (isset($_SERVER['QUERY_STRING'])) {
+        $_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
+      }
+    }
+  }
+
+  /**
+   * Generates DOCTYPE and Page Title for HTML5
+   *
+   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in Database
+   * Config.inc.php
+   * @param string $PageTitle Title of the page
+   */
+  public static function Html5Header($PageTitle = 'Paschim Medinipur') {
+    $AppTitle = AppTitle;
+    header('Content-type: text/html; charset=utf-8');
+    header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Expires: 0');
+    header('Pragma: no-cache');
+    echo '<!DOCTYPE html>';
+    echo '<html xmlns="http://www.w3.org/1999/xhtml">';
+    echo '<head>';
+    echo '<title>' . $PageTitle . ' - ' . $AppTitle . '</title>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=https://www.enable-javascript.com/"></noscript>';
+    echo '<meta name="robots" content="noarchive,noodp">';
+    echo '<meta name=viewport content="width=device-width, initial-scale=1">';
+
+    //echo '<script src="' . $_SESSION['BaseURL'] . 'js/modernizr-latest.js"'
+    //.' type="text/javascript"></script>';
+  }
+
+  /**
    * Converts a date string into DD-MM-YYYY format
    *
    * @param string $AppDate
@@ -282,6 +322,10 @@ class WebLib {
       return date('Y-m-d', strtotime($AppDate));
     }
   }
+
+  /*
+   * Shows the content of $_SESSION['Msg']
+   */
 
   /**
    * Returns a random string of specified length
@@ -328,10 +372,6 @@ class WebLib {
     //echo 'Total Fields:'.count($PostData);
     return $PostData;
   }
-
-  /*
-   * Shows the content of $_SESSION['Msg']
-   */
 
   public static function ShowMsg() {
     if (self::GetVal($_SESSION, 'Msg') != '') {
@@ -410,22 +450,72 @@ class WebLib {
   }
 
   /**
-   * Returns SQL Query of the specified object
-   *
-   * @param string $TableName
-   * @return string SQL Query for the requested object
-   */
-  private static function GetTableDefs($TableName) {
-    return SQLDefs($TableName);
-  }
-
-  /**
    * Excutes DDL Queried for creating database objects
    *
    */
   public static function CreateDB() {
     if (NeedsDB) {
       CreateSchemas();
+    }
+  }
+
+  /**
+   * Verifies Session Authentication and Logs Audit Trails
+   * @todo Audit Trails to be logged with submitted data
+   */
+  public static function AuthSession() {
+    if (!isset($_SESSION)) {
+      session_start();
+      date_default_timezone_set('Asia/Kolkata');
+    }
+
+    self::SetURI();
+    $_SESSION['ET']        = microtime(true);
+    $_SESSION['Debug']     = self::GetVal($_SESSION, 'Debug') . 'InSession_AUTH';
+    $SessRet               = self::CheckAuth();
+    $_SESSION['CheckAuth'] = $SessRet;
+    if (self::GetVal($_REQUEST, 'NoAuth')) {
+      self::InitSess();
+    } else {
+      $reg                  = new MySQLiDBHelper();
+      $LogData['SessionID'] = self::GetVal($_SESSION, 'ID');
+      $LogData['IP']        = $_SERVER['REMOTE_ADDR'];
+      $LogData['Referrer']  = self::GetVal($_SERVER, 'HTTP_REFERER', true);
+      $LogData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
+      $LogData['UserMapID'] = self::GetVal($_SESSION, 'UserMapID');
+      $LogData['URL']       = $_SERVER['PHP_SELF'];
+      $LogData['Action']    = $SessRet . ' (' . $_SERVER['SCRIPT_NAME'] . ')';
+      $LogData['Method']    = $_SERVER['REQUEST_METHOD'];
+      $LogData['URI']       = $_SERVER['REQUEST_URI'];
+      $reg->insert(MySQL_Pre . 'Logs', $LogData);
+      unset($LogData);
+      unset($reg);
+      if ($SessRet !== 'Valid') {
+        if (self::GetVal($_SESSION, 'BaseURL') === null) {
+          header("HTTP/1.1 404 Not Found");
+        } else {
+          $HomeURL = $_SESSION['BaseURL'] . 'index.php';
+          session_unset();
+          session_destroy();
+          session_start();
+          date_default_timezone_set('Asia/Kolkata');
+          self::SetURI();
+          $_SESSION          = array();
+          $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
+            . $SessRet . 'SESSION_TOKEN-!Valid';
+          $_SESSION['Msg']   = $SessRet;
+          header('Location: ' . $HomeURL);
+        }
+        exit();
+      } else {
+        $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
+          . 'SESSION_TOKEN-Valid';
+        $sess_id           = md5(microtime());
+        setcookie('SESSION_TOKEN', $sess_id, 0,
+          $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
+        $_SESSION['SESSION_TOKEN'] = $sess_id;
+        $_SESSION['LifeTime']      = time();
+      }
     }
   }
 
@@ -469,91 +559,6 @@ class WebLib {
         } elseif (self::GetVal($_SESSION, 'UserMapID') !== null) {
           return 'Valid';
         }
-      }
-    }
-  }
-
-  /**
-   * Initiates an UnAuthenticated Session
-   *
-   */
-  public static function InitSess() {
-    if (!isset($_SESSION)) {
-      session_start();
-      date_default_timezone_set('Asia/Kolkata');
-    }
-    if ((self::GetVal($_SESSION, 'BaseDIR') === null) or ($_SERVER['SERVER_NAME']!=Server_Name)) {
-      header("HTTP/1.1 404 Not Found");
-      exit();
-    }
-    self::SetURI();
-    $sess_id           = md5(microtime());
-    $_SESSION['ET']    = microtime(true);
-    $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
-      . 'InInitPage(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
-      . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN', true) . ')';
-    setcookie('SESSION_TOKEN', $sess_id, 0,
-      $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
-    $_SESSION['SESSION_TOKEN'] = $sess_id;
-    $_SESSION['LifeTime']      = time();
-  }
-
-  /**
-   * Verifies Session Authentication and Logs Audit Trails
-   * @todo Audit Trails to be logged with submitted data
-   */
-  public static function AuthSession() {
-    if (!isset($_SESSION)) {
-      session_start();
-      date_default_timezone_set('Asia/Kolkata');
-    }
-
-    self::SetURI();
-    $_SESSION['ET']        = microtime(true);
-    $_SESSION['Debug']     = self::GetVal($_SESSION, 'Debug') . 'InSession_AUTH';
-    $SessRet               = self::CheckAuth();
-    $_SESSION['CheckAuth'] = $SessRet;
-    if (self::GetVal($_REQUEST, 'NoAuth')) {
-      self::InitSess();
-    } else {
-      $reg                  = new MySQLiDBHelper();
-      $LogData['SessionID'] = self::GetVal($_SESSION, 'ID');
-      $LogData['IP']        = $_SERVER['REMOTE_ADDR'];
-      $LogData['Referrer']  = self::GetVal($_SERVER, 'HTTP_REFERER', true);
-      $LogData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-      $LogData['UserMapID']    = self::GetVal($_SESSION, 'UserMapID');
-      $LogData['URL']       = $_SERVER['PHP_SELF'];
-      $LogData['Action']    = $SessRet . ' (' . $_SERVER['SCRIPT_NAME'] . ')';
-      $LogData['Method']    = $_SERVER['REQUEST_METHOD'];
-      $LogData['URI']       = $_SERVER['REQUEST_URI'];
-      $reg->insert(MySQL_Pre . 'Logs', $LogData);
-      unset($LogData);
-      unset($reg);
-      if ($SessRet !== 'Valid') {
-        if (self::GetVal($_SESSION, 'BaseURL') === null) {
-          header("HTTP/1.1 404 Not Found");
-        } else {
-          $HomeURL = $_SESSION['BaseURL'] . 'index.php';
-          session_unset();
-          session_destroy();
-          session_start();
-          date_default_timezone_set('Asia/Kolkata');
-          self::SetURI();
-          $_SESSION          = array();
-          $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
-            . $SessRet . 'SESSION_TOKEN-!Valid';
-          $_SESSION['Msg']   = $SessRet;
-          header('Location: ' . $HomeURL);
-        }
-        exit();
-      } else {
-        $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
-          . 'SESSION_TOKEN-Valid';
-        $sess_id           = md5(microtime());
-        setcookie('SESSION_TOKEN', $sess_id, 0,
-          $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
-        $_SESSION['SESSION_TOKEN'] = $sess_id;
-        $_SESSION['LifeTime']      = time();
       }
     }
   }
@@ -757,19 +762,6 @@ class WebLib {
   }
 
   /**
-   * Sets the REQUEST_URI if not set
-   */
-  public static function SetURI() {
-    $_SESSION['ET'] = microtime(true);
-    if (!isset($_SERVER['REQUEST_URI'])) {
-      $_SERVER['REQUEST_URI'] = substr($_SERVER['PHP_SELF'], 1);
-      if (isset($_SERVER['QUERY_STRING'])) {
-        $_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
-      }
-    }
-  }
-
-  /**
    * Sets the paths for AppROOT, BaseDIR & BaseURL
    */
   public static function SetPATH($PageLength = 9) {
@@ -870,10 +862,20 @@ class WebLib {
       $i++;
     }
 
-    if ($i==1){
+    if ($i == 1) {
       echo '<th>No Data available!</th>';
     }
     echo "</table>\n";
+  }
+
+  /**
+   * Returns SQL Query of the specified object
+   *
+   * @param string $TableName
+   * @return string SQL Query for the requested object
+   */
+  private static function GetTableDefs($TableName) {
+    return SQLDefs($TableName);
   }
 }
 

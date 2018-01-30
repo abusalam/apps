@@ -31,9 +31,9 @@ WebLib::IncludeJS('js/chosen.jquery.min.js');
 </head>
 <body>
 <div class="TopPanel">
-  <div class="LeftPanelSide"></div>
-  <div class="RightPanelSide"></div>
-  <h1><?php echo AppTitle; ?></h1>
+    <div class="LeftPanelSide"></div>
+    <div class="RightPanelSide"></div>
+    <h1><?php echo AppTitle; ?></h1>
 </div>
 <div class="Header">
 </div>
@@ -50,63 +50,64 @@ $Data = new MySQLiDB();
   WebLib::ShowMsg();
   if ($_SESSION['action'] == 0) {
     ?>
-    <div class="FieldGroup" id="CreateUser-dialog-form" style="display:none">
-      <form name="frmCreateUser" id="frmCreateUser" method="post"
-            action="Users.php">
-        <label for="UserName">Display Name: </label>
-        <input type="text" name="DisplayName" id="DisplayName" required/>
-        <br/>
-        <label for="UserDesg">User Name: </label>
-        <input type="text" name="UserName" id="UserName" required/>
-        <br/>
-        <input type="hidden" name="FormToken"
-               value="<?php
-               echo WebLib::GetVal($_SESSION, 'FormToken')
-               ?>"/>
-        <br/>
-        <input type="submit" id="CmdCreateSubmit" name="CmdSubmit"
-               value="Create"/>
-      </form>
-    </div>
-
-    <form name="frmEditUser" id="frmCreateUser" method="post"
-          action="Users.php">
-      <div class="FieldGroup">
-        <label for="UserName">Select User: </label><br/>
-        <select name="UserMapID" data-placeholder="Select an User">
-          <?php
-          $Query = 'Select `UserMapID`,'
-            . ' CONCAT(`UserName`,\' [\',IFNULL(`UserID`,'
-            . '\'Un-Registered\'),\']\') as `UserName` '
-            . ' FROM `' . MySQL_Pre . 'Users` '
-            . ' Where `CtrlMapID`='
-            . WebLib::GetVal($_SESSION, 'UserMapID', true)
-            . ' Order By `UserName`';
-          $Data->show_sel('UserMapID', 'UserName', $Query, WebLib::GetVal($_POST, 'UserMapID'));
-          ?>
-        </select>
-        <hr/>
-        <input type="hidden" name="FormToken" value="<?php
-        echo WebLib::GetVal($_SESSION, 'FormToken')
-        ?>"/>
-        <input type="button" id="CmdCreate" value="Create New User"/>
-        <input type="submit" name="CmdSubmit" value="Impersonate"/>
-        <?php
-        if (WebLib::GetVal($_SESSION, 'ImpFromUserMapID') !== null) {
-          ?>
-          <input type="submit" name="CmdSubmit" value="Stop Impersonating"/>
-        <?php
-        }
-        ?>
-        <input type="submit" name="CmdSubmit" value="Activate"/>
-        <input type="submit" name="CmdSubmit" value="De-Activate"/>
-        <hr/>
+      <div class="FieldGroup" id="CreateUser-dialog-form" style="display:none">
+          <form name="frmCreateUser" id="frmCreateUser" method="post"
+                action="Users.php">
+              <label for="UserName">Display Name: </label>
+              <input type="text" name="DisplayName" id="DisplayName" required/>
+              <br/>
+              <label for="UserDesg">User Name: </label>
+              <input type="text" name="UserName" id="UserName" required/>
+              <br/>
+              <input type="hidden" name="FormToken"
+                     value="<?php
+                     echo WebLib::GetVal($_SESSION, 'FormToken')
+                     ?>"/>
+              <br/>
+              <input type="submit" id="CmdCreateSubmit" name="CmdSubmit"
+                     value="Create"/>
+          </form>
       </div>
-    </form>
-    <div style="clear:both;"></div>
-    <h3>Users:</h3>
-    <hr/>
-  <?php
+
+      <form name="frmEditUser" id="frmCreateUser" method="post"
+            action="Users.php">
+          <div class="FieldGroup">
+              <label for="UserName">Select User: </label><br/>
+              <select name="UserMapID" data-placeholder="Select an User">
+                <?php
+                $Query = 'Select `UserMapID`,'
+                  . ' CONCAT(`UserName`,\' [\',IFNULL(`UserID`,'
+                  . '\'Un-Registered\'),\']\') as `UserName` '
+                  . ' FROM `' . MySQL_Pre . 'Users` '
+                  . ' Where `CtrlMapID`='
+                  . WebLib::GetVal($_SESSION, 'UserMapID', true)
+                  . ' Order By `UserName`';
+                $Data->show_sel('UserMapID', 'UserName', $Query, WebLib::GetVal($_POST, 'UserMapID'));
+                ?>
+              </select>
+              <hr/>
+              <input type="hidden" name="FormToken" value="<?php
+              echo WebLib::GetVal($_SESSION, 'FormToken')
+              ?>"/>
+              <input type="button" id="CmdCreate" value="Create New User"/>
+              <input type="submit" name="CmdSubmit" value="Impersonate"/>
+            <?php
+            if (WebLib::GetVal($_SESSION, 'ImpFromUserMapID') !== null) {
+              ?>
+                <input type="submit" name="CmdSubmit"
+                       value="Stop Impersonating"/>
+              <?php
+            }
+            ?>
+              <input type="submit" name="CmdSubmit" value="Activate"/>
+              <input type="submit" name="CmdSubmit" value="De-Activate"/>
+              <hr/>
+          </div>
+      </form>
+      <div style="clear:both;"></div>
+      <h3>Users:</h3>
+      <hr/>
+    <?php
   }
   //if (WebLib::GetVal($_SESSION, 'Query') === NULL) {
   $_SESSION['Query'] = 'Select `UserID` as `E-Mail Address`,`UserName`,'

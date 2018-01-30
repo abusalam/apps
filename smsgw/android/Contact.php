@@ -2,6 +2,15 @@
 
 class Contact {
 
+  static function getContactByMobileNo($MobileNo) {
+    $DB = new MySQLiDBHelper();
+    $DB->where('MobileNo', $MobileNo);
+    $Contacts = $DB->get(MySQL_Pre . 'SMS_GroupWiseContacts');
+
+    //print_r($Contacts);
+    return $Contacts;
+  }
+
   function createContact($Mobile, $Name, $Designation) {
     $DB                        = new MySQLiDBHelper();
     $insertData['ContactName'] = $Name;
@@ -33,15 +42,6 @@ class Contact {
     $DB = new MySQLiDBHelper();
     $DB->where('GroupID', $Gid);
     $Contacts = $DB->get(MySQL_Pre . 'SMS_ViewContacts');
-
-    //print_r($Contacts);
-    return $Contacts;
-  }
-
-  static function getContactByMobileNo($MobileNo) {
-    $DB = new MySQLiDBHelper();
-    $DB->where('MobileNo', $MobileNo);
-    $Contacts = $DB->get(MySQL_Pre . 'SMS_GroupWiseContacts');
 
     //print_r($Contacts);
     return $Contacts;

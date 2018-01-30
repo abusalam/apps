@@ -31,6 +31,49 @@ require_once(__DIR__ . '/../../android/AndroidAPI.php');
 class MprAPI extends AndroidAPI {
 
   /**
+   * User Schemes: Retrieve all the Schemes for the User
+   *
+   * Request:
+   *   JSONObject={"API":"US",
+   *               "MDN":"35",
+   *               "OTP":"123456"}
+   *
+   * Response:
+   *    JSONObject={"API":true,
+   *               "DB":[{"SN":"BRGF","ID":"1"},{"SN":"MPLADS","ID":"5"}],
+   *               "MSG":"All Schemes Loaded",
+   *               "ET":2.0987,
+   *               "ST":"Wed 20 Aug 08:31:23 PM"}
+   */
+  protected function US() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
+      OR $this->getNoAuthMode()
+    ) {
+      $DB = new MySQLiDBHelper();
+      $DB->where('UserMapID', $AuthUser->getUserMapID());
+      $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
+        . MySQL_Pre . 'MPR_ViewWorkerSchemes');
+      if (count($Schemes) == 0) {
+        $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
+          . MySQL_Pre . 'MPR_Schemes');
+      }
+      $this->Resp['DB']  = $Schemes;
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'Total Schemes: ' . count($Schemes);
+      //$this->setExpiry(3600);
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP';
+    }
+    unset($DB);
+    unset($Schemes);
+  }
+
+  /**
    * Input validation for API PayLoads in this class
    *
    * Following keys are checked in the parent class:
@@ -70,50 +113,6 @@ class MprAPI extends AndroidAPI {
       }
     }
     return parent::checkPayLoad($checkParams);
-  }
-
-  /**
-   * User Schemes: Retrieve all the Schemes for the User
-   *
-   * Request:
-   *   JSONObject={"API":"US",
-   *               "MDN":"35",
-   *               "OTP":"123456"}
-   *
-   * Response:
-   *    JSONObject={"API":true,
-   *               "DB":[{"SN":"BRGF","ID":"1"},{"SN":"MPLADS","ID":"5"}],
-   *               "MSG":"All Schemes Loaded",
-   *               "ET":2.0987,
-   *               "ST":"Wed 20 Aug 08:31:23 PM"}
-   */
-  protected function US() {
-    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
-      return false;
-    }
-    $AuthUser = new AuthOTP();
-    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP)
-      OR $this->getNoAuthMode()
-    ) {
-      $DB = new MySQLiDBHelper();
-      $DB->where('UserMapID', $AuthUser->getUserMapID());
-      $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
-        . MySQL_Pre . 'MPR_ViewWorkerSchemes');
-      if (count($Schemes) == 0) {
-        $DB->where('UserMapID', $AuthUser->getUserMapID());
-        $Schemes = $DB->query('Select `SchemeName` as `SN`, `SchemeID` as `ID` FROM '
-          . MySQL_Pre . 'MPR_Schemes');
-      }
-      $this->Resp['DB']  = $Schemes;
-      $this->Resp['API'] = true;
-      $this->Resp['MSG'] = 'Total Schemes: ' . count($Schemes);
-      //$this->setExpiry(3600);
-    } else {
-      $this->Resp['API'] = false;
-      $this->Resp['MSG'] = 'Invalid OTP';
-    }
-    unset($DB);
-    unset($Schemes);
   }
 
   /**

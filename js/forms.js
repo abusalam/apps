@@ -3,11 +3,12 @@
  * and open the template in the editor.
  */
 
-$(function() {
+$(function () {
   $('input[type="submit"]').button();
-  $('#UserPass').on({"blur": function() {
+  $('#UserPass').on({
+    "blur": function () {
       $(this).val(sha512(sha512($(this).val()).toString()
-              + sha512($('#LoginToken').val())));
+        + sha512($('#LoginToken').val())));
     }
   });
 

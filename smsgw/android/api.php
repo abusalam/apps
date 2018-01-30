@@ -4,9 +4,9 @@ require_once(__DIR__ . '/MessageAPI.php');
 
 $RT = time();
 WebLib::CreateDB();
-$json     = file_get_contents('php://input');
+$json = file_get_contents('php://input');
 
-function ParseJson($json){
+function ParseJson($json) {
   if ($json == '') {
     throw new RuntimeException('Invalid Input Data');
   }
@@ -18,12 +18,12 @@ function ParseJson($json){
 }
 
 try {
-  $jsonData=ParseJson($json);
+  $jsonData = ParseJson($json);
   if ($jsonData !== null) {
     $mAPI = new MessageAPI($jsonData);
     $mAPI();
   }
-} catch (Exception $e){
+} catch (Exception $e) {
   echo 'Error: ' . $e->getMessage();
 }
 

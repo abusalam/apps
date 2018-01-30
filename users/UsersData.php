@@ -72,16 +72,17 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
         $Inserted = $DB->update(MySQL_Pre . 'Users', array('Activated' => 1));
 
-        $QueryUser = 'Select `UserName`,`UserID` '
-          . ' FROM `' . MySQL_Pre . 'Users`';
+        $Query = 'Select `UserName`,`UserID`' . ' FROM `' . MySQL_Pre . 'Users`';
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
-        $Rows = $DB->query($QueryUser);
+        $Rows = $DB->query($Query);
         $User = $Rows[0];
         unset($Rows);
 
         $Subject = 'User Account Activated';
         $Body    = '<span>Your UserID: <b>' . $User['UserID']
-          . '</b> is now Activated</span>';
+          . '</b> is now Activated.</span>';
+
+        $_SESSION['Msg'] = 'User Account[' . $User['UserID'] . '] Activated Successfully!';
 
         $RunQuery = false;
         break;
@@ -92,12 +93,17 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
         $Inserted = $DB->update(MySQL_Pre . 'Users', array('Activated' => 0));
 
-        $DB->where("UserMapID", $_SESSION['UserMapID']);
-        $User = $DB->query('Select `UserName`,`UserID`' . ' From `' . MySQL_Pre . 'Users`');
+        $Query = 'Select `UserName`,`UserID`' . ' From `' . MySQL_Pre . 'Users`';
+        $DB->where("UserMapID", WebLib::GetVal($_POST, 'UserMapID'));
+        $Rows = $DB->query($Query);
+        $User = $Rows[0];
+        unset($Rows);
 
-        $Subject = 'User Account De-Activated - Paschim Medinipur District Portal';
-        $Body    = '<span>Your UserID: <b>' . $User[0]['UserID']
-          . '</b> is now De-Activated</span>';
+        $Subject = 'User Account De-Activated';
+        $Body    = '<span>Your UserID: <b>' . $User['UserID']
+          . '</b> is now De-Activated.</span>';
+
+        $_SESSION['Msg'] = 'User Account[' . $User['UserID'] . '] De-Activated Successfully!';
 
         $RunQuery = false;
         break;
@@ -106,7 +112,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
       if ($RunQuery) {
         $Inserted = $DB->ddlQuery($Query);
       }
-      if ($Inserted > 0) {
+      if ($Inserted) {
         if (WebLib::GetVal($_POST, 'CmdSubmit') === 'Create') {
           $_SESSION['Msg'] = 'User Created Successfully!';
         } else {
@@ -114,7 +120,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
             $GmailResp = GMailSMTP($User['UserID'], $User['UserName'], $Subject, $Body);
             $Mail      = json_decode($GmailResp);
             if ($Mail->Sent) {
-              if (WebLib::GetVal($_SESSION, 'Msg') === '') {
+              if (WebLib::GetVal($_SESSION, 'Msg') === null) {
                 $_SESSION['Msg'] = 'User '
                   . WebLib::GetVal($_POST, 'CmdSubmit') . 'd Successfully!';
               }

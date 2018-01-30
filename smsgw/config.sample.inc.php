@@ -5,9 +5,9 @@
  */
 
 if (file_exists(__DIR__ . '/../config.inc.php')) {
-    require_once __DIR__ . '/../config.inc.php';
+  require_once __DIR__ . '/../config.inc.php';
 } else {
-    require_once __DIR__ . '/../config.sample.inc.php';
+  require_once __DIR__ . '/../config.sample.inc.php';
 }
 
 define('SMSGW_URL', 'http://localhost/sendmsg.php');

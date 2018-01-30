@@ -6,6 +6,8 @@ if (file_exists(__DIR__ . '/config.inc.php')) {
   require_once __DIR__ . '/config.sample.inc.php';
 }
 
+require_once __DIR__ . '/../php-mailer/GMail.lib.php';
+
 class SMSGW {
 
   public static function SendSMS($SMSData, $MobileNo, $MsgType = 'PM', $ScheTime = null, $DlrType = 5) {
@@ -60,6 +62,9 @@ class SMSGW {
       $curl_output = curl_exec($ch);
     } else {
       $curl_output = 'SMS Gateway disabled in configuration.';
+      //TODO: Send Email when SMS Gateway Disabled in Configuration
+      $Subject='From: ' . $_SERVER['REMOTE_ADDR'] . ' On: ' . date('d/m/Y l H:i:s A', time());
+      GMailSMTP('abu.alam@nic.in', 'SMS Gateway', $Subject, $SMSData);
     }
 
     if ($curl_output === false) {
