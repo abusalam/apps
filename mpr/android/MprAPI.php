@@ -238,14 +238,17 @@ class MprAPI extends AndroidAPI {
       $DB->where('UserMapID', $AuthUser->getUserMapID());
       $DB->where('SchemeID', $this->Req->SID);
       $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
+      $AllowEdit = true;
       if (count($UserWorks) == 0) {
         $DB->where('CtrlMapID', $AuthUser->getUserMapID());
         $DB->where('SchemeID', $this->Req->SID);
         $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
+        $AllowEdit = false;
       }
-      $this->Resp['DB']  = $UserWorks;
-      $this->Resp['API'] = true;
-      $this->Resp['MSG'] = 'Total Works : ' . count($UserWorks);
+      $this->Resp['DB']             = $UserWorks;
+      $this->Resp['Editable'] = $AllowEdit;
+      $this->Resp['API']            = true;
+      $this->Resp['MSG']            = 'Total Works : ' . count($UserWorks);
       //$this->setExpiry(3600);
     } else {
       $this->Resp['API'] = false;
