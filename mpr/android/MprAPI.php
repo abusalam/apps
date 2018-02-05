@@ -245,6 +245,11 @@ class MprAPI extends AndroidAPI {
         $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
         $AllowEdit = false;
       }
+      if (count($UserWorks) == 0) {
+        $DB->where('SchemeID', $this->Req->SID);
+        $UserWorks = $DB->get(MySQL_Pre . 'MPR_ViewUserWorks');
+        $AllowEdit = false;
+      }
       $this->Resp['DB']             = $UserWorks;
       $this->Resp['Editable'] = $AllowEdit;
       $this->Resp['API']            = true;
