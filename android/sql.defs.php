@@ -19,7 +19,7 @@ function SQLDefs($ObjectName) {
         . '`UserData` text DEFAULT NULL,'
         . '`TempData` text DEFAULT NULL,'
         . '`UsageCount` int DEFAULT 0,'
-        . '`Status` enum(\'Registered\',\'Activated\',\'Inactive\') DEFAULT NULL,'
+        . '`KeyExpired` tinyint DEFAULT 0,'
         . '`LastAccessTime` timestamp NOT NULL '
         . ' DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,'
         . ' PRIMARY KEY (`MobileNo`)'
@@ -43,6 +43,7 @@ function SQLDefs($ObjectName) {
         . '`IP` varchar(16) NOT NULL,'
         . '`MobileNo` varchar(15) NOT NULL,'
         . '`AccessTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,'
+        . '`PayLoad` LONGTEXT NOT NULL,'
         . 'PRIMARY KEY (`LogID`)'
         . ') ENGINE=InnoDB DEFAULT CHARSET=utf8';
       break;

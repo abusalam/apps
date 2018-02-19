@@ -36,13 +36,15 @@ class AndroidAPI {
   private $Expiry;
   private $NoAuthMode;
   private $IntervalRU;
+  private $KeyExpiry;
 
-  function __construct($jsonData, $mNoAuthMode = false, $IntervalRU = 60) {
-    $this->IntervalRU = $IntervalRU; // Default Register Interval 1 Hour
+  function __construct($jsonData, $mNoAuthMode = false, $IntervalRU = 60, $KeyExpiry = "-1 week") {
+    $this->setIntervalRU($IntervalRU);
     $this->Resp['ET'] = microtime();
     $this->Expiry     = null;
     $this->Req        = $jsonData;
     $this->setNoAuthMode($mNoAuthMode);
+    $this->setKeyExpiry($KeyExpiry);
   }
 
   function __invoke() {
@@ -53,9 +55,63 @@ class AndroidAPI {
     }
   }
 
+  /**
+   * @return int
+   */
+  public function getIntervalRU() {
+    return $this->IntervalRU;
+  }
+
+  /**
+   * @param int $IntervalRU
+   */
+  public function setIntervalRU($IntervalRU) {
+    $this->IntervalRU = $IntervalRU;
+  }
+
+
+  /**
+   * @return string
+   */
+  public function getKeyExpiry() {
+    return $this->KeyExpiry;
+  }
+
+  /**
+   * @param string $KeyExpiry
+   */
+  public function setKeyExpiry($KeyExpiry) {
+    $this->KeyExpiry = $KeyExpiry;
+  }
+
   private function setCallAPI($CallAPI) {
     if (method_exists($this, $CallAPI)) {
-      $this->$CallAPI();
+      $DB                 = new MySQLiDBHelper();
+      $Data['MobileNo']   = $this->Req->MDN;
+      $Data['AccessTime'] = date('Y-m-d H:i:s', time());
+      $Data['IP']         = $_SERVER['REMOTE_ADDR'];
+      $Data['PayLoad']    = json_encode($this->Req);
+      $DB->insert(MySQL_Pre . 'APP_Logs', $Data);
+      $TimeOut = false;
+      $DB->where('MobileNo', $Data['MobileNo']);
+      $User = $DB->get(MySQL_Pre . 'APP_Users');
+      if (count($User) > 0) {
+        $TimeOut = ((strtotime($this->getKeyExpiry()) - strtotime($User['0']['LastAccessTime'])) > 0 ? true : false);
+        $TimeOut = ($TimeOut || ($User[0]['KeyExpired'] == 1) ? true : false);
+      }
+
+      if ($TimeOut) {
+        $DB->where('MobileNo', $Data['MobileNo']);
+        $DB->update(MySQL_Pre . 'APP_Users', array("KeyExpired" => 1));
+        if (in_array($CallAPI, array("RU", "OT"))) {
+          $this->$CallAPI();
+        } else {
+          $this->Resp['API'] = false;
+          $this->Resp['MSG'] = 'Session Timed Out. Please logout and Login Again!';
+        }
+      } else {
+        $this->$CallAPI();
+      }
     } else {
       /**
        * Unknown API Call
@@ -295,7 +351,8 @@ class AndroidAPI {
       $this->Resp['DB']['USER'] = $DB->query('Select `UserMapID`, `UserID` as `eMailID`,'
         . ' `UserName` as `Designation`, `DisplayName` FROM ' . MySQL_Pre . 'Users');
 
-      $UserData['UserMapID'] = $this->Resp['DB']['USER'][0]['UserMapID'];
+      $UserData['UserMapID']  = $this->Resp['DB']['USER'][0]['UserMapID'];
+      $UserData['KeyExpired'] = 0;
       //TODO Import the UserData from Users table into APP_Users
 
       $DB->where('MobileNo', $this->Req->MDN)
