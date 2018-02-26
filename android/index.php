@@ -1,7 +1,7 @@
 <?php
 require_once('AuthOTP.php');
 
-session_start();
+WebLib::AuthSession();
 
 WebLib::CreateDB();
 
