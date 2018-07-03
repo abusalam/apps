@@ -214,7 +214,7 @@ class AndroidAPI {
       $AuthUser = new AuthOTP(AuthOTP::TOKEN_DATA_TEMP);
       $AuthUser->deleteUser($this->Req->MDN);
       $SecretKey = $AuthUser->setUser($this->Req->MDN, "TOTP");
-      SMSGW::SendSMS('Activation Key: ' . $SecretKey
+      SMSGW::SendOTP('Activation Key: ' . $SecretKey
         . "\nValid Till: " . date("D d M g:i:s A", time() + $this->IntervalRU), $this->Req->MDN);
       $this->Resp['MSG'] = "Please enter the Activation Key Sent to Mobile No. " . $this->Req->MDN;
     } else {
