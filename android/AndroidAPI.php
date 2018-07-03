@@ -38,7 +38,7 @@ class AndroidAPI {
   private $IntervalRU;
   private $KeyExpiry;
 
-  function __construct($jsonData, $mNoAuthMode = false, $IntervalRU = 60, $KeyExpiry = "300 seconds ago") {
+  function __construct($jsonData, $mNoAuthMode = false, $IntervalRU = 60, $KeyExpiry = "365 days ago") {
     $this->setIntervalRU($IntervalRU);
     $this->Resp['ET'] = microtime();
     $this->Expiry     = null;
