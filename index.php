@@ -38,7 +38,7 @@ WebLib::ShowMenuBar('APPS');
 ?>
 <div class="content">
     <div class="formWrapper">
-        <h3 class="formWrapper-h3">Staging Platform Information</h3>
+        <!--h3 class="formWrapper-h3">Staging Platform Information</h3>
         <span class="Message">
             <ul>
                 <li>Default User ID: admin Password: test@123</li>
@@ -52,7 +52,7 @@ WebLib::ShowMenuBar('APPS');
             <hr/>
             Note: The above information to be removed after Security Audit.
             <hr/>
-        </span>
+        </span-->
     </div>
 </div>
 <div class="pageinfo">
