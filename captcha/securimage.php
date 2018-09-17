@@ -286,7 +286,7 @@ class Securimage {
    * Whether the captcha should be case sensitive (not recommended, use only for maximum protection)
    * @var bool
    */
-  public $case_sensitive = false;
+  public $case_sensitive = true;
 
   /**
    * The character set to use for generating the captcha code
@@ -1609,13 +1609,13 @@ class Securimage {
         $fp = fopen($this->database_file, 'w+');
         if (!$fp) {
           $err = error_get_last();
-          trigger_error("Securimage failed to create SQLite3 database file '{$this->database_file}'. Reason: {$err['message']}", E_USER_WARNING);
+          trigger_error("Securimage failed to create SQLite3 database file.", E_USER_WARNING);
           return false;
         }
         fclose($fp);
         chmod($this->database_file, 0666);
       } else if (!is_writeable($this->database_file)) {
-        trigger_error("Securimage does not have read/write access to database file '{$this->database_file}. Make sure permissions are 0666 and writeable by user '" . get_current_user() . "'", E_USER_WARNING);
+        trigger_error("Securimage does not have read/write access to database file. Make sure permissions are 0666 and writeable by user", E_USER_WARNING);
         return false;
       }
     }

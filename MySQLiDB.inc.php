@@ -69,7 +69,7 @@ class MySQLiDB {
 
   function __construct() {
     $this->NoResult = 1;
-    $this->DB=new MySQLiDBHelper();
+    $this->DB       = new MySQLiDBHelper();
     //trigger_error("This Module is Deprecated use MySQLi instead",E_USER_DEPRECATED);
   }
 
@@ -98,6 +98,23 @@ class MySQLiDB {
   public function __sleep() {
     $this->do_close();
     return array('conn', 'result', 'Debug');
+  }
+
+  /**
+   * Closes the current database connection
+   */
+  public function do_close() {
+    // Free resultset
+    if (!$this->NoResult) {
+      mysql_free_result($this->RecSet);
+      $this->NoResult = 1;
+    }
+
+    // Closing connection
+    if ($this->conn) {
+      mysql_close($this->conn);
+    }
+    //echo "<br />LastQuery: ".$LastQuery;
   }
 
   public function __wakeup() {
@@ -129,22 +146,6 @@ class MySQLiDB {
   }
 
   /**
-   * Executes a select query and returns the first field value of the top row
-   *
-   * @param string $Query
-   * @return int|string Returns 0 if Max is null otherwise Max Value
-   */
-  public function do_max_query($Query) {
-    $this->do_sel_query($Query);
-    $row = $this->get_n_row();
-    //echo "Whole Row: ".$row[0].$row[1];
-    if ($row[0] == null)
-      return 0;
-    else
-      return htmlspecialchars($row[0]);
-  }
-
-  /**
    * Executes a insert/update query
    *
    * Returns the number of rows affected
@@ -152,21 +153,22 @@ class MySQLiDB {
    * @param string $querystr
    * @return int
    */
-  public function do_ins_query($querystr) {
-    $this->do_connect();
-    $this->RecSet = mysql_query($querystr, $this->conn);
+  public function do_ins_query($TableName, $FieldData = array()) {
+    $Data         = new MySQLiDBHelper();
+    $this->RecSet = $Data->insert($TableName, $FieldData);
+    unset($Data);
     if (!$this->RecSet) {
-      $message = 'Error(database): ' . mysql_error();
+      $message = 'Error in Inserting into database.'; // . mysql_error();
       //$message .= 'Whole query: '. $querystr."<br>";
-      if ($this->Debug)
+      if ($this->Debug) {
         $_SESSION['Msg'] = $message;
+      }
       trigger_error($message, E_USER_NOTICE);
       $this->RowCount = 0;
       return 0;
     }
     $this->NoResult = 1;
-    $this->RowCount = mysql_affected_rows($this->conn);
-    return $this->RowCount;
+    return $this->RecSet;
   }
 
   /**
@@ -175,14 +177,15 @@ class MySQLiDB {
    * Returns the number of rows fetched
    *
    * @param string $querystr
-   * @return int
+   * @return integer
    */
   public function do_sel_query($querystr) {
     $this->do_connect();
     $this->RecSet = mysql_query($querystr, $this->conn);
     if (mysql_errno($this->conn)) {
-      if ($this->Debug)
+      if ($this->Debug) {
         $_SESSION['Msg'] = mysql_error($this->conn);
+      }
       $this->NoResult = 1;
       $this->RowCount = 0;
       return 0;
@@ -200,8 +203,9 @@ class MySQLiDB {
    * @return array
    */
   public function get_row() {
-    if (!$this->NoResult)
+    if (!$this->NoResult) {
       return mysql_fetch_assoc($this->RecSet);
+    }
   }
 
   /**
@@ -211,8 +215,9 @@ class MySQLiDB {
    * @return type
    */
   public function get_n_row() {
-    if (!$this->NoResult)
+    if (!$this->NoResult) {
       return mysql_fetch_row($this->RecSet);
+    }
   }
 
   /**
@@ -223,12 +228,15 @@ class MySQLiDB {
    * @return string
    */
   public function GetFieldName($ColPos) {
-    if (mysql_errno())
+    if (mysql_errno()) {
       return "ERROR!";
-    else if ($this->ColCount > $ColPos)
-      return mysql_field_name($this->RecSet, $ColPos);
-    else
-      return "Offset Error!";
+    } else {
+      if ($this->ColCount > $ColPos) {
+        return mysql_field_name($this->RecSet, $ColPos);
+      } else {
+        return "Offset Error!";
+      }
+    }
   }
 
   /**
@@ -239,12 +247,15 @@ class MySQLiDB {
    * @return string
    */
   public function GetTableName($ColPos) {
-    if (mysql_errno())
+    if (mysql_errno()) {
       return "ERROR!";
-    else if ($this->ColCount > $ColPos)
-      return mysql_field_table($this->RecSet, $ColPos);
-    else
-      return "Offset Error!";
+    } else {
+      if ($this->ColCount > $ColPos) {
+        return mysql_field_table($this->RecSet, $ColPos);
+      } else {
+        return "Offset Error!";
+      }
+    }
   }
 
   /**
@@ -254,34 +265,52 @@ class MySQLiDB {
    * @return string
    */
   function GetCaption($ColName, $FieldsTable = "SRER_FieldNames") {
-    $Fields = new MySQLiDB();
+    $Fields  = new MySQLiDB();
     $ColHead = $Fields->do_max_query("Select `Description` from `" . MySQL_Pre . "{$FieldsTable}`"
-            . " Where `FieldName`='{$ColName}'");
+      . " Where `FieldName`='{$ColName}'");
     $Fields->do_close();
     unset($Fields);
     return (!$ColHead ? $ColName : $ColHead);
   }
 
   /**
+   * Executes a select query and returns the first field value of the top row
+   *
+   * @param string $Query
+   * @return int|string Returns 0 if Max is null otherwise Max Value
+   */
+  public function do_max_query($Query) {
+    $Record  = $this->DB->query($Query);
+    $RowData = array_values($Record[0]);
+    //echo "Whole Row: ".$row[0].$row[1];
+    if ($RowData[0] == null) {
+      return 0;
+    } else {
+      return htmlentities($RowData[0]);
+    }
+  }
+
+  /**
    * Displays a HTML Combo filled with options specified by $txt & $val
    *
-   * @param string $val Name of the Field which will be used as value
-   * @param string $txt Name of the Field which will be shown in options
-   * @param string $query Should select the $val & $txt fields
+   * @param string $val     Name of the Field which will be used as value
+   * @param string $txt     Name of the Field which will be shown in options
+   * @param string $query   Should select the $val & $txt fields
    * @param string $sel_val Value of the Option to be selected
    * @example Output: <option value="$row[$val]"> $row[$txt] < /option>;
-   * htmlspecialchars() applied to all the values
+   *                        htmlspecialchars() applied to all the values
    */
   public function show_sel($val, $txt, $query, $sel_val = "") {
-    $Rows=$this->DB->rawQuery($query);
+    $Rows = $this->DB->rawQuery($query);
     echo "<option value=''></option>";
     foreach ($Rows as $Row) {
-      if ($Row[$val] == $sel_val)
+      if ($Row[$val] == $sel_val) {
         $sel = "selected";
-      else
+      } else {
         $sel = "";
-      echo '<option value="' . htmlspecialchars($Row[$val])
-      . '"' . $sel . '>' . htmlspecialchars($Row[$txt]) . '</option>';
+      }
+      echo '<option value="' . htmlentities($Row[$val])
+        . '"' . $sel . '>' . htmlentities($Row[$txt]) . '</option>';
     }
   }
 
@@ -293,67 +322,26 @@ class MySQLiDB {
    */
   public function ShowTable($QueryString) {
     // Performing SQL query
-    $Rows=$this->DB->rawQuery($QueryString);
+    $Rows = $this->DB->rawQuery($QueryString);
     // Printing results in HTML
     echo '<table rules="all" frame="box" width="100%" cellpadding="5" cellspacing="1">';
-    $Header=true;
-    foreach($Rows as $Row){
-      if($Header){
-        foreach($Row as $Field => $Value){
-          echo '<th>' . $Field . '</th>';
+    $Header = true;
+    foreach ($Rows as $Row) {
+      if ($Header) {
+        foreach ($Row as $Field => $Value) {
+          echo '<th>' . htmlentities($Field) . '</th>';
         }
 
       }
-      $Header=false;
+      $Header = false;
       echo "\t<tr>\n";
-      foreach($Row as $Value){
-        echo "\t\t<td>" . $Value . "</td>\n";
+      foreach ($Row as $Value) {
+        echo "\t\t<td>" . htmlentities($Value) . "</td>\n";
       }
       echo "\t</tr>\n";
     }
     echo "</table>\n";
     return (count($Rows));
-  }
-
-  public function ShowTableKiosk($QueryString) {
-    // Connecting, selecting database
-    $this->do_sel_query($QueryString);
-    // Printing results in HTML
-    echo '<table rules="all" frame="box" width="100%" cellpadding="5" cellspacing="1" border="1">';
-    echo '<tr><td colspan="2" style="background-color:#F4A460;height:3px;border: 1px solid black;"></td></tr>';
-    $i = 0;
-    while ($line = mysql_fetch_array($this->RecSet, MYSQL_ASSOC)) {
-      $i = 0;
-      foreach ($line as $col_value) {
-        echo "\t<tr>\n";
-        echo '<th  style="background-color:#FFDA91;font-weight:bold;text-align:left;border: 1px solid black;">' . htmlspecialchars(mysql_field_name($this->RecSet, $i)) . '</th>';
-        echo "\t\t" . '<td style="border: 1px solid black;">' . $col_value . "</td>\n";
-        //$strdt=date("F j, Y, g:i:s a",$ntime);
-        //echo "\t\t<td>$strdt</td>\n";
-        echo "\t</tr>\n";
-        $i++;
-      }
-      echo '<tr><td colspan="2" style="background-color:#F4A460;height:3px;border: 1px solid black;"></td></tr>';
-    }
-    echo "</table>\n";
-    $this->do_close();
-    return ($i);
-  }
-
-  /**
-   * Closes the current database connection
-   */
-  public function do_close() {
-    // Free resultset
-    if (!$this->NoResult) {
-      mysql_free_result($this->RecSet);
-      $this->NoResult = 1;
-    }
-
-    // Closing connection
-    if ($this->conn)
-      mysql_close($this->conn);
-    //echo "<br />LastQuery: ".$LastQuery;
   }
 
 }

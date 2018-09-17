@@ -1,14 +1,15 @@
 <?php
 
-require_once( '../lib.inc.php');
+require_once('../lib.inc.php');
 
 if ($_SERVER['REMOTE_ADDR'] === SMSGW_IP) {
 
-  $Data = new MySQLiDB();
-  $smsData = $Data->SqlSafe(json_encode($_GET));
-  $Qry = "insert into SMS_Data(`IP`,`MsgData`) values('{$_SERVER['REMOTE_ADDR']}','{$smsData}')";
-  $Data->do_ins_query($Qry);
-  $Data->do_close();
+  $Data               = new MySQLiDBHelper();
+  $smsData            = $Data->escape(json_encode($_GET));
+  $QryData['IP']      = $_SERVER['REMOTE_ADDR'];
+  $QryData['MsgData'] = $smsData;
+  $Data->insert('SMS_Data', $QryData);
+  unset($Data);
 
   $KeyWords = explode(" ", $_GET['Message'], 2);
   switch (strtolower($KeyWords[0])) {

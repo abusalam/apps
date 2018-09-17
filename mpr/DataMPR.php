@@ -1,13 +1,13 @@
 <?php
 
-require_once ( __DIR__ . '/../lib.inc.php');
+require_once(__DIR__ . '/../lib.inc.php');
 
 $Data               = new MySQLiDBHelper();
 $_SESSION['action'] = 0;
 $Query              = '';
-if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
+if (WebLib::GetVal($_POST, 'FormToken') !== null) {
   if (WebLib::GetVal($_POST, 'FormToken') !==
-      WebLib::GetVal($_SESSION, 'FormToken')) {
+    WebLib::GetVal($_SESSION, 'FormToken')) {
     $_SESSION['action'] = 1;
   } else {
     // Authenticated Inputs
@@ -55,13 +55,13 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
         $DataMPR['ProjectCost']    = WebLib::GetVal($_POST, 'ProjectCost');
         $DataMPR['AlotmentAmount'] = WebLib::GetVal($_POST, 'AlotmentAmount');
         $DataMPR['StartDate']      = WebLib::ToDBDate(WebLib::GetVal($_POST,
-                                                                     'StartDate'));
+          'StartDate'));
         $DataMPR['AlotmentDate']   = WebLib::ToDBDate(WebLib::GetVal($_POST,
-                                                                     'AlotmentDate'));
+          'AlotmentDate'));
         $DataMPR['TenderDate']     = WebLib::ToDBDate(WebLib::GetVal($_POST,
-                                                                     'TenderDate'));
+          'TenderDate'));
         $DataMPR['WorkOrderDate']  = WebLib::ToDBDate(WebLib::GetVal($_POST,
-                                                                     'WorkOrderDate'));
+          'WorkOrderDate'));
         $DataMPR['SchemeID']       = WebLib::GetVal($_POST, 'SchemeID');
 
         if ((strlen($DataMPR['ProjectName']) > 2) && ($DataMPR['SchemeID'] !== null)) {
@@ -77,11 +77,11 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
       case 'Create Progress':
         $DataMPR['ProjectID']         = WebLib::GetVal($_POST, 'ProjectID');
         $DataMPR['ReportDate']        = WebLib::ToDBDate(WebLib::GetVal($_POST,
-                                                                        'ReportDate'));
+          'ReportDate'));
         $DataMPR['PhysicalProgress']  = WebLib::GetVal($_POST,
-                                                       'PhysicalProgress');
+          'PhysicalProgress');
         $DataMPR['FinancialProgress'] = WebLib::GetVal($_POST,
-                                                       'FinancialProgress');
+          'FinancialProgress');
         $DataMPR['Remarks']           = WebLib::GetVal($_POST, 'Remarks');
         if ((strlen($DataMPR['Remarks']) > 2) && ($DataMPR['ProjectID'] !== null)) {
           $DataMPR['UserMapID'] = $_SESSION['UserMapID'];
@@ -92,9 +92,9 @@ if (WebLib::GetVal($_POST, 'FormToken') !== NULL) {
       case 'GetREPORTData':
         $_SESSION['POST'] = $_POST;
         $Query            = 'Select `ReportID`, `UserMapID`, `ReportDate`, '
-            . '`ProjectID`, `PhysicalProgress`, `FinancialProgress`, `Remarks`'
-            . ' From `' . MySQL_Pre . 'MPR_Progress`'
-            . ' Where `ProjectID`=?';
+          . '`ProjectID`, `PhysicalProgress`, `FinancialProgress`, `Remarks`'
+          . ' From `' . MySQL_Pre . 'MPR_Progress`'
+          . ' Where `ProjectID`=?';
         doQuery($DataResp, $Query, array(WebLib::GetVal($_POST, 'ProjectID')));
         break;
     }
@@ -113,14 +113,15 @@ unset($Data);
 /**
  * Perfroms Select Query to the database
  *
- * @param ref     $DataResp
- * @param string  $Query
- * @param array   $Params
- * @example GetData(&$DataResp, "Select a,b,c from Table Where c=? Order By b LIMIT ?,?", array('1',30,10))
+ * @param ref    $DataResp
+ * @param string $Query
+ * @param array  $Params
+ * @example GetData(&$DataResp, "Select a,b,c from Table Where c=? Order By b
+ *          LIMIT ?,?", array('1',30,10))
  */
 function doQuery(&$DataResp,
                  $Query,
-                 $Params = NULL) {
+                 $Params = null) {
   $Data             = new MySQLiDBHelper();
   $Result           = $Data->rawQuery($Query, $Params);
   $DataResp['Data'] = $Result;

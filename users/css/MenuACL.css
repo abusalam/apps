@@ -7,30 +7,32 @@
 */
 
 root {
-  display: block;
+    display: block;
 }
 
-.column{
-  margin: 10px;
-  padding: 5px 10px 5px 0px;
-  height: 400px;
-  overflow-y: scroll;
-  float: left;
-  border:1px solid;
-  background-color: #EAEAEA;
+.column {
+    margin: 10px;
+    padding: 5px 10px 5px 0px;
+    height: 400px;
+    overflow-y: scroll;
+    float: left;
+    border: 1px solid;
+    background-color: #EAEAEA;
 }
 
-.content li ,.ListItem{
-  list-style-type: none;
-  margin:0px 5px 0px 5px;
-  border-bottom:1px solid;
-  width: 100%;
-  display: block;
+.content li, .ListItem {
+    list-style-type: none;
+    margin: 0px 5px 0px 5px;
+    border-bottom: 1px solid;
+    width: 100%;
+    display: block;
 }
-.ListItem label{
-  width: 100%;
-  display: block;
+
+.ListItem label {
+    width: 100%;
+    display: block;
 }
-.ListItem label:hover{
-  background-color: #FAFAFA;
+
+.ListItem label:hover {
+    background-color: #FAFAFA;
 }

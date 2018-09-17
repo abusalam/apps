@@ -1,15 +1,10 @@
 <?php
 
-/*
- * @ todo Fetch District AC and Parts Combo Data on seperate request via ajax
- * @todo Keep All District, AC, Parts available for parent users
- */
-
-$DB = new MySQLiDBHelper();
-$Inserted = 0;
-$RunQuery = true;
+$DB                 = new MySQLiDBHelper();
+$Inserted           = 0;
+$RunQuery           = true;
 $_SESSION['action'] = 0;
-$Query = '';
+$Query              = '';
 if (WebLib::GetVal($_POST, 'FormToken') !== null) {
   if (WebLib::GetVal($_POST, 'FormToken') !==
     WebLib::GetVal($_SESSION, 'FormToken')
@@ -19,10 +14,16 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
     // Authenticated Inputs
     switch (WebLib::GetVal($_POST, 'CmdSubmit')) {
       case 'Create':
-        if (strlen(WebLib::GetVal($_POST, 'UserName')) > 2) {
+        $DB->where('UserName', WebLib::GetVal($_POST, 'UserName', true));
+        $Users = $DB->get(MySQL_Pre . 'Users');
+        if (count($Users) > 0) {
+          $Query           = '';
+          $_SESSION['Msg'] = 'UserName already exists.';
+        } elseif (strlen(WebLib::GetVal($_POST, 'UserName')) > 2) {
           $Query = 'Insert Into `' . MySQL_Pre . 'Users` '
-            . '(`UserName`,`CtrlMapID`,`Registered`,`Activated`)'
-            . ' Values(\'' . WebLib::GetVal($_POST, 'UserName', true)
+            . '(`DisplayName`,`UserName`,`CtrlMapID`,`Registered`,`Activated`)'
+            . ' Values(\'' . WebLib::GetVal($_POST, 'DisplayName', true)
+            . '\',\'' . WebLib::GetVal($_POST, 'UserName', true)
             . '\',' . WebLib::GetVal($_SESSION, 'UserMapID', true) . ',0,0)';
         } else {
           $Query           = '';
@@ -32,17 +33,24 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
 
       case 'Impersonate':
         if (WebLib::GetVal($_POST, 'UserMapID') !== null) {
-          if (WebLib::GetVal($_SESSION, 'ImpFromUserMapID') === null) {
-            $_SESSION['ImpFromUserMapID'] = $_SESSION['UserMapID'];
-            $_SESSION['ImpFromUserName']  = $_SESSION['UserName'];
-          }
-          $_SESSION['UserMapID'] = WebLib::GetVal($_POST, 'UserMapID');
+          $DB->where("CtrlMapID", $_SESSION['UserMapID']);
+          $DB->where("UserMapID", WebLib::GetVal($_POST, 'UserMapID'));
+          $User = $DB->query('Select UserName From `' . MySQL_Pre . 'Users`');
+          if (count($User)) {
+            if (WebLib::GetVal($_SESSION, 'ImpFromUserMapID') === null) {
+              $_SESSION['ImpFromUserMapID'] = $_SESSION['UserMapID'];
+              $_SESSION['ImpFromUserName']  = $_SESSION['UserName'];
+            }
+            $_SESSION['UserMapID'] = WebLib::GetVal($_POST, 'UserMapID');
 
-          $DB->where("UserMapID", $_SESSION['UserMapID']);
-          $User = $DB->query('Select UserName ' . ' From `' . MySQL_Pre . 'Users`');
-          $_SESSION['UserName']    = 'Impersonated-' . $User[0]['UserName'];
-          $_SESSION['Msg']         = $_SESSION['UserName'];
-          $_SESSION['ReloadMenus'] = true;
+            $DB->where("UserMapID", $_SESSION['UserMapID']);
+            $User                    = $DB->query('Select UserName ' . ' From `' . MySQL_Pre . 'Users`');
+            $_SESSION['UserName']    = 'Impersonated-' . htmlentities($User[0]['UserName']);
+            $_SESSION['Msg']         = $_SESSION['UserName'];
+            $_SESSION['ReloadMenus'] = true;
+          } else {
+            $_SESSION['Msg'] = 'Invalid User!';
+          }
         } else {
           $_SESSION['Msg'] = 'Select the User to Impersonate!';
         }
@@ -64,16 +72,17 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
         $Inserted = $DB->update(MySQL_Pre . 'Users', array('Activated' => 1));
 
-        $QueryUser = 'Select `UserName`,`UserID` '
-          . ' FROM `' . MySQL_Pre . 'Users`';
+        $Query = 'Select `UserName`,`UserID`' . ' FROM `' . MySQL_Pre . 'Users`';
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
-        $Rows = $DB->query($QueryUser);
+        $Rows = $DB->query($Query);
         $User = $Rows[0];
         unset($Rows);
 
         $Subject = 'User Account Activated';
         $Body    = '<span>Your UserID: <b>' . $User['UserID']
-          . '</b> is now Activated</span>';
+          . '</b> is now Activated.</span>';
+
+        $_SESSION['Msg'] = 'User Account[' . $User['UserID'] . '] Activated Successfully!';
 
         $RunQuery = false;
         break;
@@ -83,46 +92,19 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
         $DB->where('CtrlMapID', WebLib::GetVal($_SESSION, 'UserMapID', true));
         $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
         $Inserted = $DB->update(MySQL_Pre . 'Users', array('Activated' => 0));
-        
-        $DB->where("UserMapID", $_SESSION['UserMapID']);
-        $User = $DB->query('Select `UserName`,`UserID`' . ' From `' . MySQL_Pre . 'Users`');
 
-        $Subject = 'User Account De-Activated - Paschim Medinipur District Portal';
-        $Body    = '<span>Your UserID: <b>' . $User[0]['UserID']
-          . '</b> is now De-Activated</span>';
-
-        $RunQuery = false;
-        break;
-
-      case 'Reset Password':
-        $Pass = WebLib::GeneratePassword(10, 2, 2, 2);
-        $DB->where('Registered', 1);
-        $DB->where('Activated', 1);
-        $DB->where('CtrlMapID', WebLib::GetVal($_SESSION, 'UserMapID', true));
-        $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
-
-        $Inserted = $DB->update(MySQL_Pre . 'Users', array('UserPass' => md5($Pass)));
-
-        $QueryUser = 'Select `UserName`,`UserID`,`MobileNo`'
-          . ' FROM `' . MySQL_Pre . 'Users`';
-        $DB->where('UserMapID', WebLib::GetVal($_POST, 'UserMapID'));
-        $Rows = $DB->query($QueryUser);
+        $Query = 'Select `UserName`,`UserID`' . ' From `' . MySQL_Pre . 'Users`';
+        $DB->where("UserMapID", WebLib::GetVal($_POST, 'UserMapID'));
+        $Rows = $DB->query($Query);
         $User = $Rows[0];
         unset($Rows);
 
-        $TxtBody = 'UserID: ' . $User['UserID'] . "\r\n" . 'Password: ' . $Pass;
-        $SentSMS = '';
-        if ($Inserted > 0) {
-          if (UseSMSGW === true) {
-            SMSGW::SendSMS($TxtBody, $User['MobileNo']);
-            $_SESSION['Msg'] = 'Password Sent To: ' . $User['MobileNo'] . '<br/>';
-          }
-        }
+        $Subject = 'User Account De-Activated';
+        $Body    = '<span>Your UserID: <b>' . $User['UserID']
+          . '</b> is now De-Activated.</span>';
 
-        $Subject  = 'User Account Password Reset - Paschim Medinipur District Portal';
-        $Body     = '<span>Password Your UserID: <b>' . $User['UserID']
-          . '</b> is: </span>' . $Pass . '<br/>'
-          . '<b>Please Login to change the Current Password</b>';
+        $_SESSION['Msg'] = 'User Account[' . $User['UserID'] . '] De-Activated Successfully!';
+
         $RunQuery = false;
         break;
     }
@@ -130,7 +112,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
       if ($RunQuery) {
         $Inserted = $DB->ddlQuery($Query);
       }
-      if ($Inserted > 0) {
+      if ($Inserted) {
         if (WebLib::GetVal($_POST, 'CmdSubmit') === 'Create') {
           $_SESSION['Msg'] = 'User Created Successfully!';
         } else {
@@ -138,7 +120,7 @@ if (WebLib::GetVal($_POST, 'FormToken') !== null) {
             $GmailResp = GMailSMTP($User['UserID'], $User['UserName'], $Subject, $Body);
             $Mail      = json_decode($GmailResp);
             if ($Mail->Sent) {
-              if (WebLib::GetVal($_SESSION, 'Msg') === '') {
+              if (WebLib::GetVal($_SESSION, 'Msg') === null) {
                 $_SESSION['Msg'] = 'User '
                   . WebLib::GetVal($_POST, 'CmdSubmit') . 'd Successfully!';
               }

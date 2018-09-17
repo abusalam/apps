@@ -1,43 +1,41 @@
 <?php
-/**
- * @todo User Password Change incomplete [Working currently]
- */
 require_once(__DIR__ . '/../lib.inc.php');
 WebLib::AuthSession();
 WebLib::Html5Header("Profile");
 WebLib::IncludeCSS();
-WebLib::IncludeJS("js/md5.js");
+WebLib::IncludeJS('js/jQuery-MD5/sha512.min.js');
 WebLib::JQueryInclude();
 WebLib::IncludeCSS("Jcrop/css/jquery.Jcrop.min.css");
 WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
+WebLib::IncludeCSS('mpr/css/forms.css');
 ?>
 <script>
-  $(function() {
+  $(function () {
     $('#ChgPwd')
-            .button()
-            .click(function() {
-      if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
-        if (scorePassword($('#CnfPassWD').val()) >= 80) {
-          $('#OldPassWD').val(MD5(MD5($('#OldPassWD').val()) + $('#AjaxToken').val()));
-          $('#NewPassWD').val(MD5(MD5($('#NewPassWD').val()) + $('#CnfPassWD').val()));
-          $('#CnfPassWD').val(MD5($('#CnfPassWD').val()));
-          $('#ChgPwd-frm').submit();
-          $(this).dialog("close");
+      .button()
+      .click(function () {
+        if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
+          if (validatePassword($('#CnfPassWD').val())) {
+            $('#OldPassWD').val(sha512(sha512($('#OldPassWD').val()) + $('#AjaxToken').val()));
+            $('#NewPassWD').val(sha512(sha512($('#NewPassWD').val()) + $('#CnfPassWD').val()));
+            $('#CnfPassWD').val(sha512($('#CnfPassWD').val()));
+            $('#ChgPwd-frm').submit();
+            $(this).dialog("close");
+          }
+          else {
+            alert('Password Complexity as per policy is required!');
+          }
+        } else {
+          alert('New passwords don\'t match');
         }
-        else {
-          alert('Password Complexity atleast 80 is required!');
-        }
-      } else {
-        alert('New passwords don\'t match');
-      }
-    });
+      });
 
     $('input[type="button"]').button();
     $('#Msg').text('');
-    $('#NewPassWD').keyup(function() {
-      $('#PwdScore').html('(' + scorePassword($(this).val()) + '/100)');
+    $('#NewPassWD').keyup(function () {
+      $('#PwdScore').html('' + (validatePassword($(this).val()) ? 'Strong' : 'Weak'));
     });
-    $('#CnfPassWD').keyup(function() {
+    $('#CnfPassWD').keyup(function () {
       if (($('#NewPassWD').val() === $('#CnfPassWD').val())) {
         $('#PwdMatch').html('Matched');
       } else {
@@ -45,90 +43,125 @@ WebLib::IncludeJS("Jcrop/js/jquery.Jcrop.min.js");
       }
     });
   });
-  function scorePassword(pass) {
-    var score = 0;
-    if (!pass)
-      return score;
 
-    // award every unique letter until 5 repetitions
-    var letters = new Object();
-    for (var i = 0; i < pass.length; i++) {
-      letters[pass[i]] = (letters[pass[i]] || 0) + 1;
-      score += 5.0 / letters[pass[i]];
+  function validatePassword(newPassword) {
+    var minNumberofChars = 8;
+    var maxNumberofChars = 20;
+    var regularExpression = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{8,20}$/;
+    if (newPassword.length < minNumberofChars || newPassword.length > maxNumberofChars) {
+      return false;
     }
-
-    // bonus points for mixing it up
-    var variations = {
-      digits: /\d/.test(pass),
-      lower: /[a-z]/.test(pass),
-      upper: /[A-Z]/.test(pass),
-      nonWords: /\W/.test(pass),
-    }
-
-    variationCount = 0;
-    for (var check in variations) {
-      variationCount += (variations[check] == true) ? 1 : 0;
-    }
-    score += (variationCount - 1) * 10;
-
-    return parseInt(score);
+    return regularExpression.test(newPassword);
   }
 </script>
 </head>
 <body>
-  <div class="TopPanel">
+<div class="TopPanel">
     <div class="LeftPanelSide"></div>
     <div class="RightPanelSide"></div>
     <h1><?php echo AppTitle; ?></h1>
-  </div>
-  <div class="Header">
-  </div>
-  <?php
-  WebLib::ShowMenuBar('USER');
-  ?>
-  <div class="content">
-    <span class="Message" id="Msg">
-      <b>Loading please wait...</b>
-    </span>
-    <?php
-    $Query = '';
-    if ((WebLib::GetVal($_POST, 'CnfPassWD') !== null) && ($_SESSION['Token'] === WebLib::GetVal($_POST, 'FormToken'))) {
-      $Data = new MySQLiDB();
-      $Pass = WebLib::GetVal($_POST, 'CnfPassWD', TRUE);
-      $UserMapID = WebLib::GetVal($_SESSION, 'UserMapID', TRUE);
-      $Query = 'Update `' . MySQL_Pre . 'Users` '
-              . ' SET `UserPass`=\'' . $Pass . '\' '
-              . ' Where Registered=1 AND Activated=1 AND UserMapID=\'' . $UserMapID . '\''
-              . ' AND MD5(concat(`UserPass`,\'' . WebLib::GetVal($_SESSION, 'Token', TRUE) . '\'))'
-              . ' =\'' . WebLib::GetVal($_POST, 'OldPassWD', TRUE) . '\';';
-      if ($Data->do_ins_query($Query) > 0) {
-        $_SESSION['Msg'] = 'Password Changed Successfully!';
-      } else {
-        $_SESSION['Msg'] = 'Unable to change password!';
+</div>
+<div class="Header">
+</div>
+<?php
+WebLib::ShowMenuBar('USER');
+?>
+<div class="content">
+    <div class="formWrapper-Autofit">
+        <h3 class="formWrapper-h3">Change Password</h3>
+        <span class="Message" id="Msg" style="float: right;">
+              <b>Loading please wait...</b>
+          </span>
+      <?php
+
+      if (WebLib::GetVal($_POST, 'CnfPassWD') !== null) {
+        $Data = new MySQLiDBHelper();
+        //TODO :: Review Update Password
+        $Data->where('UserMapID', $_SESSION['UserMapID']);
+        $Users    = $Data->get(MySQL_Pre . 'Users', 1);
+        $Password = WebLib::GetVal($Users[0], 'UserPass');
+        if (hash('sha512', $Password . $_SESSION['Token']) === WebLib::GetVal($_POST, 'OldPassWD')) {
+          $Data->where('Registered', 1);
+          $Data->where('Activated', 1);
+          $Data->where('UserMapID', $_SESSION['UserMapID']);
+
+          $PassData['UserPass'] = WebLib::GetVal($_POST, 'CnfPassWD', true);
+          $Updated              = $Data->update(MySQL_Pre . 'Users', $PassData);
+          if ($Updated > 0) {
+            $_SESSION['Msg'] = 'Password Changed Successfully!';
+          } else {
+            $_SESSION['Msg'] = 'Unable to change password!';
+          }
+        } else {
+          $_SESSION['Msg'] = 'Wrong password!';
+        }
+        unset($Data);
       }
-      $Data->do_close();
-    }
-    $_SESSION['Token'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . $_SESSION['ET']);
-    WebLib::ShowMsg();
-    ?>
-    <form id="ChgPwd-frm" action="<?php echo WebLib::GetVal($_SERVER, 'PHP_SELF'); ?>" method="post">
-      <h2>Change Password</h2>
-      <div id="chgpwd-dlg" title="Change Password">
-        <input type="password" placeholder="Old Password" name="OldPassWD" id="OldPassWD" /><br/>
-        <input type="password" placeholder="New Password" name="NewPassWD" id="NewPassWD" /><span id="PwdScore"></span><br/>
-        <input type="password" placeholder="Confirm Password" name="CnfPassWD" id="CnfPassWD" /><span id="PwdMatch"></span>
-      </div>
-      <input type="hidden" id="AjaxToken" name="FormToken"
-             value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>" />
-      <input type="button" id="ChgPwd" value="Change Password" />
-    </form>
-  </div>
-  <div class="pageinfo">
-    <?php WebLib::PageInfo(); ?>
-  </div>
-  <div class="footer">
-    <?php WebLib::FooterInfo(); ?>
-  </div>
+      $_SESSION['Token'] = md5($_SERVER['REMOTE_ADDR'] . session_id() . $_SESSION['ET']);
+      WebLib::ShowMsg();
+      ?>
+        <pre id="Error">   <?php //print_r($_POST); ?></pre>
+        <form id="ChgPwd-frm" action="Profile.php" method="post"
+              autocomplete="off">
+            <div id="chgpwd-dlg" title="Change Password">
+                <div class="FieldGroup">
+                    <label for="txtAmount"><strong>Current
+                            Password:</strong><br/>
+                        <input type="password" placeholder="Current Password"
+                               name="OldPassWD"
+                               id="OldPassWD" required
+                               class="form-TxtInput"/>
+                    </label>
+                </div>
+                <div style="clear: both;"></div>
+                <div class="FieldGroup">
+                    <label for="txtBalance"><strong>New Password: </strong><span
+                                id="PwdScore"></span><br/>
+                        <input type="password" placeholder="New Password"
+                               name="NewPassWD"
+                               id="NewPassWD" required
+                               class="form-TxtInput"/>
+                    </label>
+                </div>
+                <div style="clear: both;"></div>
+                <div class="FieldGroup">
+                    <label for="txtBalance"><strong>Confirm New
+                            Password: </strong><span id="PwdMatch"></span><br/>
+                        <input type="password"
+                               placeholder="Confirm New Password"
+                               name="CnfPassWD" id="CnfPassWD" required
+                               class="form-TxtInput"/>
+
+                    </label>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <h4>Password Policy:</h4>
+            <ul>
+                <li>Password must at least be 8 characters.</li>
+                <li>Password must not be the same as the previous 1
+                    passwords.
+                </li>
+                <li>Password must contain Uppercase, lower case, number and
+                    Special Characters.
+                </li>
+            </ul>
+            <div style="clear: both;"></div>
+            <hr/>
+            <div class="formControl">
+                <input type="button" id="ChgPwd" value="Change Password"/>
+            </div>
+        </form>
+        <input type="hidden" id="AjaxToken" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'Token'); ?>"/>
+    </div>
+</div>
+<div class="pageinfo">
+  <?php WebLib::PageInfo(); ?>
+</div>
+<div class="footer">
+  <?php WebLib::FooterInfo(); ?>
+</div>
 </body>
 </html>
 

@@ -50,10 +50,97 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function AG() {
-    $this->Resp['DB']  = Group::getAllGroups();
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'All Groups Loaded';
-    //$this->setExpiry(3600); // 60 Minutes
+    if (!$this->checkPayLoad(array('MDN', 'OTP'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $this->Resp['DB']  = Group::getAllGroups();
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'All Groups Loaded';
+      //$this->setExpiry(3600); // 60 Minutes
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+    return true;
+  }
+
+  /**
+   * Input validation for API PayLoads in this class
+   *
+   * Following keys are checked in the parent class:
+   *      ['MDN','OTP','OTP1','OTP2','IMEI','IP']
+   *
+   * @param $Params
+   * @return bool
+   *
+   * @example Sample function call
+   *
+   *        $this->checkPayLoad(array('MDN','OTP'))
+   *
+   */
+  protected function checkPayLoad($Params) {
+
+    $checkParams = array();
+
+    foreach ($Params as $Param) {
+
+      switch ($Param) {
+        case 'CID':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^\d+$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Invalid Contact ID";
+              return false;
+            }
+          }
+          break;
+
+        case 'MN':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^\d{10}$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Mobile Number should be 10 digits only.";
+              return false;
+            }
+          }
+          break;
+
+        case 'NM':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^[A-Za-z\s]+$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Name should contain alphabets only.";
+              return false;
+            }
+          }
+          break;
+
+        case 'DG':
+          if (!property_exists($this->Req, $Param)) {
+            $this->Resp['MSG'] = "Invalid PayLoad";
+            return false;
+          } else {
+            if (!preg_match('/^[A-Za-z()-\s]+$/', $this->Req->$Param)) {
+              $this->Resp['MSG'] = "Designation should contain alphabets, () and - only.";
+              return false;
+            }
+          }
+          break;
+
+        default:
+          array_push($checkParams, $Param);
+          break;
+      }
+    }
+    return parent::checkPayLoad($checkParams);
   }
 
   /**
@@ -74,6 +161,9 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function SM() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'GRP', 'TXT'))) {
+      return false;
+    }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
       $Msg               = new Message();
@@ -108,52 +198,102 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function DS() {
-    //$AuthUser = new AuthOTP();
-    $DB   = new MySQLiDB();
-    $Data = new MySQLiDBHelper();
-    //if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
-    $RowCount = $DB->do_sel_query("Select * from " . MySQL_Pre . "SMS_ViewDlrData");
-    $Result   = array();
-    for ($i = 0; $i < $RowCount; $i++) {
-      $Row             = $DB->get_row();
-      $Record['MsgID'] = $Row['MsgID'];
-
-      $Record['MsgData']        = json_decode(htmlspecialchars_decode($Row['MsgData']), true);
-      $MsgData['MessageID']     = $Record['MsgData']['a2wackid'];
-      $MsgData['MobileNo']      = $Record['MsgData']['mnumber'];
-      $MsgData['DlrStatus']     = $Record['MsgData']['a2wstatus'];
-      $MsgData['CarrierStatus'] = $Record['MsgData']['carrierstatus'];
-      $MsgData['SentOn']        = $Record['MsgData']['submitdt'];
-      $MsgData['DeliveredOn']   = $Record['MsgData']['lastutime'];
-      if ($MsgData['CarrierStatus'] == 'DELIVRD') {
-        $MsgData['UnDelivered'] = 0;
-      }
-      $Data->where('MessageID', $MsgData['MessageID']);
-      $Rows = $Data->get(MySQL_Pre . 'SMS_DlrReports');
-      if (count($Rows) == 0) {
-        $this->Resp['Data'] = $MsgData;
-        $Updated            = $Data->insert(MySQL_Pre . "SMS_DlrReports", $MsgData);
-      } else {
-        $Data->where('UnDelivered', 1);
-        $Data->where('MessageID', $MsgData['MessageID']);
-        $Data->update(MySQL_Pre . "SMS_DlrReports", $MsgData);
-        $Updated = 1;
-      }
-      if ($Updated > 0) {
-        $Data->where('MsgID', $Record['MsgID']);
-        $UpdateData['ReadUnread'] = 1;
-        $this->Resp['DB']['Updated']=$Data->update("SMS_Data", $UpdateData);
-      }
-      array_push($Result, $Record);
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'MID'))) {
+      return false;
     }
-    $DB->do_close();
-    unset($Data);
-    $this->Resp['DB']  = $Result;
-    $this->Resp['API'] = true;
-    //} else {
-    //  $this->Resp['API'] = false;
-    //  $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
-    //}
+    $AuthUser = new AuthOTP();
+    $DB       = new MySQLiDB();
+    $Data     = new MySQLiDBHelper();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $RowCount = $DB->do_sel_query("Select * from " . MySQL_Pre . "SMS_ViewDlrData");
+      $Result   = array();
+      for ($i = 0; $i < $RowCount; $i++) {
+        $Row             = $DB->get_row();
+        $Record['MsgID'] = $Row['MsgID'];
+
+        $Record['MsgData']        = json_decode(htmlspecialchars_decode($Row['MsgData']), true);
+        $MsgData['MessageID']     = $Record['MsgData']['a2wackid'];
+        $MsgData['MobileNo']      = $Record['MsgData']['mnumber'];
+        $MsgData['DlrStatus']     = $Record['MsgData']['a2wstatus'];
+        $MsgData['CarrierStatus'] = $Record['MsgData']['carrierstatus'];
+        $MsgData['SentOn']        = $Record['MsgData']['submitdt'];
+        $MsgData['DeliveredOn']   = $Record['MsgData']['lastutime'];
+        if ($MsgData['CarrierStatus'] == 'DELIVRD') {
+          $MsgData['UnDelivered'] = 0;
+        }
+        $Data->where('MessageID', $MsgData['MessageID']);
+        $Rows = $Data->get(MySQL_Pre . 'SMS_DlrReports');
+        if (count($Rows) == 0) {
+          $this->Resp['Data'] = $MsgData;
+          $Updated            = $Data->insert(MySQL_Pre . "SMS_DlrReports", $MsgData);
+        } else {
+          $Data->where('UnDelivered', 1);
+          $Data->where('MessageID', $MsgData['MessageID']);
+          $Data->update(MySQL_Pre . "SMS_DlrReports", $MsgData);
+          $Updated = 1;
+        }
+        if ($Updated > 0) {
+          $Data->where('MsgID', $Record['MsgID']);
+          $UpdateData['ReadUnread']    = 1;
+          $this->Resp['DB']['Updated'] = $Data->update("SMS_Data", $UpdateData);
+        }
+        array_push($Result, $Record);
+      }
+      $DB->do_close();
+      unset($Data);
+      $this->Resp['DB']  = $Result;
+      $this->Resp['API'] = true;
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+  }
+
+  /**
+   * Create a New Group
+   *
+   * Request:
+   *   JSONObject={"API":"NG",
+   *               "MDN":"9876543210",
+   *               "GRP":"Test Group",
+   *               "OTP":"987654"}
+   *
+   * Response:
+   *   JSONObject={
+   *                "ET": 0.527576,
+   *                "DB":
+   *                    {
+   *                      "GroupID": 1,
+   *                      "GroupName": "Test Group"
+   *                    },
+   *                "API": true,
+   *                "MSG": "Group Created with ID:1",
+   *                "ST": "Tue 07 Mar 3:39:37 PM"
+   *              }
+   */
+  protected function NG() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'GRP'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $Group   = new Group();
+      $GroupID = $Group->CreateGroup($this->Req->GRP);
+      if ($GroupID > 0) {
+        $GroupDB['GroupID']   = $GroupID;
+        $GroupDB['GroupName'] = $this->Req->GRP;
+        $this->Resp['DB']     = $GroupDB;
+        $this->Resp['API']    = true;
+        $this->Resp['MSG']    = 'Group Created with ID:' . $GroupID;
+      } else {
+        $this->Resp['API'] = false;
+        $this->Resp['MSG'] = 'Unable to Create Group!';
+      }
+
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
   }
 
   /**
@@ -181,11 +321,14 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function GM() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'GRP'))) {
+      return false;
+    }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
       $Contact           = new Contact();
       $count             = $Contact->countContactByGroup($this->Req->GRP);
-      $Contacts             = $Contact->getGroupMembers($this->Req->GRP);
+      $Contacts          = $Contact->getGroupMembers($this->Req->GRP);
       $this->Resp['DB']  = $Contacts;
       $this->Resp['API'] = true;
       $this->Resp['MSG'] = 'Loaded ' . $count
@@ -202,6 +345,7 @@ class MessageAPI extends AndroidAPI {
    * Request:
    *   JSONObject={"API":"CG",
    *               "MDN":"9876543210",
+   *               "CID":"10",
    *               "OTP":"987654"}
    *
    * Response:
@@ -212,10 +356,74 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function CG() {
-    $this->Resp['DB']  = Group::getContactGroups();
-    $this->Resp['API'] = true;
-    $this->Resp['MSG'] = 'All Groups Loaded';
-    //$this->setExpiry(3600); // 60 Minutes
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'CID'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $this->Resp['DB']  = Group::getContactGroups($this->Req->CID);
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
+      //$this->setExpiry(3600); // 60 Minutes
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+  }
+
+  /**
+   * Search Contact: Retrieve Contact Groups by Mobile No
+   *
+   * Request:
+   *   JSONObject={"API":"SC",
+   *               "MDN":"9876543210",
+   *               "MN":"9000000001",
+   *               "OTP":"987654"}
+   *
+   * Response:
+   *    JSONObject={"API":true,
+   *               "DB":[{
+   *                      "ContactID": 18,
+   *                      "ContactName": "Ritwik Hazra",
+   *                      "Designation": "BDO Medinipur Sadar",
+   *                      "MobileNo": "9000000001",
+   *                      "GroupName": "All BDOs",
+   *                      "GroupID": 1
+   *                     },
+   *                     {
+   *                      "ContactID": 18,
+   *                      "ContactName": "Ritwik Hazra",
+   *                      "Designation": "BDO Medinipur Sadar",
+   *                      "MobileNo": "9000000001",
+   *                      "GroupName": "PUP BDOs",
+   *                      "GroupID": 11
+   *                     },
+   *                     {
+   *                      "ContactID": 18,
+   *                      "ContactName": "Ritwik Hazra",
+   *                      "Designation": "BDO Medinipur Sadar",
+   *                      "MobileNo": "9000000001",
+   *                      "GroupName": "ACA BDOs",
+   *                      "GroupID": 12
+   *                    }],
+   *               "MSG":"Total Groups: 2",
+   *               "ET":2.0987,
+   *               "ST":"Wed 20 Aug 08:31:23 PM"}
+   */
+  protected function SC() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'MN'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $this->Resp['DB']  = Contact::getContactByMobileNo($this->Req->MN);
+      $this->Resp['API'] = true;
+      $this->Resp['MSG'] = 'All Groups for this Contact loaded successfully';
+      //$this->setExpiry(3600); // 60 Minutes
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
   }
 
   /**
@@ -238,16 +446,65 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function AC() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'GRP', 'MN', 'NM', 'DG'))) {
+      return false;
+    }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
-      $Contact           = new Contact();
-      $ContactID = $Contact->createContact($this->Req->MN,$this->Req->NM,$this->Req->DG);
-      $Group = new Group();
-      $Group->setGroup($this->Req->GRP);
-      $Gid = $Group->addMember($ContactID);
-      $this->Resp['DB']  = $Gid;
-      $this->Resp['API'] = true;
-      $this->Resp['MSG'] = 'Added to ' . $this->Req->GRP . ' Group';
+      $Contact   = new Contact();
+      $ContactID = $Contact->createContact($this->Req->MN, $this->Req->NM, $this->Req->DG);
+      if ($ContactID > 0) {
+        $Group = new Group();
+        $Group->setGroup($this->Req->GRP);
+        $Gid               = $Group->addMember($ContactID);
+        $this->Resp['DB']  = $Gid;
+        $this->Resp['API'] = true;
+        $this->Resp['MSG'] = 'Added to ' . $this->Req->GRP . ' Group';
+      } else {
+        $this->Resp['API'] = false;
+        $this->Resp['MSG'] = 'Unable to add Contact!';
+      }
+
+    } else {
+      $this->Resp['API'] = false;
+      $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
+    }
+  }
+
+  /**
+   * Add Update Existing Contact
+   *
+   * Request:
+   *   JSONObject={"API":"UC",
+   *               "MDN":"9876543210",
+   *               "MN":"9876543210",
+   *               "NM":"Contact Name",
+   *               "DG":"Designation",
+   *               "OTP":"987654"}
+   *
+   * Response:
+   *   JSONObject={"API":true,
+   *               "DB":10,
+   *               "MSG":"Contact Updated Successfully!",
+   *               "ET":2.0987,
+   *               "ST":"Wed 20 Aug 08:31:23 PM"}
+   */
+  protected function UC() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'MN', 'NM', 'DG'))) {
+      return false;
+    }
+    $AuthUser = new AuthOTP();
+    if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
+      $Contact   = new Contact();
+      $ContactID = $Contact->updateContact($this->Req->MN, $this->Req->NM, $this->Req->DG);
+      if ($ContactID > 0) {
+        $this->Resp['API'] = true;
+        $this->Resp['MSG'] = 'Contact Updated Successfully!';
+      } else {
+        $this->Resp['API'] = false;
+        $this->Resp['MSG'] = 'Unable to update Contact!';
+      }
+
     } else {
       $this->Resp['API'] = false;
       $this->Resp['MSG'] = 'Invalid OTP ' . $this->Req->OTP;
@@ -272,11 +529,14 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function AM() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'GRP', 'CID'))) {
+      return false;
+    }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
       $Group = new Group();
       $Group->setGroup($this->Req->GRP);
-      $Gid = $Group->addMember($this->Req->CID);
+      $Gid               = $Group->addMember($this->Req->CID);
       $this->Resp['DB']  = $Gid;
       $this->Resp['API'] = true;
       $this->Resp['MSG'] = 'Added to ' . $this->Req->GRP . ' Group';
@@ -304,11 +564,14 @@ class MessageAPI extends AndroidAPI {
    *               "ST":"Wed 20 Aug 08:31:23 PM"}
    */
   protected function RM() {
+    if (!$this->checkPayLoad(array('MDN', 'OTP', 'GRP', 'CID'))) {
+      return false;
+    }
     $AuthUser = new AuthOTP();
     if ($AuthUser->authenticateUser($this->Req->MDN, $this->Req->OTP) OR $this->getNoAuthMode()) {
       $Group = new Group();
       $Group->setGroup($this->Req->GRP);
-      $Gid = $Group->delMember($this->Req->CID);
+      $Gid               = $Group->delMember($this->Req->CID);
       $this->Resp['DB']  = $Gid;
       $this->Resp['API'] = true;
       $this->Resp['MSG'] = 'Removed from ' . $this->Req->GRP . ' Group';

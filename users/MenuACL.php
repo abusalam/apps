@@ -11,114 +11,125 @@ WebLib::IncludeCSS('users/css/MenuACL.css');
 ?>
 </head>
 <body>
-  <div class="TopPanel">
+<div class="TopPanel">
     <div class="LeftPanelSide"></div>
     <div class="RightPanelSide"></div>
     <h1><?php echo AppTitle; ?></h1>
-  </div>
-  <div class="Header">
-  </div>
+</div>
+<div class="Header">
+</div>
+<?php
+include __DIR__ . '/MenuData.php';
+WebLib::ShowMenuBar('USER');
+?>
+<div class="content">
+    <h2>Manage Menu ACLs</h2>
+    <hr/>
   <?php
-  include __DIR__ . '/MenuData.php';
-  WebLib::ShowMenuBar('USER');
-  ?>
-  <div class="content">
-    <?php
-    WebLib::ShowMsg();
-    $Data = new MySQLiDBHelper();
-    if ((WebLib::GetVal($_POST, 'CmdMenuAction') === 'Filter Users') && isset($_POST['MenuID'])) {
-      $Query = 'Select `U`.`UserMapID`,CONCAT(`UserName`,\'-\',`U`.`UserMapID`) as `UserName` '
-              . ' FROM `' . MySQL_Pre . 'Users` as `U` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
-              . ' ON (`A`.`UserMapID`=`U`.`UserMapID`) Where `A`.`MenuID`=?  Order By `UserName`';
-      $RowsUser = $Data->rawQuery($Query, array('MenuID' => $_POST['MenuID'][0]));
-      $Query = 'Select `M`.`MenuID`,`AppID`,'
-              . ' CONCAT(`Caption`,\'(\',`UserMapID`,\'-\',`M`.`MenuID`,\'-\',`A`.`Activated`,\')\') as `Caption`'
-              . ' FROM `' . MySQL_Pre . 'MenuItems` as `M` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
-              . ' ON (`A`.`MenuID`=`M`.`MenuID`) Where `A`.`MenuID`=? Order By `AppID`,`MenuOrder`';
-      $RowsMenu = $Data->rawQuery($Query, array('MenuID' => $_POST['MenuID'][0]));
-    } else if ((WebLib::GetVal($_POST, 'CmdMenuAction') === 'Filter Menus') && isset($_POST['UserMapID'])) {
+  WebLib::ShowMsg();
+  $Data         = new MySQLiDBHelper();
+  $NoMenuStatus = true;
 
-      $Query = 'Select `M`.`MenuID`,`AppID`,'
-              . ' CONCAT(`Caption`,\'(\',`UserMapID`,\'-\',`M`.`MenuID`,\'-\',`A`.`Activated`,\')\') as `Caption`'
-              . ' FROM `' . MySQL_Pre . 'MenuItems` as `M` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
-              . ' ON (`A`.`MenuID`=`M`.`MenuID`) Where `UserMapID`=? Order By `AppID`,`MenuOrder`';
-      $RowsMenu = $Data->rawQuery($Query, array('UserMapID' => $_POST['UserMapID'][0]));
+  if ((WebLib::GetVal($_POST, 'CmdMenuAction') === 'Show Restricted Users') && isset($_POST['MenuID'])) {
+    $Query    = 'Select `U`.`UserMapID`,CONCAT(`UserName`,\' [\',`U`.`UserMapID`,\']\') as `UserName` '
+      . ' FROM `' . MySQL_Pre . 'Users` as `U` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
+      . ' ON (`A`.`UserMapID`=`U`.`UserMapID`) Where `A`.`MenuID`=?  Order By `UserName`';
+    $RowsUser = $Data->rawQuery($Query, array('MenuID' => $_POST['MenuID'][0]));
+    $Query    = 'Select `M`.`MenuID`,`AppID`,'
+      . ' CONCAT(`Caption`,\' [\',`UserMapID`,\'-\',`A`.`Activated`,\']\') as `Caption`'
+      . ' FROM `' . MySQL_Pre . 'MenuItems` as `M` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
+      . ' ON (`A`.`MenuID`=`M`.`MenuID`) Where `A`.`MenuID`=? Order By `AppID`,`MenuOrder`';
+    $RowsMenu = $Data->rawQuery($Query, array('MenuID' => $_POST['MenuID'][0]));
+  } else {
+    if ((WebLib::GetVal($_POST, 'CmdMenuAction') === 'Show Restricted Menus') && isset($_POST['UserMapID'])) {
 
-      $Query = 'Select `UserMapID`,CONCAT(`UserName`,\'-\',`UserMapID`) as `UserName` '
-              . ' FROM `' . MySQL_Pre . 'Users` as `U` Where `UserMapID`=?  Order By `UserName`';
-      $RowsUser = $Data->rawQuery($Query, array('UserMapID' => $_POST['UserMapID'][0]));
+      $Query    = 'Select `M`.`MenuID`,`AppID`,'
+        . ' CONCAT(`Caption`,\' [\',`UserMapID`,\'-\',`A`.`Activated`,\']\') as `Caption`'
+        . ' FROM `' . MySQL_Pre . 'MenuItems` as `M` JOIN `' . MySQL_Pre . 'MenuACL` as `A` '
+        . ' ON (`A`.`MenuID`=`M`.`MenuID`) Where `UserMapID` in (?) Order By `AppID`,`MenuOrder`';
+      $RowsMenu = $Data->rawQuery($Query, array('UserMapID' => implode(',', $_POST['UserMapID'])));
+
+      $Query    = 'Select `UserMapID`,CONCAT(`UserName`,\' [\',`UserMapID`,\']\') as `UserName` '
+        . ' FROM `' . MySQL_Pre . 'Users` as `U` Where `UserMapID` in (?)  Order By `UserName`';
+      $RowsUser = $Data->rawQuery($Query, array('UserMapID' => implode(',', $_POST['UserMapID'])));
     } else {
-      $RowsUser = $Data->rawQuery('Select `UserMapID`,`UserName` '
-              . ' FROM `' . MySQL_Pre . 'Users`  Order By `UserName`');
-      $RowsMenu = $Data->rawQuery('Select `MenuID`,`AppID`,`Caption` '
-              . ' FROM `' . MySQL_Pre . 'MenuItems` Order By `AppID`,`MenuOrder`');
+      $RowsUser     = $Data->rawQuery('Select `UserMapID`,`UserName` '
+        . ' FROM `' . MySQL_Pre . 'Users`  Order By `UserName`');
+      $RowsMenu     = $Data->rawQuery('Select `MenuID`,`AppID`,`Caption` '
+        . ' FROM `' . MySQL_Pre . 'MenuItems` Order By `AppID`,`MenuOrder`');
+      $NoMenuStatus = true;
     }
-    ?>
-    <form method="post" action="<?php echo WebLib::GetVal($_SERVER, 'PHP_SELF'); ?>">
-      <div class="column">
-        <ul>
-          <?php
-          echo '<li class="ListItem">Total Users: ' . count($RowsUser) . '</li>';
-          foreach ($RowsUser as $Index => $User) {
-            echo '<li class="ListItem">'
-            . '<label for="User' . $User['UserMapID'] . '" >'
-            . '<input id="User' . $User['UserMapID'] . '" type="checkbox" name="UserMapID[]" '
-            . 'value="' . $User['UserMapID'] . '" />'
-            . $User['UserName']
-            . '</label></li>';
-          }
-          ?>
-        </ul>
-      </div>
-      <div class="column">
-        <ul>
-          <?php
-          echo '<li class="ListItem">Total Menus: ' . count($RowsMenu) . '</li>';
-          foreach ($RowsMenu as $Index => $Menu) {
-            echo '<li class="ListItem">'
-            . '<label for="Menu' . $Menu['MenuID'] . '" >'
-            . '<input id="Menu' . $Menu['MenuID'] . '" type="checkbox" name="MenuID[]" '
-            . 'value="' . $Menu['MenuID'] . '" />'
-            . '<strong>' . $Menu['AppID'] . '=>' . $Menu['Caption'] . '</strong>'
-            . '</label></li>';
-          }
-          ?>
-        </ul>
-      </div>
-      <div  class="column">
-        <pre>
-          <?php
-          print_r($_POST);
-          ?>
-        </pre>
-      </div>
-    <span class="Message" style="float: right;">
-      Allow => Add New ACL and Hide Menu <br/>
-      Restrict => Show Menu <br/>
-      Activate => Hide Menu
-    </span>
-      <div style="clear: both;"></div>
-      <input type="submit"  name="CmdMenuAction" value="Allow" />
-      <input type="submit"  name="CmdMenuAction" value="Restrict" />
-      <input type="submit"  name="CmdMenuAction" value="Activate" />
-      <input type="submit"  name="CmdMenuAction" value="Deactivate" />
-      <input type="submit"  name="CmdMenuAction" value="Filter Menus" />
-      <input type="submit"  name="CmdMenuAction" value="Filter Users" />
-      <input type="hidden" name="FormToken" value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>" />
+  }
+  ?>
+    <form method="post" action="MenuACL.php">
+        <div class="column">
+            <ul>
+              <?php
+              echo '<li class="ListItem">Total Users: ' . (count($RowsUser) - 1) . '</li>';
+              foreach ($RowsUser as $Index => $User) {
+                if ($User['UserMapID'] > 1) {
+                  echo '<li class="ListItem">'
+                    . '<label for="User' . $User['UserMapID'] . '" >'
+                    . '<input id="User' . $User['UserMapID'] . '" type="checkbox" name="UserMapID[]" '
+                    . 'value="' . $User['UserMapID'] . '" />'
+                    . htmlentities($User['UserName'])
+                    . '</label></li>';
+                }
+              }
+              ?>
+            </ul>
+        </div>
+        <div class="column">
+            <ul>
+              <?php
+              $Status[0] = " Allowed";
+              $Status[1] = " Restricted";
+
+              echo '<li class="ListItem">Total Menus: ' . count($RowsMenu) . '</li>';
+              foreach ($RowsMenu as $Index => $Menu) {
+                if ($NoMenuStatus) {
+                  $MenuStatus = '';
+                } else {
+                  $MenuStatus = $Status[substr($Menu['Caption'], -2, 1)];
+                }
+                echo '<li class="ListItem">'
+                  . '<label for="Menu' . $Menu['MenuID'] . '" >'
+                  . '<input id="Menu' . $Menu['MenuID'] . '" type="checkbox" name="MenuID[]" '
+                  . 'value="' . $Menu['MenuID'] . '" />'
+                  . '<strong>' . $Menu['AppID'] . '=>' . $Menu['Caption'] . $MenuStatus . '</strong>'
+                  . '</label></li>';
+              }
+              ?>
+            </ul>
+        </div>
+        <div style="clear: both;"></div>
+        <input type="submit" name="CmdMenuAction" value="Refresh"/>
+        <input type="submit" name="CmdMenuAction" value="Restrict Menu"/>
+        <!-- input type="submit"  name="CmdMenuAction" value="Delete Menu ACL" / -->
+        <input type="submit" name="CmdMenuAction"
+               value="Activate Menu Restriction"/>
+        <input type="submit" name="CmdMenuAction"
+               value="Deactivate Menu Restriction"/>
+        <input type="submit" name="CmdMenuAction"
+               value="Show Restricted Menus"/>
+        <input type="submit" name="CmdMenuAction"
+               value="Show Restricted Users"/>
+        <input type="hidden" name="FormToken"
+               value="<?php echo WebLib::GetVal($_SESSION, 'FormToken') ?>"/>
     </form>
 
-    <?php
-    unset($Data);
-    unset($RowsUser);
-    unset($RowsMenu);
-    ?>
-  </div>
-  <div class="pageinfo">
-    <?php WebLib::PageInfo(); ?>
-  </div>
-  <div class="footer">
-    <?php WebLib::FooterInfo(); ?>
-  </div>
+  <?php
+  unset($Data);
+  unset($RowsUser);
+  unset($RowsMenu);
+  ?>
+</div>
+<div class="pageinfo">
+  <?php WebLib::PageInfo(); ?>
+</div>
+<div class="footer">
+  <?php WebLib::FooterInfo(); ?>
+</div>
 </body>
 </html>
 

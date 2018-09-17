@@ -118,7 +118,7 @@ class SMTP {
   protected function edebug($str) {
     switch ($this->Debugoutput) {
       case 'error_log':
-        error_log($str);
+        //error_log($str);
         break;
       case 'html':
         //Cleans up output a bit for a better looking display that's HTML-safe
@@ -127,7 +127,7 @@ class SMTP {
       case 'echo':
       default:
         //Just echoes exactly what was received
-        echo $str;
+        //echo $str;
     }
   }
 

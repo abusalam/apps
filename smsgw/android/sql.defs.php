@@ -2,37 +2,20 @@
 
 function CreateSchemas() {
   $ObjDB = new MySQLiDBHelper();
-  $ObjDB->ddlQuery(SQLDefs('SMS_Users'));
   $ObjDB->ddlQuery(SQLDefs('SMS_Groups'));
-  $ObjDB->ddlQuery(SQLDefs('SMS_GroupDetails'));
   $ObjDB->ddlQuery(SQLDefs('SMS_Messages'));
   $ObjDB->ddlQuery(SQLDefs('SMS_Contacts'));
-  $ObjDB->ddlQuery(SQLDefs('SMS_ViewContacts'));
+  $ObjDB->ddlQuery(SQLDefs('SMS_GroupDetails'));
   $ObjDB->ddlQuery(SQLDefs('SMS_GroupMembers'));
+  $ObjDB->ddlQuery(SQLDefs('SMS_ViewContacts'));
+  $ObjDB->ddlQuery(SQLDefs('SMS_GroupWiseContacts'));
   $ObjDB->ddlQuery(SQLDefs('SMS_Status'));
-  $ObjDB->ddlQuery(SQLDefs('SMS_Register'));
   unset($ObjDB);
 }
 
 function SQLDefs($ObjectName) {
   $SqlDB = '';
   switch ($ObjectName) {
-
-    case 'SMS_Users':
-      $SqlDB = 'CREATE TABLE IF NOT EXISTS `' . MySQL_Pre . $ObjectName . '` ('
-        . '`MobileNo` varchar(10) DEFAULT NULL,'
-        . '`UserName` varchar(50) DEFAULT NULL,'
-        . '`UserData` text DEFAULT NULL,'
-        . '`TempData` text DEFAULT NULL,'
-        . '`Designation` varchar(50) DEFAULT NULL,'
-        . '`eMailID` text DEFAULT NULL,'
-        . '`UsageCount` int DEFAULT 0,'
-        . '`Status` enum(\'Registered\',\'Activated\',\'Inactive\') DEFAULT NULL,'
-        . '`LastAccessTime` timestamp NOT NULL '
-        . ' DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,'
-        . ' PRIMARY KEY (`MobileNo`)'
-        . ') ENGINE=InnoDB DEFAULT CHARSET=utf8;';
-      break;
 
     case 'SMS_Groups':
       $SqlDB = 'CREATE TABLE IF NOT EXISTS `' . MySQL_Pre . $ObjectName . '` ('
@@ -45,11 +28,11 @@ function SQLDefs($ObjectName) {
 
     case 'SMS_GroupDetails':
       $SqlDB = 'CREATE TABLE IF NOT EXISTS `' . MySQL_Pre . $ObjectName . '` ('
-        . '`ContactID` int(11) NOT NULL AUTO_INCREMENT,'
-        . '`GroupID` int(11) NOT NULL DEFAULT \'0\','
+        . '`ContactID` int(11) NOT NULL,'
+        . '`GroupID` int(11) NOT NULL,'
         . 'PRIMARY KEY (`ContactID`,`GroupID`),'
-        . 'FOREIGN KEY (`GroupID`) REFERENCES `WebSite_SMS_Groups` (`GroupID`) ON UPDATE CASCADE,'
-        . 'FOREIGN KEY (`ContactID`) REFERENCES `WebSite_SMS_Contacts` (`ContactID`) ON UPDATE CASCADE'
+        . 'FOREIGN KEY (`GroupID`) REFERENCES `' . MySQL_Pre . 'SMS_Groups` (`GroupID`) ON UPDATE CASCADE,'
+        . 'FOREIGN KEY (`ContactID`) REFERENCES `' . MySQL_Pre . 'SMS_Contacts` (`ContactID`) ON UPDATE CASCADE'
         . ') ENGINE=InnoDB  DEFAULT CHARSET = utf8;';
       break;
 
@@ -70,7 +53,8 @@ function SQLDefs($ObjectName) {
         . '`ContactName` varchar(50) DEFAULT NULL,'
         . '`Designation` varchar(50) NOT NULL,'
         . '`MobileNo` varchar(10) DEFAULT NULL,'
-        . ' PRIMARY KEY (`ContactID`)'
+        . ' PRIMARY KEY (`ContactID`),'
+        . ' UNIQUE KEY `MobileNo` (`MobileNo`)'
         . ') ENGINE=InnoDB  DEFAULT CHARSET = utf8;';
       break;
 
@@ -84,8 +68,8 @@ function SQLDefs($ObjectName) {
     case 'SMS_GroupMembers':
       $SqlDB = 'CREATE VIEW `' . MySQL_Pre . $ObjectName . '` AS SELECT '
         . '`C`.`ContactID` AS `ContactID`,`C`.`ContactName` AS `ContactName`,`C`.`Designation` AS `Designation`,'
-        . '`G`.`GroupID` AS `GroupID`,`C`.`MobileNo` AS `MobileNo` from (`WebSite_SMS_GroupDetails` `G` join '
-        . '`WebSite_SMS_Contacts` `C` on((`C`.`ContactID` = `G`.`ContactID`))) ;';
+        . '`G`.`GroupID` AS `GroupID`,`C`.`MobileNo` AS `MobileNo` from (`' . MySQL_Pre . 'SMS_GroupDetails` `G` join '
+        . '`' . MySQL_Pre . 'SMS_Contacts` `C` on((`C`.`ContactID` = `G`.`ContactID`))) ;';
       break;
 
     case 'SMS_Status':
@@ -99,13 +83,15 @@ function SQLDefs($ObjectName) {
         . ') ENGINE=InnoDB  DEFAULT CHARSET = utf8;';
       break;
 
-    case 'SMS_Register':
-      $SqlDB = 'CREATE TABLE IF NOT EXISTS `' . MySQL_Pre . $ObjectName . '` ('
-        . '`RequestID` int NOT NULL AUTO_INCREMENT,'
-        . '`MobileNo` varchar(10) DEFAULT NULL,'
-        . '`RequestTime` timestamp DEFAULT CURRENT_TIMESTAMP,'
-        . ' PRIMARY KEY (`RequestID`)'
-        . ') ENGINE=InnoDB  DEFAULT CHARSET = utf8;';
+    case 'SMS_GroupWiseContacts':
+      $SqlDB = 'CREATE OR REPLACE VIEW `' . MySQL_Pre . $ObjectName . '`'
+        . '  AS  select `C`.`ContactID` AS `ContactID`,'
+        . '`C`.`ContactName` AS `ContactName`,'
+        . '`C`.`Designation` AS `Designation`,`C`.`MobileNo` AS `MobileNo`,'
+        . '`G`.`GroupName` AS `GroupName`,`G`.`GroupID` AS `GroupID` '
+        . 'from ((`' . MySQL_Pre . 'SMS_GroupDetails` `GD` right join '
+        . '`' . MySQL_Pre . 'SMS_Contacts` `C` on((`C`.`ContactID` = `GD`.`ContactID`)))'
+        . ' left join `' . MySQL_Pre . 'SMS_Groups` `G` on((`G`.`GroupID` = `GD`.`GroupID`)));';
       break;
   }
 

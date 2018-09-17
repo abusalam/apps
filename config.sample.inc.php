@@ -10,6 +10,11 @@
 define('HOST_Name', 'localhost');
 
 /**
+ * Defines Web Server Hostname
+ */
+define('Server_Name', 'localhost');
+
+/**
  * Defines MySQL Server Username
  */
 define('MySQL_User', 'root');
@@ -65,4 +70,11 @@ define('NeedsDB', true);
  * If set to TRUE then SMSs will be Sent
  */
 define('UseSMSGW', false);
+
+/**
+ * Defines use of Login Captcha
+ *
+ * If set to TRUE then Login Captcha will be Shown
+ */
+define('UseCaptcha', true);
 ?>

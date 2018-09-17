@@ -1,10 +1,19 @@
 <?php
+//ini_set('display_errors', 'On'); // TODO:: Turn Off for Security Audit
+//error_reporting(E_ALL);
 
+/**
+ * Defined Version for application
+ * @version v1.0.1 SCA_11911 20170421-1345
+ */
+define('APPS_Version', 'v1.3.1 Audited 20180703-1303'); //TODO: Define Application Version
+date_default_timezone_set('Asia/Kolkata');
 /**
  * @todo Unique Random ID Generator function to be included
  * @todo HelpLine has to be added
  * @todo Menus made to be Database driven
- * @todo *** VVI *** Make Modernizr to display message if browser is not capable.
+ * @todo *** VVI *** Make Modernizr to display message if browser is not
+ *       capable.
  *
  *
  * block attempts to directly run this script from script directory
@@ -122,13 +131,13 @@ class WebLib {
    * Deployment info of the server
    */
   public static function DeployInfo($EnableLoging = false) {
-    $_SESSION['Version'] = `git describe --tags`;
-    $_SESSION['Version'] .= date('Ymd');
+    $_SESSION['Version']  = `git describe --tags`;
+    $_SESSION['Version']  .= date('Ymd');
     $_SESSION['AppTitle'] = AppTitle;
     if ($EnableLoging === true) {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-      curl_setopt($ch, CURLOPT_URL, 'https://www.paschimmedinipur.gov.in');
+      curl_setopt($ch, CURLOPT_URL, 'https://apps.paschimmedinipur.gov.in');
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($_SESSION));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       $CURL_OUTPUT = curl_exec($ch);
@@ -138,34 +147,12 @@ class WebLib {
   }
 
   /**
-   * Generates DOCTYPE and Page Title for HTML5
-   *
-   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in Database Config.inc.php
-   * @param string $PageTitle Title of the page
-   */
-  public static function Html5Header($PageTitle = 'Paschim Medinipur') {
-    $AppTitle = AppTitle;
-    header('Content-type: text/html; charset=utf-8');
-    echo '<!DOCTYPE html>';
-    echo '<html xmlns="http://www.w3.org/1999/xhtml">';
-    echo '<head>';
-    echo '<title>' . $PageTitle . ' - ' . $AppTitle . '</title>';
-    echo '<meta name="robots" content="noarchive,noodp">';
-    echo '<meta name=viewport content="width=device-width, initial-scale=1">';
-    //echo '<script src="' . $_SESSION['BaseURL'] . 'js/modernizr-latest.js"'
-    //.' type="text/javascript"></script>';
-  }
-
-  /**
    * Generates call to jQuery Scripts in Head Section
    */
   public static function JQueryInclude() {
-    echo '<link href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"'
-      . ' type="text/css" rel="Stylesheet" />'
-      . '<script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js">
-      </script>'
-      . '<script type="text/javascript" src="//code.jquery.com/ui/1.10.4/jquery-ui.js">
-      </script>';
+    self::IncludeJS('js/jquery.min.js');
+    self::IncludeJS('js/jquery-ui.min.js');
+    self::IncludeCSS('css/smoothness/jquery-ui.min.css');
   }
 
   /**
@@ -176,45 +163,25 @@ class WebLib {
    * @param string $PathToJS src including path
    */
   public static function IncludeJS($PathToJS) {
-    echo '<script type="text/javascript" src="' . $_SESSION['BaseURL'] . $PathToJS . '"></script>';
+    echo '<script type="text/javascript" src="' . self::GetVal($_SESSION, 'BaseURL') . $PathToJS . '"></script>';
   }
 
   /**
-   * IncludeCSS([$CSS = 'css/Style.css'])
-   *
-   * Generates link to css specified by $CSS
-   *
-   * @param string $PathToCSS href including path
-   */
-  public static function IncludeCSS($PathToCSS = 'css/Style.css') {
-    echo '<link type="text/css" href="' . $_SESSION['BaseURL'] . $PathToCSS . '" rel="Stylesheet" />';
-  }
-
-  /**
-   * initHTML5page([$PageTitle = ''])
-   *
-   * Starts a Session and Html5Header function
-   *
-   * @param string $PageTitle Title of the page
-   */
-  public static function InitHTML5page($PageTitle = '') {
-    self::InitSess();
-    self::Html5Header($PageTitle);
-  }
-
-  /**
-   * <b>WebLib::GetVal($Array, $Index, [$ForSQL = FALSE, [$HTMLSafe = TRUE]])</b>
+   * <b>WebLib::GetVal($Array, $Index, [$ForSQL = FALSE, [$HTMLSafe =
+   * TRUE]])</b>
    *
    * Returns value of an array element without cousing warning/error
    *
-   * @param array $Array eg. $_SESSION
-   * @param string $Index eg. 'index'
-   * @param bool $ForSQL If set to true then SQLSafe else htmlspecialchars will be applied
-   * @param bool $HTMLSafe If FALSE then OutPut without htmlspecialchars
+   * @param array  $Array    eg. $_SESSION
+   * @param string $Index    eg. 'index'
+   * @param bool   $ForSQL   If set to true then SQLSafe else htmlentities will
+   *                         be applied
+   * @param bool   $HTMLSafe If FALSE then OutPut without htmlentities
    * @return null|$Array[$Index]
-   * @example WebLib::GetVal($Array, $Index) = htmlspecialchars | NULL
-   * @example WebLib::GetVal($Array, $Index, TRUE) = SqlSafe | ''
-   * @example WebLib::GetVal($Array, $Index, FALSE, FALSE) = raw output | NULL
+   * @example     WebLib::GetVal($Array, $Index) = htmlentities | NULL
+   * @example     WebLib::GetVal($Array, $Index, TRUE) = SqlSafe | ''
+   * @example     WebLib::GetVal($Array, $Index, FALSE, FALSE) = raw output |
+   *                         NULL
    */
   public static function GetVal($Array,
                                 $Index,
@@ -231,12 +198,99 @@ class WebLib {
         return $Value;
       } else {
         if ($HTMLSafe) {
-          return htmlspecialchars($Array[$Index]);
+          return htmlentities($Array[$Index]);
         } else {
           return $Array[$Index];
         }
       }
     }
+  }
+
+  /**
+   * IncludeCSS([$CSS = 'css/Style.css'])
+   *
+   * Generates link to css specified by $CSS
+   *
+   * @param string $PathToCSS href including path
+   */
+  public static function IncludeCSS($PathToCSS = 'css/Style.css') {
+    echo '<link type="text/css" href="' . self::GetVal($_SESSION, 'BaseURL') . $PathToCSS . '" rel="Stylesheet" />';
+  }
+
+  /**
+   * initHTML5page([$PageTitle = ''])
+   *
+   * Starts a Session and Html5Header function
+   *
+   * @param string $PageTitle Title of the page
+   */
+  public static function InitHTML5page($PageTitle = '') {
+    self::InitSess();
+    self::Html5Header($PageTitle);
+  }
+
+  /**
+   * Initiates an UnAuthenticated Session
+   *
+   */
+  public static function InitSess() {
+    if (!isset($_SESSION)) {
+      session_start();
+      date_default_timezone_set('Asia/Kolkata');
+    }
+    if ((self::GetVal($_SESSION, 'BaseDIR') === null) or ($_SERVER['SERVER_NAME'] != Server_Name)) {
+      header("HTTP/1.1 404 Not Found");
+      exit();
+    }
+    self::SetURI();
+    $sess_id           = md5(microtime());
+    $_SESSION['ET']    = microtime(true);
+    $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
+      . 'InInitPage(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
+      . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN', true) . ')';
+    setcookie('SESSION_TOKEN', $sess_id, 0,
+      $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
+    $_SESSION['SESSION_TOKEN'] = $sess_id;
+    $_SESSION['LifeTime']      = time();
+  }
+
+  /**
+   * Sets the REQUEST_URI if not set
+   */
+  public static function SetURI() {
+    $_SESSION['ET'] = microtime(true);
+    if (!isset($_SERVER['REQUEST_URI'])) {
+      $_SERVER['REQUEST_URI'] = substr($_SERVER['PHP_SELF'], 1);
+      if (isset($_SERVER['QUERY_STRING'])) {
+        $_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
+      }
+    }
+  }
+
+  /**
+   * Generates DOCTYPE and Page Title for HTML5
+   *
+   * Title: {$PageTitle} - {$AppTitle}; AppTitle is Defined in Database
+   * Config.inc.php
+   * @param string $PageTitle Title of the page
+   */
+  public static function Html5Header($PageTitle = 'Paschim Medinipur') {
+    $AppTitle = AppTitle;
+    header('Content-type: text/html; charset=utf-8');
+    header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Expires: 0');
+    header('Pragma: no-cache');
+    echo '<!DOCTYPE html>';
+    echo '<html xmlns="http://www.w3.org/1999/xhtml">';
+    echo '<head>';
+    echo '<title>' . $PageTitle . ' - ' . $AppTitle . '</title>';
+    echo '<noscript><meta http-equiv="refresh" content="0;url=https://www.enable-javascript.com/"></noscript>';
+    echo '<meta name="robots" content="noarchive,noodp">';
+    echo '<meta name=viewport content="width=device-width, initial-scale=1">';
+
+    //echo '<script src="' . $_SESSION['BaseURL'] . 'js/modernizr-latest.js"'
+    //.' type="text/javascript"></script>';
   }
 
   /**
@@ -269,6 +323,10 @@ class WebLib {
     }
   }
 
+  /*
+   * Shows the content of $_SESSION['Msg']
+   */
+
   /**
    * Returns a random string of specified length
    *
@@ -280,8 +338,8 @@ class WebLib {
     $size  = strlen($chars);
     $str   = '';
     for ($i = 0; $i < $length; $i++) {
-      $Chr = $chars[rand(0, $size - 1)];
-      $str .= $Chr;
+      $Chr   = $chars[rand(0, $size - 1)];
+      $str   .= $Chr;
       $chars = str_replace($Chr, '', $chars);
       $size  = strlen($chars);
     }
@@ -315,20 +373,16 @@ class WebLib {
     return $PostData;
   }
 
-  /*
-   * Shows the content of $_SESSION['Msg']
-   */
-
   public static function ShowMsg() {
     if (self::GetVal($_SESSION, 'Msg') != '') {
-      echo '<span class="Message">' . self::GetVal($_SESSION, 'Msg', false,
-          false) . '</span><br/>';
+      echo '<span class="Message">' . self::GetVal($_SESSION, 'Msg', false, false) . '</span><br/>';
       $_SESSION['Msg'] = '';
     }
   }
 
   /**
-   * Displays Page Informations and Records Visit Count in MySQL_Pre.Visits table
+   * Displays Page Informations and Records Visit Count in MySQL_Pre.Visits
+   * table
    * @todo Active User Count to be incorporated with LifeTime Limit
    */
   public static function PageInfo() {
@@ -361,7 +415,7 @@ class WebLib {
     $_SESSION['LifeTime'] = time();
     echo '<strong > Last Updated On:</strong> &nbsp;&nbsp;'
       . date('l d F Y g:i:s A ', filemtime($strfile))
-      . ' IST &nbsp;&nbsp;&nbsp;<b>Your IP: </b>' . $_SERVER['REMOTE_ADDR']
+      . ' IST &nbsp;&nbsp;&nbsp;<b>Your IP: </b>' . self::GetVal($_SERVER, 'REMOTE_ADDR')
       . '&nbsp;&nbsp;&nbsp;<b>Visits:</b>&nbsp;&nbsp;' . $VisitorNum
       . '&nbsp;&nbsp;&nbsp;<span id="ED"><b>Loaded In:</b> '
       . round(microtime(true) - self::GetVal($_SESSION, 'ET'), 3) . ' Sec</span>';
@@ -369,16 +423,14 @@ class WebLib {
   }
 
   /**
-   * Shows Static Footer Information and Records Execution Duration with Visitor Logs
+   * Shows Static Footer Information and Records Execution Duration with
+   * Visitor Logs
    */
   public static function FooterInfo() {
     echo 'Designed and Developed By '
       . '<strong>National Informatics Centre</strong>, '
-      . 'Paschim Medinipur District Centre<br/>'
-      . 'L. A. Building (2nd floor), Collectorate Compound, Midnapore<br/>'
-      . 'West Bengal - 721101 , India Phone : +91-3222-263506, '
-      . 'Email: wbmdp(a)gov.in<br/>';
-    echo $_SESSION['Version'];
+      . 'Paschim Medinipur District Centre<br/>';
+    echo APPS_Version;
     $_SESSION['ED']            = round(microtime(true) - self::GetVal($_SESSION,
         'ET'), 3);
     $reg                       = new MySQLiDBHelper();
@@ -394,16 +446,7 @@ class WebLib {
     $reg->insert(MySQL_Pre . 'VisitorLogs', $VisitLogData);
     unset($reg);
     $_SESSION['ED'] = 0;
-  }
-
-  /**
-   * Returns SQL Query of the specified object
-   *
-   * @param string $TableName
-   * @return string SQL Query for the requested object
-   */
-  private static function GetTableDefs($TableName) {
-    return SQLDefs($TableName);
+    self::IncludeJS('js/BurstCache.js');
   }
 
   /**
@@ -413,81 +456,6 @@ class WebLib {
   public static function CreateDB() {
     if (NeedsDB) {
       CreateSchemas();
-    }
-  }
-
-  /**
-   * Checks if the current session is Valid
-   *
-   * @return string <b>(Browsing|LogOut|TimeOut|INVALID SESSION|Valid)</b>
-   */
-  public static function CheckAuth() {
-    $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug') . 'CheckAuth';
-    $ScriptURL         = str_replace(self::GetVal($_SESSION, 'BaseDIR'), '',
-      $_SERVER['SCRIPT_NAME']);
-    if ((self::GetVal($_SESSION, 'UserMapID') === null)) {
-      return 'Browsing';
-    }
-    if (self::GetVal($_REQUEST, 'LogOut')) {
-      return 'LogOut';
-    } else {
-      if (self::GetVal($_SESSION, 'LifeTime') < (time() - (LifeTime * 60))) {
-        return 'TimeOut(' . time() . '-'
-        . self::GetVal($_SESSION, 'LifeTime') . '='
-        . (time() - self::GetVal($_SESSION, 'LifeTime')) . ' Sec)';
-      } else {
-        if (self::GetVal($_SESSION, 'SESSION_TOKEN') !=
-          self::GetVal($_COOKIE, 'SESSION_TOKEN')
-        ) {
-          $_SESSION['Debug'] = '(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
-            . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN') . ')';
-
-          return 'INVALID SESSION TOKEN ('
-          . self::GetVal($_SESSION, 'SESSION_TOKEN')
-          . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN') . ')';
-        } elseif (self::GetVal($_SESSION, 'ID') !== session_id()) {
-          $_SESSION['Debug'] = '(' . self::GetVal($_SESSION, 'ID')
-            . ' = ' . session_id() . ')';
-
-          return 'INVALID SESSION ID (' . self::GetVal($_SESSION, 'ID')
-          . ' = ' . session_id() . ')';
-        } elseif (self::IsAllowed($ScriptURL) === false) {
-          return 'Restricted!';
-        } elseif (self::GetVal($_SESSION, 'AppKey') !== AppKey) {
-          return 'Invalid AppKey(' . self::GetVal($_SESSION, 'AppKey')
-          . '-' . AppKey . ')!';
-        } elseif (self::GetVal($_SESSION, 'UserMapID') !== null) {
-          return 'Valid';
-        }
-      }
-    }
-  }
-
-  /**
-   * Initiates an UnAuthenticated Session
-   *
-   */
-  public static function InitSess() {
-    if (!isset($_SESSION)) {
-      session_start();
-      date_default_timezone_set('Asia/Kolkata');
-    }
-    if (self::GetVal($_SESSION, 'BaseDIR') === null) {
-      header("HTTP/1.1 404 Not Found");
-      exit();
-    }
-    self::SetURI();
-    $sess_id           = md5(microtime());
-    $_SESSION['ET']    = microtime(true);
-    $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
-      . 'InInitPage(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
-      . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN', true) . ')';
-    setcookie('SESSION_TOKEN', $sess_id, (time() + (LifeTime * 60)),
-      $_SESSION['BaseDIR']);
-    $_SESSION['SESSION_TOKEN'] = $sess_id;
-    $_SESSION['LifeTime']      = time();
-    if (self::GetVal($_REQUEST, 'show_src') === 'me') {
-      show_source($_SERVER['SCRIPT_FILENAME']);
     }
   }
 
@@ -514,7 +482,7 @@ class WebLib {
       $LogData['IP']        = $_SERVER['REMOTE_ADDR'];
       $LogData['Referrer']  = self::GetVal($_SERVER, 'HTTP_REFERER', true);
       $LogData['UserAgent'] = $_SERVER['HTTP_USER_AGENT'];
-      $LogData['UserID']    = self::GetVal($_SESSION, 'UserMapID');
+      $LogData['UserMapID'] = self::GetVal($_SESSION, 'UserMapID');
       $LogData['URL']       = $_SERVER['PHP_SELF'];
       $LogData['Action']    = $SessRet . ' (' . $_SERVER['SCRIPT_NAME'] . ')';
       $LogData['Method']    = $_SERVER['REQUEST_METHOD'];
@@ -543,16 +511,54 @@ class WebLib {
         $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug')
           . 'SESSION_TOKEN-Valid';
         $sess_id           = md5(microtime());
-        setcookie('SESSION_TOKEN', $sess_id, (time() + (LifeTime * 60)),
-          $_SESSION['BaseDIR']);
+        setcookie('SESSION_TOKEN', $sess_id, 0,
+          $_SESSION['BaseDIR'], $_SERVER['SERVER_NAME'], false, true);
         $_SESSION['SESSION_TOKEN'] = $sess_id;
         $_SESSION['LifeTime']      = time();
       }
     }
-    if (self::GetVal($_REQUEST, 'show_src') !== null) {
-      if ($_REQUEST['show_src'] == 'me') {
-        $ScriptName = $_SERVER['PHP_SELF'];
-        show_source(substr($ScriptName, 1, strlen($ScriptName)));
+  }
+
+  /**
+   * Checks if the current session is Valid
+   *
+   * @return string <b>(Browsing|LogOut|TimeOut|INVALID SESSION|Valid)</b>
+   */
+  public static function CheckAuth() {
+    $_SESSION['Debug'] = self::GetVal($_SESSION, 'Debug') . 'CheckAuth';
+    $ScriptURL         = str_replace(self::GetVal($_SESSION, 'BaseDIR'), '',
+      $_SERVER['SCRIPT_NAME']);
+    if ((self::GetVal($_SESSION, 'UserMapID') === null)) {
+      return 'Browsing';
+    }
+    if (self::GetVal($_REQUEST, 'LogOut')) {
+      return 'LogOut';
+    } else {
+      if (self::GetVal($_SESSION, 'LifeTime') < (time() - (LifeTime * 60))) {
+        return 'TimeOut(' . time() . '-'
+          . self::GetVal($_SESSION, 'LifeTime') . '='
+          . (time() - self::GetVal($_SESSION, 'LifeTime')) . ' Sec)';
+      } else {
+        if (self::GetVal($_SESSION, 'SESSION_TOKEN') !=
+          self::GetVal($_COOKIE, 'SESSION_TOKEN')
+        ) {
+          $_SESSION['Debug'] = '(' . self::GetVal($_SESSION, 'SESSION_TOKEN')
+            . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN') . ')';
+
+          return 'INVALID SESSION TOKEN ('
+            . self::GetVal($_SESSION, 'SESSION_TOKEN')
+            . ' = ' . self::GetVal($_COOKIE, 'SESSION_TOKEN') . ')';
+        } elseif (self::GetVal($_SESSION, 'ID') !== session_id()) {
+          $_SESSION['Debug'] = '(Invalid Session ID)';
+          return 'INVALID SESSION ID';
+        } elseif (self::IsAllowed($ScriptURL) === false) {
+          return 'Restricted!';
+        } elseif (self::GetVal($_SESSION, 'AppKey') !== AppKey) {
+          return 'Invalid AppKey(' . self::GetVal($_SESSION, 'AppKey')
+            . '-' . AppKey . ')!';
+        } elseif (self::GetVal($_SESSION, 'UserMapID') !== null) {
+          return 'Valid';
+        }
       }
     }
   }
@@ -603,9 +609,10 @@ class WebLib {
       array(new FilterSame('AppID', $AppID), 'IsSame'));
     foreach ($MenuItems as $MenuItem) {
       if (self::IsAllowed($MenuItem['URL'])) {
-        echo self::ShowMenuitem($MenuItem['Caption'], $MenuItem['URL']);
+        echo self::ShowMenuitem(self::GetVal($MenuItem, 'Caption'), self::GetVal($MenuItem, 'URL'));
       }
     }
+    echo '<li class="Menuitems" style="float:right;">' . WebLib::GetVal($_SESSION, 'UserName') . '</li>';
     echo '</ul></div>';
   }
 
@@ -615,9 +622,9 @@ class WebLib {
     $Class        = ($IsSameScript) ? 'SelMenuitems' : 'Menuitems';
 
     return '<li class = "' . $Class . '">'
-    . '<a href = "' . $_SESSION['BaseURL'] . $URL . '">'
-    . $Caption . '</a>'
-    . '</li>';
+      . '<a href = "' . $_SESSION['BaseURL'] . $URL . '">'
+      . $Caption . '</a>'
+      . '</li>';
   }
 
   /**
@@ -635,7 +642,7 @@ class WebLib {
       'database_pass'   => MySQL_Pass,
       'database_name'   => MySQL_DB,
       'database_table'  => MySQL_Pre . 'CaptchaCodes',
-      'captcha_type'    => Securimage::SI_CAPTCHA_MATHEMATIC,
+      'captcha_type'    => Securimage::SI_CAPTCHA_STRING,
       'no_session'      => true
     );
     if ($ShowImage) {
@@ -645,8 +652,8 @@ class WebLib {
         . '<img id="siimage"'
         . ' src="ShowCaptcha.php?captchaId=' . $captchaId . '"'
         . ' alt="captcha image" />'
-        . '<input class="form-TxtInput" placeholder="Solve the math above" '
-        . 'type="text" name="captcha_code" value="" required />';
+        . '<input class="form-TxtInput" placeholder="Type the image code" '
+        . 'type="text" name="captcha_code" value="" autocomplete="off" required />';
       echo $Captcha;
     } else {
       $captcha_code = self::GetVal($_POST, 'captcha_code');
@@ -732,8 +739,8 @@ class WebLib {
   /**
    * Returns the leafnodes of a subtree from a given node
    *
-   * @todo Searches the whole tree every time,
-   * @todo tree should be reduced to subtrees filtering by parents
+   * @todo  Searches the whole tree every time,
+   * @todo  tree should be reduced to subtrees filtering by parents
    *
    * @param (ref) array $Tree[](P,C);
    * @param int $Node (P)
@@ -751,19 +758,6 @@ class WebLib {
     }
     if ($Leaf === true) {
       $LeafNodes .= $Node . ',';
-    }
-  }
-
-  /**
-   * Sets the REQUEST_URI if not set
-   */
-  public static function SetURI() {
-    $_SESSION['ET'] = microtime(true);
-    if (!isset($_SERVER['REQUEST_URI'])) {
-      $_SERVER['REQUEST_URI'] = substr($_SERVER['PHP_SELF'], 1);
-      if (isset($_SERVER['QUERY_STRING'])) {
-        $_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
-      }
     }
   }
 
@@ -786,18 +780,19 @@ class WebLib {
     }
     if (self::GetVal($_SESSION, 'BaseDIR') === null) {
       $_SESSION['AppROOT'] = __DIR__ . '/';
-      $_SESSION['BaseDIR'] = substr($_SERVER['SCRIPT_NAME'], 0,
-        strlen($_SERVER['SCRIPT_NAME']) - $PageLength);
+      $_SESSION['BaseDIR'] = substr(self::GetVal($_SERVER, 'SCRIPT_NAME'), 0,
+        strlen(self::GetVal($_SERVER, 'SCRIPT_NAME')) - $PageLength);
       $Proto               = (self::GetVal($_SERVER, 'HTTPS') === 'on') ? 'https://' : 'http://';
-      $_SESSION['BaseURL'] = $Proto . $_SERVER['HTTP_HOST'] . $_SESSION['BaseDIR'];
+      $_SESSION['BaseURL'] = $Proto . self::GetVal($_SERVER, 'SERVER_NAME') . $_SESSION['BaseDIR'];
       $_SESSION['AppKey']  = AppKey;
-      //self::DeployInfo();
-      $_SESSION['Version'] = 'v1.1-314-g6debe48 20150207';
+      //self::DeployInfo(); //
+      $_SESSION['Version'] = 'NIC/CSD/IA/11911 Level:01 20170405 {SCA_11911-4-gcae9423 20170406}';
     }
   }
 
   /**
-   * Restricts Access to the script from Specified IP Addresses in IntraNIC Table
+   * Restricts Access to the script from Specified IP Addresses in IntraNIC
+   * Table
    */
   public static function IntraNIC() {
     $Data = new MySQLiDBHelper(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
@@ -815,12 +810,12 @@ class WebLib {
   /**
    * Displays a HTML Combo filled with options specified by $txt & $val
    *
-   * @param string $val Name of the Field which will be used as value
-   * @param string $txt Name of the Field which will be shown in options
-   * @param string $query Should select the $val & $txt fields
+   * @param string $val     Name of the Field which will be used as value
+   * @param string $txt     Name of the Field which will be shown in options
+   * @param string $query   Should select the $val & $txt fields
    * @param string $sel_val Value of the Option to be selected
    * @example Output: <option value="$row[$val]"> $row[$txt] < /option>;
-   * htmlspecialchars() applied to all the values
+   *                        htmlspecialchars() applied to all the values
    */
   public static function showSelect($val, $txt, $query, $sel_val = "") {
     $DB   = new MySQLiDBHelper();
@@ -832,8 +827,8 @@ class WebLib {
       } else {
         $sel = "";
       }
-      echo '<option value="' . htmlspecialchars($Row[$val])
-        . '"' . $sel . '>' . htmlspecialchars($Row[$txt]) . '</option>';
+      echo '<option value="' . htmlentities($Row[$val])
+        . '"' . $sel . '>' . htmlentities($Row[$txt]) . '</option>';
     }
     unset($DB);
     unset($Rows);
@@ -854,19 +849,33 @@ class WebLib {
       if ($Header) {
         echo '<th>Sl No.</th>';
         foreach ($Row as $Field => $Value) {
-          echo '<th>' . $Field . '</th>';
+          echo '<th>' . htmlentities($Field) . '</th>';
         }
       }
       $Header = false;
       echo "\t<tr>\n<td>" . $i . "</td>";
 
       foreach ($Row as $Value) {
-        echo "\t\t<td>" . $Value . "</td>\n";
+        echo "\t\t<td>" . htmlentities($Value) . "</td>\n";
       }
       echo "\t</tr>\n";
       $i++;
     }
+
+    if ($i == 1) {
+      echo '<th>No Data available!</th>';
+    }
     echo "</table>\n";
+  }
+
+  /**
+   * Returns SQL Query of the specified object
+   *
+   * @param string $TableName
+   * @return string SQL Query for the requested object
+   */
+  private static function GetTableDefs($TableName) {
+    return SQLDefs($TableName);
   }
 }
 

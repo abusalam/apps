@@ -9,7 +9,7 @@ class ATRG_PDF extends PDF {
   public $rh;
   public $colw;
   public $cols;
-  public $fh           = 3.5;
+  public $fh = 3.5;
   private $PrintHeader = true;
 
   function ATRG_PDF() {
@@ -40,7 +40,7 @@ class ATRG_PDF extends PDF {
       //Line break
       //$this->Ln();
       $this->PreHeader();
-      $i   = 0;
+      $i = 0;
       $this->SetFont('Arial', 'B', 9);
       $this->SetLineWidth(0.3);
       $this->SetColW($this->cols[1]);
@@ -53,20 +53,17 @@ class ATRG_PDF extends PDF {
     }
   }
 
-  function Footer() {
-    //Position at 1.5 cm from bottom
-    $this->PreFooter();
-    //Text color in gray
-    $this->SetTextColor(128);
-    $this->SetFont('Arial', '', 7);
-    $this->Cell(0, 0, date("d/m/Y g:i:s A", time() + (15 * 60)), 0, 1, 'L');
-    $this->Cell(0, 0,
-                "Designed and Developed By National Informatics Centre, Paschim Medinipur",
-                0, 1, 'C');
-    //Arial italic 8
-    $this->SetFont('Arial', 'I', 7);
-    //Page number
-    $this->Cell(0, 0, 'Page: ' . $this->PageNo() . ' of {nb}', 0, 1, 'R');
+  function PreHeader() {
+    $this->SetAutoPageBreak(true, 20);
+    $this->SetFont('Arial', 'B', 13);
+    $this->SetTextColor(0);
+    $this->Cell(0, 6, "Attendance Register", 0, 1, "C");
+    $this->SetFont('Arial', 'B', 12);
+    $this->Cell(0, 5, "", 0, 1, "C");
+    $this->Cell(0, 0, "Name: $this->author", 0, 1, "L");
+    $this->Cell(0, 0, "Month: $this->title", 0, 1, "R");
+    $this->SetFont('Arial', 'B', 8);
+    $this->Cell(0, 5, $_SESSION['PDFName'], 0, 1, "C");
   }
 
   function SetColW($cols) {
@@ -94,26 +91,51 @@ class ATRG_PDF extends PDF {
       $oy = $oy + (($h - ($r * $this->fh)) / 2);
 
       do {
-        $j  = strpos($s, '|');
-        $j  = empty($j) ? strlen($s) : $j;
+        $j = strpos($s, '|');
+        $j = empty($j) ? strlen($s) : $j;
         $this->SetXY($ox, $oy);
         $this->SetDrawColor(255, 0, 0);
-        if (($j > 0) || (strlen($s) > 0))
+        if (($j > 0) || (strlen($s) > 0)) {
           $this->Cell($w, $this->fh, str_replace("|", ", ", substr($s, 0, $j)),
-                                                                   0, 0, $align);
-        $oy+=$this->fh;
+            0, 0, $align);
+        }
+        $oy += $this->fh;
         $i  = $j;
-        if (strlen(substr($s, 0, $j)) > 0)
-          $s  = substr($s, $j + 1, $nb - $j);
+        if (strlen(substr($s, 0, $j)) > 0) {
+          $s = substr($s, $j + 1, $nb - $j);
+        }
         $nb = strlen($s);
-      }while ($j);
+      } while ($j);
       $this->SetXY($x, $y);
       $this->SetDrawColor(0);
       $this->SetTextColor(255, 255, 255);
       $this->Cell($w, $h, '', $b, 0, $align);
       $this->SetTextColor(0);
-    } else
+    } else {
       $this->Cell($w, $h, str_replace("|", ", ", $s), $b, 0, $align);
+    }
+  }
+
+  function Footer() {
+    //Position at 1.5 cm from bottom
+    $this->PreFooter();
+    //Text color in gray
+    $this->SetTextColor(128);
+    $this->SetFont('Arial', '', 7);
+    $this->Cell(0, 0, date("d/m/Y g:i:s A", time() + (15 * 60)), 0, 1, 'L');
+    $this->Cell(0, 0,
+      "Designed and Developed By National Informatics Centre, Paschim Medinipur",
+      0, 1, 'C');
+    //Arial italic 8
+    $this->SetFont('Arial', 'I', 7);
+    //Page number
+    $this->Cell(0, 0, 'Page: ' . $this->PageNo() . ' of {nb}', 0, 1, 'R');
+  }
+
+  function PreFooter() {
+    $this->SetFont('Arial', '', 8);
+    $this->SetTextColor(0);
+    $this->SetY(-4);
   }
 
   function Details($Query,
@@ -124,8 +146,8 @@ class ATRG_PDF extends PDF {
     $this->SetLineWidth($lw);
     $Data = new MySQLiDB();
     $Data->do_sel_query($Query);
-    $c    = 1;
-    while ($row  = $Data->get_n_row()) {
+    $c = 1;
+    while ($row = $Data->get_n_row()) {
       $i     = 0;
       $row   = $this->SplitLn($row);
       $h     = ($this->maxln * $this->fh) + 6;
@@ -153,25 +175,6 @@ class ATRG_PDF extends PDF {
     unset($Data);
     //$this->Write(0,$Query);
     //$this->Ln();
-  }
-
-  function PreHeader() {
-    $this->SetAutoPageBreak(true, 20);
-    $this->SetFont('Arial', 'B', 13);
-    $this->SetTextColor(0);
-    $this->Cell(0, 6, "Attendance Register", 0, 1, "C");
-    $this->SetFont('Arial', 'B', 12);
-    $this->Cell(0, 5, "", 0, 1, "C");
-    $this->Cell(0, 0, "Name: $this->author", 0, 1, "L");
-    $this->Cell(0, 0, "Month: $this->title", 0, 1, "R");
-    $this->SetFont('Arial', 'B', 8);
-    $this->Cell(0, 5, $_SESSION['PDFName'], 0, 1, "C");
-  }
-
-  function PreFooter() {
-    $this->SetFont('Arial', '', 8);
-    $this->SetTextColor(0);
-    $this->SetY(-4);
   }
 
 }
